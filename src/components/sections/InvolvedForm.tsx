@@ -540,24 +540,6 @@ function ContactForm({
               : ''}
         </p>
 
-        <SubmitButton variant="accent" size="lg" busy={busy}>
-          {phase === 'sending' ? (
-            FORM.status.sending
-          ) : phase === 'sent' ? (
-            FORM.status.sent
-          ) : (
-            /* Three labels, one shown at a time by the same `:has()` rules that
-               switch the branches. CSS, so it survives with the bundle off. */
-            PURPOSES.map((purpose) => (
-              <span
-                key={purpose.id}
-                className={`form__submit-label form__submit-label--${branchKey(purpose.id)}`}
-              >
-                {purpose.submitLabel}
-              </span>
-            ))
-          )}
-        </SubmitButton>
         {turnstileSiteKey === null ? null : (
           /*
            * Cloudflare Turnstile. The widget writes a `cf-turnstile-response`
@@ -580,6 +562,25 @@ function ContactForm({
             ) : null}
           </>
         )}
+
+        <SubmitButton variant="accent" size="lg" busy={busy}>
+          {phase === 'sending' ? (
+            FORM.status.sending
+          ) : phase === 'sent' ? (
+            FORM.status.sent
+          ) : (
+            /* Three labels, one shown at a time by the same `:has()` rules that
+               switch the branches. CSS, so it survives with the bundle off. */
+            PURPOSES.map((purpose) => (
+              <span
+                key={purpose.id}
+                className={`form__submit-label form__submit-label--${branchKey(purpose.id)}`}
+              >
+                {purpose.submitLabel}
+              </span>
+            ))
+          )}
+        </SubmitButton>
         <p className="note">{FORM.privacy}</p>
         <DonateRow />
       </form>
