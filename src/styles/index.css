@@ -1,0 +1,13 @@
+/*
+ * Single stylesheet entry. Order matters: tokens define the custom properties
+ * everything else reads, base sets element defaults, then components, then the
+ * section layouts that compose them.
+ *
+ * scripts/prerender.mjs throws if Vite emits more than one CSS file, so keep
+ * every stylesheet reachable from here.
+ */
+@import './tokens.css';
+@import './base.css';
+@import './components.css';
+@import './layout.css';
+@import './sections.css';

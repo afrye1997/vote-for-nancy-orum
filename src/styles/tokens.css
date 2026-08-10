@@ -1,0 +1,192 @@
+/*
+ * Design tokens, vendored verbatim from the Bella Vista Campaign design system
+ * (claude.ai/design project 49f5002f, bundle 09521ca7) on 2026-08-09.
+ *
+ * Vendored rather than linked so the build has no runtime dependency on the
+ * design project. When the design system changes, re-copy this file — do not
+ * hand-edit individual values here, or the next sync silently reverts them.
+ *
+ * Source files: tokens/colors.css, tokens/typography.css, tokens/spacing.css,
+ * tokens/effects.css. Fonts are loaded by the document head (see prerender.mjs)
+ * rather than through @import, which would block rendering on a third-party
+ * round trip discovered only after this stylesheet had already downloaded.
+ *
+ * Values under "site additions" are NOT from the design system. They exist
+ * because the mockup hardcoded them inline; they are named here so a colour
+ * appears exactly once.
+ */
+:root {
+  /* Fresh civic — sampled from the official logo (green→blue gradient, navy, white) */
+  --green-700: #2e8312;
+  --green-600: #3da21c;
+  --green-500: #52b52e;
+  --green-300: #9bd97d;
+  --green-100: #e7f5dc;
+  --lime-300: #a9e284;
+  --blue-700: #0a3ea7;
+  --blue-600: #1155d6;
+  --blue-500: #2d6fe8;
+  --blue-300: #8fb4f3;
+  --blue-100: #e3edfc;
+  --navy-900: #12235b;
+  --navy-700: #25397f;
+  --slate-700: #3c4c74;
+  --slate-600: #56688a;
+  --slate-400: #9daecb;
+  --frost-50: #f6f9fd;
+  --frost-100: #ecf2fa;
+  --frost-200: #dce6f2;
+  --grad-brand: linear-gradient(115deg, #3da21c, #1155d6);
+
+  /* semantic aliases */
+  --brand-primary: var(--blue-600);
+  --brand-primary-hover: var(--blue-700);
+  --brand-accent: var(--green-600);
+  --brand-support: var(--navy-900);
+  --surface-page: var(--frost-50);
+  --surface-card: #ffffff;
+  --surface-tint: var(--frost-100);
+  --surface-inverse: var(--navy-900);
+  --text-body: var(--navy-900);
+  --text-muted: var(--slate-600);
+  --text-inverse: #ffffff;
+  --text-on-primary: #ffffff;
+  --border-soft: var(--frost-200);
+  --border-strong: var(--slate-400);
+  --link: var(--blue-600);
+  --link-hover: var(--blue-700);
+  --success: var(--green-600);
+  --warning: #e8a013;
+  --danger: var(--navy-700);
+  --focus-ring: var(--green-500);
+
+  /* typography */
+  --font-display: 'Big Caslon', 'Libre Caslon Display', Didot, serif;
+  --font-body: 'Figtree', system-ui, sans-serif;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 36px;
+  --text-4xl: 48px;
+  --text-5xl: 64px;
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
+  --leading-body: 1.6;
+  --tracking-wide: 0.08em;
+  --weight-body: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-display: 400;
+
+  /* spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+  --container-max: 1120px;
+
+  /* effects */
+  --shadow-card: 0 1px 2px rgba(18, 35, 91, 0.06), 0 4px 14px rgba(18, 35, 91, 0.08);
+  --shadow-raised: 0 2px 4px rgba(18, 35, 91, 0.08), 0 12px 32px rgba(18, 35, 91, 0.14);
+  --shadow-inset: inset 0 1px 2px rgba(18, 35, 91, 0.08);
+  --ease-organic: cubic-bezier(0.22, 0.8, 0.36, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 400ms;
+
+  /* ── site additions ─────────────────────────────────────────────────────── */
+
+  /*
+   * The mockup's call-to-action band is #3D54B0, not --brand-primary. It is a
+   * deliberately softer blue behind large display type; keeping it as its own
+   * token records that the difference is intentional.
+   */
+  --cta-band: #3d54b0;
+  /*
+   * Scrims over hero photography. Every stop is navy-900 at reduced alpha.
+   * `npm run contrast` measures each one against the brightest possible
+   * photograph — the scrim composited over pure white — at the LIGHTEST alpha
+   * its text actually sits on. See the correction note in that file.
+   *
+   * The mockup's stops are 0.08 at 32% and 0.86 at 68%. Rendered at 1440px the
+   * text panel starts at 53% of the width — inside the transition, over roughly
+   * 0.53 alpha, not the 0.86 the stop advertises. On this particular photograph
+   * that lands the white headline on a sunlit sign, and it is unreadable.
+   *
+   * My first contrast audit missed this because it measured the dense stop
+   * rather than the alpha actually behind the text. Moving the ramp earlier
+   * puts the whole panel past it at every width the two-column hero is used.
+   */
+  --scrim-hero: linear-gradient(100deg, rgba(18, 35, 91, 0.08) 32%, rgba(18, 35, 91, 0.86) 68%);
+  /* Below 900px the panel moves to the left, where the diagonal is lightest,
+     so the diagonal is abandoned. 0.78 is the lightest stop the panel touches. */
+  --scrim-hero-narrow: linear-gradient(to top, rgba(18, 35, 91, 0.94), rgba(18, 35, 91, 0.78));
+  /*
+   * The header sits over photography with nothing behind it. On the Get
+   * involved hero that is a bright yellow carnival board, and the navigation
+   * disappears into it. This band is dense across the navigation's own strip
+   * and gone by the bottom of the header. The links are 17px semibold — not
+   * large text — so they need 4.5, and 0.70 gets them to 4.85 over a white
+   * photograph. It is masked away from the logo; see layout.css.
+   */
+  --scrim-header: linear-gradient(
+    to bottom,
+    rgba(18, 35, 91, 0.78) 0%,
+    rgba(18, 35, 91, 0.7) 46%,
+    rgba(18, 35, 91, 0) 100%
+  );
+  --scrim-band: linear-gradient(
+    to top,
+    rgba(18, 35, 91, 0.78) 0%,
+    rgba(18, 35, 91, 0.25) 42%,
+    rgba(18, 35, 91, 0) 65%
+  );
+  --scrim-page-hero: linear-gradient(
+    to top,
+    rgba(18, 35, 91, 0.82) 0%,
+    rgba(18, 35, 91, 0.3) 50%,
+    rgba(18, 35, 91, 0.05) 100%
+  );
+  /*
+   * Three accessibility corrections to design-system colours. Each is the
+   * smallest change that clears the threshold — solved for, not eyeballed, and
+   * re-checked by `npm run contrast`. The originals stay above, untouched, so a
+   * re-sync of the design system does not silently undo these.
+   *
+   * --eyebrow    green-700 measures 4.27:1 on the tinted surface and 4.23:1 on
+   *              the ballot card's pale green. Eyebrows are 13px, so 4.5 is the
+   *              bar. Darkened 3.5% to reach 4.55 and 4.51.
+   * --slate-500  the rail index numbers were slate-400 at 2.25:1 on white.
+   *              They are real content — the commitment's number — not
+   *              decoration, so they need 4.5. This reaches 4.79 and stays
+   *              lighter than the label beside it.
+   * --border-control  input and select borders were slate-400 at 2.25:1. A
+   *              control's boundary is what tells you where to click; 3:1.
+   *              This reaches 3.18.
+   */
+  --eyebrow: #2c7e11;
+  --slate-500: #687386;
+  --border-control: #8391aa;
+
+  /* Gutter and rhythm. One value, so every section lines up. */
+  --gutter: 32px;
+  --section-y: 72px;
+  /* Header is absolutely positioned over the page; pages start below it. */
+  --header-h: 150px;
+}

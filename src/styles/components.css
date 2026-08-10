@@ -1,0 +1,277 @@
+/*
+ * Reusable pieces, ported from the design system's React components
+ * (components/core/*.jsx, components/forms/*.jsx) to CSS classes.
+ *
+ * The originals set every property as an inline style object. That is right for
+ * a design-tool preview and wrong for a shipped page: it defeats caching,
+ * cannot express :hover or :focus-visible, and repeats the same declarations
+ * once per element. The visual result is identical.
+ */
+
+/* ── Button ──────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-organic),
+    border-color var(--dur-fast) var(--ease-organic),
+    color var(--dur-fast) var(--ease-organic),
+    transform var(--dur-fast) var(--ease-organic);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn--sm {
+  padding: 6px 14px;
+  font-size: var(--text-sm);
+}
+
+.btn--lg {
+  padding: 14px 28px;
+  font-size: var(--text-lg);
+}
+
+.btn--primary {
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: var(--text-on-primary);
+}
+
+.btn--primary:hover {
+  background: var(--brand-primary-hover);
+  border-color: var(--brand-primary-hover);
+  color: var(--text-on-primary);
+}
+
+/*
+ * Accent sits at navy-900 on green-600 (8.2:1). The design system's hover state
+ * swaps to white on green-700, which measures 5.1:1 — both pass, so the hover
+ * is kept as authored.
+ */
+.btn--accent {
+  background: var(--brand-accent);
+  border-color: var(--brand-accent);
+  color: var(--navy-900);
+}
+
+.btn--accent:hover {
+  background: var(--green-700);
+  border-color: var(--green-700);
+  color: var(--text-on-primary);
+}
+
+.btn--secondary {
+  background: transparent;
+  border: 1.5px solid var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+.btn--secondary:hover {
+  background: var(--blue-100);
+  color: var(--brand-primary);
+}
+
+.btn--inverse {
+  background: var(--frost-50);
+  border-color: var(--frost-50);
+  color: var(--brand-primary);
+}
+
+.btn--inverse:hover {
+  background: var(--frost-100);
+  color: var(--brand-primary-hover);
+}
+
+.btn[aria-disabled='true'],
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn[aria-disabled='true']:active,
+.btn:disabled:active {
+  transform: none;
+}
+
+/*
+ * Lift-on-hover, applied by the hero to its button row. It wraps the button
+ * rather than living on it because the shadow belongs to the group.
+ */
+.btn-lift {
+  display: inline-flex;
+  border-radius: var(--radius-md);
+  transition:
+    transform var(--dur-base) var(--ease-organic),
+    box-shadow var(--dur-base) var(--ease-organic);
+}
+
+.btn-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(18, 35, 91, 0.35);
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+
+.card {
+  padding: var(--space-6);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card);
+}
+
+.card--tint {
+  background: var(--surface-tint);
+  box-shadow: none;
+}
+
+/* ── Text helpers ────────────────────────────────────────────────────────── */
+
+.eyebrow {
+  font-size: 13px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--eyebrow);
+}
+
+.eyebrow--light {
+  color: var(--lime-300);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  line-height: 1.12;
+  color: var(--navy-900);
+}
+
+.lede {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--slate-700);
+}
+
+.prose p + p {
+  margin-top: var(--space-3);
+}
+
+.note {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/*
+ * A legally-significant value the campaign has not supplied yet. Loud on
+ * purpose — see ENGINEERING.md §6. The build's forbidden-strings scan fails on
+ * the text this wraps, so it can never reach production silently.
+ */
+.placeholder {
+  padding: 0 var(--space-1);
+  background: var(--warning);
+  color: var(--navy-900);
+  font-weight: 700;
+}
+
+/* ── Form fields ─────────────────────────────────────────────────────────── */
+
+.field {
+  display: block;
+  font-family: var(--font-body);
+}
+
+.field__label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--navy-900);
+}
+
+.field__control {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-control);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-body);
+  font-size: var(--text-base);
+  transition:
+    border-color var(--dur-fast),
+    box-shadow var(--dur-fast);
+}
+
+textarea.field__control {
+  resize: vertical;
+}
+
+select.field__control {
+  appearance: none;
+  padding-right: 38px;
+  cursor: pointer;
+  /* The design system draws a ▾ in an absolutely positioned span; an inline
+     background image does the same job without the extra element. */
+  background-image: linear-gradient(45deg, transparent 50%, var(--slate-600) 50%),
+    linear-gradient(135deg, var(--slate-600) 50%, transparent 50%);
+  background-position:
+    calc(100% - 19px) calc(50% + 1px),
+    calc(100% - 14px) calc(50% + 1px);
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+}
+
+.field__control:focus-visible {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px rgba(82, 181, 46, 0.35);
+}
+
+.field__hint {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Checkbox and radio: the native control stays in the layout at 20px, styled
+   with accent-color so it keeps its own focus ring, keyboard behaviour and
+   forced-colors rendering. Reimplementing them out of spans, as the design
+   system does, loses all three. */
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.choice__input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  margin: 0;
+  accent-color: var(--brand-primary);
+  cursor: inherit;
+}

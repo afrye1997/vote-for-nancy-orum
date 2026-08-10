@@ -1,0 +1,315 @@
+/* Page shell: header, footer, call-to-action band, and the shared container. */
+
+/*
+ * 1184px, not 1120px.
+ *
+ * The mockup sets `max-width: var(--container-max); padding: 0 32px` with no
+ * box-sizing reset, so its max-width applies to the content box and the
+ * container is really 1120 + 64. This stylesheet has a border-box reset, which
+ * made every column on every page 64px narrower than the design and rewrapped
+ * every headline. Adding the gutters back is what makes the two line up.
+ */
+.container {
+  max-width: calc(var(--container-max) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.site {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--surface-page);
+}
+
+/*
+ * No page-level fade. The mockup fades `main` in over 1500ms, which is right
+ * for switching tabs inside a single document and wrong for a page load: it
+ * starts every page at opacity 0, so the largest element cannot paint until the
+ * animation has run, and Largest Contentful Paint is measured from when it
+ * does. A 1.5s self-inflicted LCP penalty on every navigation.
+ */
+.site__main {
+  flex: 1;
+}
+
+/*
+ * Pages whose first section is not a full-bleed photo start below the header
+ * instead of underneath it. The hero pages (home, get involved) deliberately
+ * run their artwork up behind it.
+ */
+.site__main--offset {
+  padding-top: calc(var(--header-h) - 30px);
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.site-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 20;
+  background: transparent;
+}
+
+/*
+ * The mockup's header is fully transparent over the artwork, so this one is
+ * too. A scrim was added here at one point to lift the navigation off the Get
+ * involved hero, where it sits on a sunlit carnival board and is genuinely hard
+ * to read — it measured 4.85:1 with the scrim and well under 4.5 without. It
+ * was removed to match the design exactly. That contrast failure is real and is
+ * listed in the handoff notes rather than silently fixed.
+ */
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: var(--header-h);
+  padding-inline: var(--space-6);
+}
+
+.site-header__logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.site-header__logo img {
+  height: 140px;
+  width: auto;
+}
+
+.site-nav {
+  position: relative;
+  top: -22px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 30px;
+}
+
+.site-nav__link {
+  padding-bottom: 3px;
+  border-bottom: 2px solid transparent;
+  font-size: 17px;
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  transition:
+    border-bottom-color var(--dur-base) var(--ease-organic),
+    color var(--dur-base) var(--ease-organic);
+}
+
+.site-nav__link:hover {
+  border-bottom-color: var(--green-600);
+}
+
+/* Over photography the nav is light; over the tinted pages it is navy. */
+.site--dark .site-nav__link {
+  color: var(--frost-100);
+  text-shadow: 0 1px 3px rgba(18, 35, 91, 0.55);
+}
+
+.site--dark .site-nav__link[aria-current='page'] {
+  color: #ffffff;
+  border-bottom-color: var(--lime-300);
+}
+
+.site--light .site-nav__link {
+  color: var(--navy-700);
+}
+
+.site--light .site-nav__link[aria-current='page'] {
+  color: var(--navy-900);
+  border-bottom-color: var(--navy-700);
+}
+
+/* ── Call-to-action band ─────────────────────────────────────────────────── */
+
+.cta-band {
+  background: var(--cta-band);
+}
+
+.cta-band__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding-block: 56px;
+}
+
+.cta-band__title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: 30px;
+  line-height: 1.15;
+  color: #ffffff;
+}
+
+.cta-band__sub {
+  margin-top: var(--space-2);
+  font-size: 17px;
+  color: var(--frost-100);
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.site-footer {
+  background: var(--navy-700);
+}
+
+.site-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding-block: 44px 36px;
+}
+
+.site-footer__sign {
+  width: 250px;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.site-footer__meta {
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  color: var(--frost-200);
+  text-align: right;
+}
+
+.site-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  justify-content: flex-end;
+  margin-bottom: var(--space-3);
+}
+
+.site-footer__meta a {
+  color: var(--frost-100);
+}
+
+.site-footer__nav a {
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.site-footer__nav a:hover {
+  text-decoration: underline;
+}
+
+.site-footer__notice {
+  margin-top: var(--space-2);
+  color: var(--green-300);
+  font-weight: var(--weight-semibold);
+}
+
+.site-footer__social {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+}
+
+.site-footer__social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.site-footer__social a:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+/*
+ * The mockup is a fixed 1120px desktop composition with no breakpoints. Below
+ * roughly 900px the overlaid header stops working — the 140px logo and the nav
+ * cannot share a row, and light nav text ends up over the pale part of the hero
+ * photograph. From here down the header becomes a normal solid block in the
+ * flow, which also removes the need for the top offset on inner pages.
+ */
+@media (max-width: 900px) {
+  :root {
+    --gutter: 20px;
+    --section-y: 48px;
+    --header-h: auto;
+  }
+
+  /*
+   * A light bar, not a navy one.
+   *
+   * Navy was the obvious choice and it made the logo disappear on every page:
+   * the light-page lockup is navy throughout, and the dark-page lockup sets
+   * "ORUM" in navy too — it survives on photography because of its white
+   * outline, not because of its colour. Neither has anywhere to go on a navy
+   * bar. On a light surface the navy lockup reads on both, so the header goes
+   * light and Header.tsx swaps in that file below this width.
+   */
+  .site-header {
+    position: static;
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  /* An opaque surface now, so the masked scrim has nothing left to do. */
+  .site--dark .site-header::before {
+    display: none;
+  }
+
+  .site-header__inner {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-block: var(--space-3);
+  }
+
+  .site-header__logo img {
+    height: 92px;
+  }
+
+  .site-nav {
+    top: 0;
+    justify-content: center;
+    gap: var(--space-5);
+  }
+
+  /* One surface below this width, so one set of link colours. */
+  .site--dark .site-nav__link,
+  .site--light .site-nav__link {
+    color: var(--navy-700);
+    text-shadow: none;
+  }
+
+  .site--dark .site-nav__link[aria-current='page'],
+  .site--light .site-nav__link[aria-current='page'] {
+    color: var(--navy-900);
+    border-bottom-color: var(--navy-700);
+  }
+
+  .site__main--offset {
+    padding-top: 0;
+  }
+
+  .site-footer__inner,
+  .cta-band__inner {
+    justify-content: flex-start;
+  }
+
+  .site-footer__meta {
+    text-align: left;
+  }
+
+  .site-footer__nav,
+  .site-footer__social {
+    justify-content: flex-start;
+  }
+}

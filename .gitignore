@@ -1,0 +1,9 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+
+# Design-project originals: 45 MB of camera files and print masters. The design
+# project is their master copy; run `npm run images` to regenerate public/img/.
+assets/
