@@ -45,6 +45,10 @@ export const BALLOT = {
   mapCaption:
     'Ward 2 is the shaded area. It is where Nancy lives and the seat she is running ' +
     'for — not a limit on who votes in this race. Source: NWARPC, 2022 ward plan.',
+  label: 'Type your street address — we\u2019ll take you to the official lookup.',
+  placeholder: '12 Chelsea Rd, Bella Vista, AR',
+  buttonLabel: 'Check',
+  privacy: 'Never saved or shared — it goes straight to the state\u2019s own tool.',
   lookupCta: 'Check your registration',
   involvedCta: 'Get involved',
   datesHeading: 'Dates worth putting in your phone',
@@ -52,8 +56,9 @@ export const BALLOT = {
 
 /**
  * The three things a visitor might be here to do. `submitLabel` changes with
- * the selection, exactly as in the mockup; the switch is CSS, so it survives
- * with JavaScript off.
+ * the selection, exactly as in the mockup; that switch is CSS, so it survives
+ * with JavaScript off. Which branch of fields is SENT is a second layer — see
+ * the "hidden branch" note at the top of InvolvedForm.tsx.
  */
 export type Purpose = {
   readonly id: string
@@ -113,6 +118,25 @@ export const FORM = {
     hint: 'Nancy answers her own email — you’ll hear back at the address above.',
   },
   privacy: 'We’ll never share your information.',
+  /**
+   * Only reachable once the form has hydrated. With JavaScript off the browser
+   * posts natively and leaves the page, so there is no in-flight state to
+   * describe — which is why none of this has a no-JavaScript counterpart, and
+   * why there is no failure copy: a failed send falls back to that same native
+   * POST rather than explaining itself.
+   *
+   * `sending` and `announcing` differ deliberately. The button's accessible name
+   * is re-read when it changes and the live region reads its own line; identical
+   * wording in both is heard as a stutter.
+   */
+  status: {
+    /** Replaces the three purpose labels on the button while a POST is in flight. */
+    sending: 'Sending…',
+    /** The live region, while a POST is in flight. */
+    announcing: 'Sending your message to the campaign.',
+    /** The live region, between a successful send and the thank-you page. */
+    sent: 'Sent. Taking you to the thank-you page.',
+  },
   /**
    * Rendered in place of the form when no Web3Forms key is configured. A form
    * that silently discards submissions is worse than one that says it is not

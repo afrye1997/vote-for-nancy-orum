@@ -109,6 +109,20 @@
 }
 
 /*
+ * A submit button with a request in flight. It carries aria-disabled so a second
+ * press is announced as a no-op, but it must not inherit the dimming above: at
+ * opacity .55 over the white card the accent label measures 1.93:1, against
+ * §5's 4.5:1. The Donate button can wear that — WCAG exempts an inactive
+ * control and it genuinely is one. This one is working, and its label is the
+ * only thing the visitor wants to read. Must stay after the rules it overrides;
+ * the specificity is identical, so source order is what decides.
+ */
+.btn[data-busy] {
+  opacity: 1;
+  cursor: progress;
+}
+
+/*
  * Lift-on-hover, applied by the hero to its button row. It wraps the button
  * rather than living on it because the shadow belongs to the group.
  */

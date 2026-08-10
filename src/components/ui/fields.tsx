@@ -1,3 +1,5 @@
+import type { ChangeEventHandler } from 'react'
+
 /**
  * Form controls.
  *
@@ -9,6 +11,12 @@
  *
  * Every control has a real `<label>` bound by `htmlFor` (ENGINEERING.md §5) and
  * a `name`, because a native POST sends nothing for an unnamed field.
+ *
+ * `disabled` is the same rule from the other end: a disabled control is left out
+ * of the form data set, by a native POST and by `new FormData(form)` alike.
+ * InvolvedForm uses it to keep a hidden branch's answers out of the campaign's
+ * inbox. It renders as no attribute at all when false, so the prerendered markup
+ * is unchanged for every field that never passes it.
  */
 
 export function TextField({
@@ -18,6 +26,7 @@ export function TextField({
   placeholder,
   type = 'text',
   required = false,
+  disabled = false,
   autoComplete,
 }: {
   readonly id: string
@@ -26,6 +35,7 @@ export function TextField({
   readonly placeholder?: string
   readonly type?: 'text' | 'email'
   readonly required?: boolean
+  readonly disabled?: boolean
   readonly autoComplete?: string
 }) {
   return (
@@ -40,6 +50,7 @@ export function TextField({
         type={type}
         placeholder={placeholder}
         required={required}
+        disabled={disabled}
         autoComplete={autoComplete}
       />
     </div>
@@ -53,6 +64,7 @@ export function TextAreaField({
   placeholder,
   hint,
   rows = 4,
+  disabled = false,
 }: {
   readonly id: string
   readonly name: string
@@ -60,6 +72,7 @@ export function TextAreaField({
   readonly placeholder?: string
   readonly hint?: string
   readonly rows?: number
+  readonly disabled?: boolean
 }) {
   const hintId = `${id}-hint`
   return (
@@ -73,6 +86,7 @@ export function TextAreaField({
         name={name}
         rows={rows}
         placeholder={placeholder}
+        disabled={disabled}
         aria-describedby={hint ? hintId : undefined}
       />
       {hint ? (
@@ -90,19 +104,21 @@ export function SelectField({
   label,
   placeholder,
   options,
+  disabled = false,
 }: {
   readonly id: string
   readonly name: string
   readonly label: string
   readonly placeholder: string
   readonly options: readonly string[]
+  readonly disabled?: boolean
 }) {
   return (
     <div className="field">
       <label className="field__label" htmlFor={id}>
         {label}
       </label>
-      <select className="field__control" id={id} name={name} defaultValue="">
+      <select className="field__control" id={id} name={name} defaultValue="" disabled={disabled}>
         <option value="">{placeholder}</option>
         {options.map((option) => (
           <option key={option} value={option}>
@@ -119,11 +135,13 @@ export function CheckboxField({
   name,
   label,
   defaultChecked = false,
+  disabled = false,
 }: {
   readonly id: string
   readonly name: string
   readonly label: string
   readonly defaultChecked?: boolean
+  readonly disabled?: boolean
 }) {
   return (
     <div>
@@ -135,6 +153,7 @@ export function CheckboxField({
           type="checkbox"
           value="yes"
           defaultChecked={defaultChecked}
+          disabled={disabled}
         />
         {label}
       </label>
@@ -148,12 +167,19 @@ export function RadioField({
   label,
   value,
   defaultChecked = false,
+  onChange,
 }: {
   readonly id: string
   readonly name: string
   readonly label: string
   readonly value: string
   readonly defaultChecked?: boolean
+  /**
+   * Uncontrolled on purpose — `defaultChecked` and no `checked`, so React never
+   * writes back to the DOM after hydration. A caller that needs to know the
+   * selection observes it here and mirrors it; it must not own it.
+   */
+  readonly onChange?: ChangeEventHandler<HTMLInputElement>
 }) {
   return (
     <label className="choice" htmlFor={id}>
@@ -164,6 +190,7 @@ export function RadioField({
         type="radio"
         value={value}
         defaultChecked={defaultChecked}
+        onChange={onChange}
       />
       {label}
     </label>

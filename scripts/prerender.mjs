@@ -217,6 +217,12 @@ const FORBIDDEN = [
   // Unresolved placeholders and dead links
   ['INSERT HERE', 'unresolved legal text'],
   ['href="#"', 'dead link'],
+  // The form's no-JavaScript floor. A `disabled` attribute in the PRERENDERED
+  // html is permanent for a visitor with no bundle: sections.css reveals a
+  // branch on :checked, and a revealed disabled field cannot be typed in.
+  // React may only add `disabled` after hydration. React 19 renders boolean
+  // attributes as `name=""`, and `aria-disabled="true"` does not match.
+  [' disabled=""', 'a field was prerendered disabled — with JavaScript off it can never be filled in'],
 ]
 
 const failures = []

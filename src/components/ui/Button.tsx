@@ -43,12 +43,27 @@ export function LinkButton({
 
 export function SubmitButton({
   children,
+  busy = false,
   ...style
 }: Style & {
   readonly children: ReactNode
+  /**
+   * A submission is in flight. `aria-disabled` rather than `disabled`, for
+   * DisabledButton's reason below and one that only applies here: `disabled` on
+   * the element that currently holds focus drops focus to `<body>`, so someone
+   * who pressed Enter loses their place at the moment they most need telling
+   * what is happening. The attribute does not stop a second activation — the
+   * form's own submit handler does.
+   */
+  readonly busy?: boolean
 }) {
   return (
-    <button className={classes(style)} type="submit">
+    <button
+      className={classes(style)}
+      type="submit"
+      aria-disabled={busy ? 'true' : undefined}
+      data-busy={busy ? '' : undefined}
+    >
       {children}
     </button>
   )
