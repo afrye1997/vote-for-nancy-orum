@@ -159,6 +159,33 @@ export const FORM = {
     /** Shown when the button is pressed before hCaptcha has issued a token. */
     unverified: 'Please finish the security check above, then send.',
     sentAnnouncement: 'Sent. Taking you to the thank-you page.',
+    /**
+     * A send that failed and left the visitor here rather than handing them to
+     * the form service's own error page.
+     *
+     * There are three of these because the three failures want different things
+     * from the visitor, and a single "something went wrong" tells them none of
+     * it: a refusal is worth reading, a dropped connection is worth retrying,
+     * and a service that answers with gibberish is worth escalating. The
+     * campaign's address is in the footer either way, which is why every one of
+     * these ends somewhere other than a dead end.
+     *
+     * `failedRefused` is deliberately followed by the service's own words. They
+     * will not always be graceful, but a visitor who is told "Could not
+     * validate hCaptcha" can act on it, and one told "failed" cannot. It is
+     * also, bluntly, the only error reporting this integration has ever had —
+     * three wrong diagnoses were made from a message that turned out to belong
+     * to a different request entirely.
+     */
+    failedRefused: 'That didn’t send. The form service said:',
+    /** Nothing came back at all — offline, blocked, or timed out. */
+    failedNoAnswer:
+      'That didn’t send — nothing came back from the form service. Check your connection and try again.',
+    /** It answered, but with something that was not a readable result. */
+    failedUnreadable:
+      'That didn’t send, and the form service didn’t say why. Please try again, or email the campaign directly.',
+    /** Appended to all three: the check has been re-armed and needs redoing. */
+    failedRetry: 'Please complete the security check again, then press send.',
   },
   /**
    * Rendered in place of the form when no Web3Forms key is configured. A form

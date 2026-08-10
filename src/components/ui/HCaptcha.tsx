@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useImperativeHandle, useRef, type Ref } from 'react'
 
 /**
  * hCaptcha, rendered explicitly.
@@ -45,6 +45,26 @@ import { useEffect, useRef } from 'react'
  *
  * None of this is a security boundary — a browser can send whatever it likes.
  * The check that matters is Web3Forms verifying the token server-side.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * A TOKEN IS SINGLE-USE AND SHORT-LIVED, SO THE WIDGET MUST BE RE-ARMABLE
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Two ways the token in the form goes stale without the visitor doing anything
+ * wrong, and both used to strand them with no recovery but a page reload:
+ *
+ *   · Spent. Web3Forms redeems the token when it verifies, so the SECOND send
+ *     of one token always fails however good it was. Any failed submit must
+ *     therefore re-arm the widget, or every retry on that page load re-sends a
+ *     token that is already dead — which reads as "the form is broken" when the
+ *     original failure may have been a dropped connection.
+ *   · Expired. hCaptcha ages a token out after roughly two minutes, so someone
+ *     writing a long question can arrive at the send button with nothing valid
+ *     in the form.
+ *
+ * Hence `reset` on the handle, and the expiry callbacks below. hCaptcha clears
+ * its own response field on expiry, so the form's pre-send guard already
+ * catches that case; resetting as well is what makes the widget visibly ask
+ * again instead of sitting there looking solved.
  */
 
 type HCaptchaApi = {
@@ -59,20 +79,60 @@ declare global {
   }
 }
 
-export function HCaptcha({ siteKey }: { readonly siteKey: string }) {
-  const ref = useRef<HTMLDivElement>(null)
+export type HCaptchaHandle = {
+  /** Discard the current token and ask the visitor again. Safe to call anytime. */
+  reset: () => void
+}
+
+/**
+ * Re-arm a widget, if there is one and hCaptcha still recognises it.
+ *
+ * Best-effort by design, and shared by both callers below so neither can get
+ * the guards subtly different. hCaptcha throws on a widget id it no longer
+ * knows — after its script reloads, say — and a form that cannot re-arm its
+ * captcha is still a form; one that threw during an event handler may not be.
+ */
+function resetWidget(widgetId: string | undefined): void {
+  if (widgetId === undefined) return
+  try {
+    window.hcaptcha?.reset?.(widgetId)
+  } catch {
+    /* Nothing to do here: reloading the page still recovers. */
+  }
+}
+
+export function HCaptcha({
+  siteKey,
+  ref,
+}: {
+  readonly siteKey: string
+  /** React 19 passes `ref` as an ordinary prop — no `forwardRef` needed. */
+  readonly ref?: Ref<HCaptchaHandle>
+}) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  /* Outside the effect because the parent reaches for it through the handle,
+     and the effect's closure is not reachable from there. */
+  const widgetRef = useRef<string | undefined>(undefined)
+
+  useImperativeHandle(ref, () => ({ reset: () => resetWidget(widgetRef.current) }), [])
 
   useEffect(() => {
-    let widgetId: string | undefined
     let cancelled = false
     let poll: ReturnType<typeof setInterval> | undefined
 
     const render = () => {
-      const el = ref.current
+      const el = containerRef.current
       if (cancelled || !el || !window.hcaptcha) return
       /* A hot reload can leave the previous iframe behind. */
       el.replaceChildren()
-      widgetId = window.hcaptcha.render(el, { sitekey: siteKey, theme: 'light' })
+      widgetRef.current = window.hcaptcha.render(el, {
+        sitekey: siteKey,
+        theme: 'light',
+        /* Both expiries clear the response field; resetting makes the widget
+           show an unsolved checkbox again rather than a stale solved one. */
+        'expired-callback': () => resetWidget(widgetRef.current),
+        'chalexpired-callback': () => resetWidget(widgetRef.current),
+      })
     }
 
     if (window.hcaptcha) {
@@ -93,12 +153,18 @@ export function HCaptcha({ siteKey }: { readonly siteKey: string }) {
       if (poll) clearInterval(poll)
       /* `remove` is the newer API; `reset` is the one that has always existed.
          Neither is worth crashing an unmount over. */
+      const widgetId = widgetRef.current
       if (widgetId === undefined) return
-      const api = window.hcaptcha
-      if (api?.remove) api.remove(widgetId)
-      else api?.reset?.(widgetId)
+      widgetRef.current = undefined
+      try {
+        const api = window.hcaptcha
+        if (api?.remove) api.remove(widgetId)
+        else api?.reset?.(widgetId)
+      } catch {
+        /* Unmounting anyway. */
+      }
     }
   }, [siteKey])
 
-  return <div ref={ref} />
+  return <div ref={containerRef} />
 }

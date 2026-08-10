@@ -1,132 +1,164 @@
-# Handoff: the captcha, and why it still does not work
+# Handoff: the captcha
 
-Written 2026-08-10 at the end of a long session. Read `HANDOFF.md` first for the
-project as a whole; this covers one unfinished thread.
+Written 2026-08-10; substantially revised later the same day. Read `HANDOFF.md`
+first for the project as a whole; this covers one thread.
 
 **Goal.** Stop bot spam reaching the campaign's Web3Forms inbox, on the free
 plan, without breaking the contact form.
 
-**Status.** Not working. Submissions fail. If the form needs to work before this
-is solved, unset `HCAPTCHA_SITE_KEY` in the Cloudflare build variables and
-trigger a build — the widget and its script vanish, the submit guard goes
-dormant, and the form posts as it did before any of this. The honeypot and
-Web3Forms' own Advanced Spam Filter still run.
+**Status.** Four defects found and fixed, including the one that caused three
+wrong diagnoses in a row. The client behaviour is now verified end to end
+against the real bundle. **It has still never been submitted against the live
+API by a human in a browser, and that is the only thing that can call this
+done.** See "What is left" below.
+
+**Escape hatch, unchanged.** If the form must work before anyone can test it,
+unset `HCAPTCHA_SITE_KEY` in the Cloudflare build variables and trigger a
+build — the widget and its script vanish, the submit guard goes dormant, and
+the form posts as it did before any of this. The honeypot and Web3Forms'
+Advanced Spam Filter still run.
 
 ---
 
-## What was tried, in order
+## The thing that was actually wrong
 
-**1. Cloudflare Turnstile.** Built, deployed, widget rendered. Submitting
-returned:
+**Every error message this thread was diagnosed from belonged to a different
+request than the one that failed.**
 
-> You are trying to use a Pro feature, Please Upgrade to use Turnstile Captcha.
+None of `You are trying to use a Pro feature`, `Could not validate hCaptcha` or
+`Form submission failed!` is a string in this repo — grep for them and you get
+nothing. They are Web3Forms' own error *page*. The visitor only ever reached
+that page because when the `fetch` failed, `fallBackToNativePost` re-submitted
+the form natively, which is a real navigation to `api.web3forms.com`.
 
-Web3Forms verifies Turnstile only on Pro. Dead end on the free plan.
+And that second request could never succeed. `h-captcha-response` is redeemed
+by Web3Forms when it verifies, so the native re-POST always carried a **spent
+token**. It was refused on that ground regardless of what went wrong the first
+time, and the message it produced then got read as the diagnosis of the first
+failure.
 
-**2. hCaptcha with the campaign's own hCaptcha account.** Their pricing page
-lists "hCaptcha Integration" under the free plan, so the code was swapped over
-and an hCaptcha account was created for a site key and secret. Submitting
-returned:
+So: three diagnoses drawn from a message that was, structurally, always going to
+say "rejected" — and the first request's real answer was never seen once. The
+"nobody has looked at the actual HTTP exchange" gap in the original handoff was
+correct, but understated. It was worse than missing data; it was confidently
+wrong data.
 
-> Could not validate hCaptcha. Please try later
+---
 
-**3. hCaptcha with Web3Forms' own site key.** Reading their docs
-(`docs.web3forms.com/getting-started/customizations/spam-protection/hcaptcha`)
-showed that on the free plan **Web3Forms supplies the site key and holds the
-matching secret** — `50b2fe65-b00b-4b9e-ad62-3ba471098be2`. Bringing your own
-pair is a paid feature, so a token minted against the campaign's own site key
-could never verify against Web3Forms' secret. That explained failure 2.
+## What was fixed
 
-Switched to their published key. Now returns:
+**1. The AJAX submission is now JSON, not multipart.** Web3Forms states this as
+a requirement, not a preference:
 
-> Form submission failed!
+> For Javascript usage, you must serialize the data and include `Content-Type`
+> headers as `application/json`
 
-which is the generic message, with no detail. **This is where it stands.**
+Every multipart example in their documentation is for file attachments, which
+this form has none of. The old code sent the `FormData` object directly to skip
+the CORS preflight that `application/json` forces — a saved round trip traded
+against a documented requirement, on a path `HANDOFF.md` itself flags as the
+single unproven assumption in the whole design. It was never once confirmed to
+work. The native POST is untouched and still urlencoded, which is correct: the
+vendor's warning about urlencoded concerns the answer arriving as a redirect,
+and a native navigation *wants* the redirect.
+
+**2. With a captcha on, there is no native fallback at all.** A failure now
+stays on the page, says what happened, re-arms the widget, and lets the visitor
+press send again. The no-response case is not an exception, though it is the
+tempting one: "no response" does not mean "not delivered" — an opaque CORS
+failure looks identical to a request that arrived and was processed — so a
+native retry there risks a dead token *and* a duplicate email, which is exactly
+what the file's existing fallback rule exists to prevent. With no captcha
+configured the original behaviour is untouched, because there it is still right.
+
+**3. The real error is surfaced.** Web3Forms' `message` is read off the response
+and shown, in three distinct shapes: refused (with their words quoted), nothing
+came back, and answered-but-unreadable. Those are three different pieces of
+advice for the visitor, and — bluntly — the only error reporting this
+integration has ever had. The underlying error also goes to `console.error`,
+which is where the next person testing against the live API will find
+`TypeError: Failed to fetch` versus an actual refusal.
+
+**4. The widget is re-armed on every failure, and on expiry.** Tokens are
+single-use and expire in roughly two minutes. Previously the only recovery was a
+full page reload, which no visitor will think to do; they would press send
+twice, see the same error, and leave. `expired-callback` and
+`chalexpired-callback` are now wired too, so someone writing a long message does
+not arrive at the button with a dead token and no visible sign of it.
 
 ---
 
 ## What is verified, and how
 
-Checked against the deployed page, not the local build:
+`scripts/prerender.mjs` output was served, the hCaptcha widget and `fetch` were
+stubbed, and the **real built bundle** was driven in headless Chrome over CDP —
+five scenarios, each from a fresh page load.
 
-- `HCAPTCHA_SITE_KEY` reaches the browser correctly. `page-data` on
-  `/involved/` contains `"hcaptchaSiteKey":"50b2fe65-b00b-4b9e-ad62-3ba471098be2"`.
-- The hCaptcha script is present, loaded with `render=explicit`.
-- `access_key` is present, so `WEB3FORMS_KEY` is still configured.
-- Zero Turnstile references remain.
-- The Cloudflare build picks up dashboard build variables correctly.
+| Scenario | Result |
+|---|---|
+| Server refuses with a message | Stays on page; shows *That didn't send. The form service said: "…"*; widget reset; **0 native submits** |
+| Network failure (`fetch` rejects) | Stays on page; "nothing came back" copy; widget reset; 0 native submits |
+| Answers, but unreadable JSON | Stays on page; "didn't say why" copy; widget reset; 0 native submits |
+| Success | Navigates to `/thanks/` |
+| No token | Blocked before any request — `fetchCount: 0` — "finish the security check above" |
 
-Web3Forms dashboard (screenshot confirmed): Captcha Protection = hCaptcha,
-Advanced Spam Filter on, Spam Protection Level Basic. **There are no custom
-key/secret fields on the free plan**, so there is nothing there to misconfigure.
-"Restrict to Domains" is a Pro feature and is empty.
+In all failing cases: exactly **one** request (no double-send), the response
+field left empty afterwards so the next press hits the guard, and the message
+carried on `role="alert"`.
 
-**Not verified, and this is the gap:** nobody has looked at the actual HTTP
-exchange. Every diagnosis so far came from the message rendered in the UI.
+**Hypothesis 1 from the original handoff is disproved, by measurement.** The
+sent payload keys were:
 
----
+```
+access_key, subject, from_name, Reason, First name, Last name, email,
+Question, h-captcha-response
+```
 
-## Leading hypotheses, most likely first
+`h-captcha-response` survives into the body, non-empty. `dropHiddenBranchFields`
+still works through the JSON conversion — `Question` present, `Drop-off address`
+and `Wants updates` correctly absent for the question branch. `body.delete` was
+never touching the token, because the widget's container is a direct child of
+the form and not inside any `.form__branch--*`.
 
-**1. `h-captcha-response` may not survive into the POST body.**
+Also still true from the original handoff, and re-confirmed: the site key
+`50b2fe65-b00b-4b9e-ad62-3ba471098be2` is Web3Forms' own published free-plan
+key, and bringing your own pair is a paid feature. Their docs explicitly support
+loading `js.hcaptcha.com` directly with it rather than their proxy script, which
+is what this does.
 
-`ContactForm`'s submit path builds `new FormData(form)` and then mutates it —
-`body.delete('redirect')`, plus `dropHiddenBranchFields()` which strips fields
-belonging to unselected radio branches. The hCaptcha token is a hidden
-`<textarea name="h-captcha-response">` that the widget injects into its
-container, and nobody has confirmed it is still in the body at the moment of
-sending.
-
-Note the submit *guard* reads the token from a **separate** `new FormData(form)`
-and passes — so the token exists in the form. That does not prove it exists in
-the body that is actually sent.
-
-**2. Content type.** We send `FormData`, which goes as `multipart/form-data`.
-Web3Forms' AJAX examples use `JSON.stringify` with
-`Content-Type: application/json`. Multipart worked for submissions *before* the
-captcha was added, so it is not broken in general — but their captcha
-validation path may expect JSON. Worth testing a JSON submission.
-
-**3. Token reuse.** hCaptcha tokens are single-use, and the widget is never
-reset after a failed submit, so every retry on the same page load resends a
-dead token. This is definitely a real defect (see below) and may have caused
-some of the observed failures, but it does not explain a failure on a genuinely
-fresh page load.
+**A note for whoever tries to test this from a terminal: you cannot.**
+`api.web3forms.com` sits behind a Cloudflare managed challenge — a plain `curl`
+comes back `HTTP 403` with `cf-mitigated: challenge` and an interstitial page,
+whatever headers you send. This is now measured, not assumed, and it is why
+there is no CI smoke test for the form.
 
 ---
 
-## Do this first
+## What is left
 
-Open DevTools → Network, submit once from a freshly loaded page, and inspect
-the request to `api.web3forms.com/submit`:
+**One human, one browser, one submission.** Everything above establishes that
+the client does the right thing with the right payload shape; none of it proves
+Web3Forms accepts it, because nothing here can reach them.
 
-- **Is `h-captcha-response` in the request payload, and non-empty?**
-  If no → hypothesis 1, and the fix is in how the body is assembled.
-  If yes → the token is being rejected, so try hypothesis 2.
-- **What is in the JSON response body?** Web3Forms returns a `message` field
-  more specific than the UI shows.
+Load `/involved/` fresh, solve the captcha, submit, and:
 
-That single observation splits the remaining possibilities in half. Everything
-before this point was inference from UI strings, which is how three wrong
-diagnoses happened in a row.
+- **If it succeeds** you land on the campaign's own `/thanks/` and the email
+  arrives. Fold the remaining `WEB3FORMS_KEY` checks in `HANDOFF.md` §1 into the
+  same sitting — both branch paths, and the `Reply-To` pass/fail.
+- **If it fails you now get told why, on the page.** Write down the quoted
+  message verbatim; that is the first real evidence this thread has ever had.
+  Open the console too for the underlying error.
 
----
+Two readings worth knowing in advance:
 
-## Defects to fix regardless of the cause
-
-**Surface the real error.** The form renders a generic failure string and
-discards the `message` Web3Forms returns. That is why diagnosis has been so
-slow, and it is bad for visitors too — they get "failed" with no idea whether
-to retry, fix something, or give up. Show what the server said.
-
-**Reset the widget after a failed submit.** Tokens are single-use. After any
-failure the widget must be reset so a retry mints a fresh one; today the only
-recovery is a full page reload, which no visitor will think to do. They will
-press send twice, see the same error, and leave.
-
-**Handle token expiry.** hCaptcha tokens expire after roughly two minutes.
-Someone filling a long form slowly can have a dead token before they ever press
-send. `expired-callback` should clear the stored token and prompt again.
+- *"Could not validate hCaptcha"* — the token is genuinely being rejected. The
+  payload shape is right, so suspect the key pairing or their dashboard state,
+  not this code.
+- *A network error with nothing quoted* — the request never got an answer.
+  Suspect the Cloudflare challenge in front of their API being applied to a
+  cross-origin `fetch`, which no amount of client code can solve. That would
+  make the Worker in `HANDOFF.md` the fix, since a server-to-server POST is not
+  challenged the same way.
 
 ---
 
@@ -134,7 +166,8 @@ send. `expired-callback` should clear the stored token and prompt again.
 
 - `src/components/ui/HCaptcha.tsx` — renders explicitly via
   `window.hcaptcha.render()` from an effect, not via the documented
-  `<div class="h-captcha" data-captcha="true">` auto-scan.
+  `<div class="h-captcha" data-captcha="true">` auto-scan. Exposes a `reset()`
+  handle and wires both expiry callbacks.
 
   **Do not "fix" this back to the documented approach.** The auto-scan races
   hydration and React reconciles away children of a container it rendered
@@ -143,11 +176,15 @@ send. `expired-callback` should clear the stored token and prompt again.
   token manually. The field the server reads is the same either way.
 
 - `src/components/sections/InvolvedForm.tsx` — `ContactForm` holds the phase
-  machine, the abort/timeout handling, `dropHiddenBranchFields()`, and the
-  submit guard that refuses to send with no token.
+  machine, the abort/timeout handling, `dropHiddenBranchFields()`,
+  `toJsonPayload()`, the submit guard, and the failure copy. The docblock
+  explains each; it is long because every paragraph in it is a bug someone
+  already shipped.
 
 - `scripts/prerender.mjs` — reads `HCAPTCHA_SITE_KEY`, emits the script tag when
   set, threads the key through `page-data` to the client.
+
+- `src/content/involved.ts` — `FORM.status.failed*`, the visitor-facing copy.
 
 - Config: `HCAPTCHA_SITE_KEY` is a **build** variable in Cloudflare. Nothing
   goes in the Web3Forms dashboard beyond selecting hCaptcha. The campaign's own
@@ -155,12 +192,12 @@ send. `expired-callback` should clear the stored token and prompt again.
 
 ---
 
-## The larger point
+## The larger point, unchanged
 
-Even solved, this only stops bots that load the page. `WEB3FORMS_KEY` is baked
-into the public HTML, so a bot can POST straight to `api.web3forms.com` and skip
-every client-side check. The Worker specced at the end of `HANDOFF.md` is what
-actually closes that, by moving the access key server-side and verifying the
-captcha before relaying. If this thread stays painful, building that instead is
-the better use of the time — it solves the real problem rather than the visible
-one.
+Even fully working, this only stops bots that load the page. `WEB3FORMS_KEY` is
+baked into the public HTML, so a bot can POST straight to `api.web3forms.com`
+and skip every client-side check. The Worker specced at the end of `HANDOFF.md`
+is what actually closes that, by moving the access key server-side and verifying
+the captcha before relaying. If the browser test above comes back with a network
+error rather than a refusal, build the Worker instead of pushing further here —
+it solves the real problem rather than the visible one.

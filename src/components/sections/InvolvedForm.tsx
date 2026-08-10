@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { SubmitButton } from '../ui/Button'
 import { Photo } from '../ui/Photo'
-import { HCaptcha } from '../ui/HCaptcha'
+import { HCaptcha, type HCaptchaHandle } from '../ui/HCaptcha'
 import { CheckboxField, RadioField, SelectField, TextAreaField, TextField } from '../ui/fields'
 import { DonateRow } from './DonateRow'
 import { FORM, PURPOSES } from '../../content/involved'
@@ -118,13 +118,53 @@ import { href } from '../../content/site'
  * than a button permanently reading "Sending…" — the one dead end a design with
  * no error UI cannot otherwise escape.
  *
- * ⚠ TURNSTILE CHANGES THIS. `h-captcha-response` is single-use, so once the
- * fetch has spent the token the native fallback carries a dead one and
- * Web3Forms will refuse it. The fallback therefore only rescues the no-response
- * case when hCaptcha is on — which is the case it exists for. It also means
- * hCaptcha all but removes the duplicate-delivery risk. hCaptcha needs
- * JavaScript, so switching it on costs the no-JavaScript path entirely; that
- * trade is the campaign's, and it is recorded in HANDOFF.md.
+ * ⚠ hCaptcha REPLACES THAT RULE WITH A SIMPLER ONE: WITH A CAPTCHA ON, THERE IS
+ * NO NATIVE FALLBACK AT ALL. A failure stays on this page, says what happened,
+ * re-arms the widget and lets the visitor press send again.
+ *
+ * The old fallback cannot work here and actively did harm. `h-captcha-response`
+ * is redeemed by Web3Forms when it verifies, so a native re-POST carries a
+ * SPENT token and is refused no matter what went wrong the first time. All it
+ * achieved was to replace this page with the vendor's own generic error page —
+ * which is where every "Form submission failed!" screenshot in
+ * HANDOFF-CAPTCHA.md came from. Three diagnoses in a row were made from the
+ * error message of the WRONG REQUEST: the second one, the one that was doomed.
+ *
+ * Nor does the no-response case rescue it, which is the tempting exception.
+ * "No response" does not mean "not delivered" — an opaque CORS failure or a
+ * lost reply looks identical to a request that arrived and was processed — so a
+ * native retry there risks both a dead token AND a duplicate email, which is
+ * exactly the outcome the rule above exists to prevent. Retrying in place with
+ * a fresh token is strictly better: it can actually succeed, it cannot
+ * duplicate, and it does not fling the visitor onto a third-party page with no
+ * way back to the campaign.
+ *
+ * With no captcha configured the original behaviour below is untouched, because
+ * there it is still correct: no token, nothing to spend, and the native POST is
+ * the documented no-JavaScript floor. hCaptcha needs JavaScript, so switching it
+ * on costs that floor entirely; that trade is the campaign's, and it is
+ * recorded in HANDOFF.md.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * THE AJAX SUBMISSION IS JSON. THE NATIVE ONE IS NOT. BOTH ARE DELIBERATE.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Web3Forms states it as a requirement, not a preference: "For Javascript
+ * usage, you must serialize the data and include Content-Type headers as
+ * application/json." Every multipart example in their documentation is for file
+ * attachments, which this form has none of.
+ *
+ * This used to send the `FormData` object directly, which made it
+ * `multipart/form-data`, chosen because multipart is CORS-safelisted and so
+ * skips the preflight that `application/json` forces. That saved a round trip
+ * and was never once confirmed to work — HANDOFF.md flags a successful
+ * multipart submission as the single unproven assumption in the whole design,
+ * and it is still unproven. Trading a documented requirement for one saved
+ * round trip is the wrong side of that bet.
+ *
+ * The native POST keeps its default urlencoded encoding, which is correct and
+ * unrelated: the vendor's warning against urlencoded is about the answer coming
+ * back as a redirect rather than as JSON, and a native navigation WANTS the
+ * redirect.
  *
  * ⚠ Do NOT reach for `<form action={fn}>` / `useActionState` here, whatever
  * ENGINEERING.md §2.3 says. React 19 renders a function action as
@@ -181,6 +221,31 @@ function dropHiddenBranchFields(form: HTMLFormElement, body: FormData): void {
 }
 
 /**
+ * `FormData` → the JSON object Web3Forms requires of a JavaScript submission.
+ *
+ * Repeats are joined rather than overwritten. Nothing in this form sends two
+ * values under one name today — the radios share `Reason` but only the checked
+ * one is submitted — so this is insurance against a future multi-select
+ * quietly delivering only its last value into the campaign's inbox. Joining is
+ * also what the vendor's own multi-select guidance does.
+ *
+ * A non-string entry can only be a `File`, which has no JSON form. This form
+ * has no file input; if one is ever added it needs the multipart path back, so
+ * dropping it here would be a silent data loss and it throws instead.
+ */
+function toJsonPayload(body: FormData): Record<string, string> {
+  const payload: Record<string, string> = {}
+  for (const [name, value] of body) {
+    if (typeof value !== 'string') {
+      throw new Error(`Cannot JSON-encode the file field "${name}" — see the note above.`)
+    }
+    const existing = payload[name]
+    payload[name] = existing === undefined ? value : `${existing}, ${value}`
+  }
+  return payload
+}
+
+/**
  * Hand the submission back to the browser, which is what it would have done
  * with no JavaScript at all.
  *
@@ -202,13 +267,35 @@ function fallBackToNativePost(form: HTMLFormElement, keepRedirect: boolean): voi
   }
 }
 
+/**
+ * What to tell the visitor, from the only two facts we have.
+ *
+ * The three cases are genuinely different advice, which is the whole reason
+ * this is not one string: a refusal has a reason worth reading, a silent
+ * network has a retry worth making, and an unreadable answer means the fault is
+ * not theirs. All three end by pointing at the re-armed captcha, because the
+ * widget has just been reset underneath them and a form that looks solved but
+ * is not is the trap this whole change exists to remove.
+ */
+function describeFailure(responded: boolean, serverMessage: string | null): string {
+  if (!responded) return `${FORM.status.failedNoAnswer} ${FORM.status.failedRetry}`
+  if (serverMessage === null) return `${FORM.status.failedUnreadable} ${FORM.status.failedRetry}`
+  return `${FORM.status.failedRefused} “${serverMessage}” ${FORM.status.failedRetry}`
+}
+
 /** `sent` is the moment between a confirmed send and the navigation. */
 /**
  * `unverified` is a resting state, not a failure: nothing was sent and the
  * visitor only has to finish the check above. It behaves like `idle` for the
  * button and the abort logic, so `busy` deliberately excludes it.
+ *
+ * `failed` reaches the screen only when a captcha is configured — without one a
+ * failure is handed to the native POST instead and this page is discarded. It
+ * carries its message in `failureText` alongside; the two are always set in the
+ * same event, so React commits them together and neither is ever seen without
+ * the other.
  */
-type Phase = 'idle' | 'sending' | 'sent' | 'unverified'
+type Phase = 'idle' | 'sending' | 'sent' | 'unverified' | 'failed'
 
 export function InvolvedForm({
   base,
@@ -275,9 +362,14 @@ function ContactForm({
   const unloadingRef = useRef(false)
   const abortRef = useRef<AbortController | null>(null)
 
+  /** The widget, so a failed send can re-arm it. Null whenever hCaptcha is off. */
+  const captchaRef = useRef<HCaptchaHandle>(null)
+
   /* A constant, never a measurement: the first client render has to reproduce
      the server's markup exactly (entry-client.tsx). */
   const [phase, setPhase] = useState<Phase>('idle')
+  /** Meaningful only in the `failed` phase. See the note on Phase. */
+  const [failureText, setFailureText] = useState<string | null>(null)
 
   /*
    * Synchronises with the page lifecycle. Returning from the thank-you page
@@ -297,6 +389,7 @@ function ContactForm({
       abortRef.current?.abort()
       abortRef.current = null
       sendingRef.current = false
+      setFailureText(null)
       setPhase('idle')
     }
     window.addEventListener('pagehide', onPageHide)
@@ -314,6 +407,8 @@ function ContactForm({
     const timer = setTimeout(() => controller.abort(), SEND_TIMEOUT_MS)
     /** Did Web3Forms answer at all? The fallback rule turns on this. */
     let responded = false
+    /** Web3Forms' own words for the refusal, when it gave any. */
+    let serverMessage: string | null = null
 
     try {
       const body = new FormData(form)
@@ -328,30 +423,51 @@ function ContactForm({
 
       const response = await fetch(WEB3FORMS_ENDPOINT, {
         method: 'POST',
-        /* No Content-Type: the browser has to write the multipart boundary.
-           Multipart and Accept are both CORS-safelisted, so this stays a simple
-           request with no preflight. Sending urlencoded would come back as a
-           redirect rather than JSON — the vendor says so explicitly. That
-           warning is about READING the answer, which is why the native POST is
-           untouched: a navigation wants the redirect. */
-        headers: { Accept: 'application/json' },
-        body,
+        /* JSON because the vendor requires it of a JavaScript submission — see
+           the note at the top of this file. It costs a preflight, because
+           `application/json` is not CORS-safelisted; their own documented
+           example sends exactly these two headers, so the endpoint answers
+           OPTIONS. The native POST is untouched and still urlencoded. */
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(toJsonPayload(body)),
         signal: controller.signal,
       })
       responded = true
 
-      const result = (await response.json()) as { success?: boolean }
+      const result = (await response.json()) as { success?: boolean; message?: unknown }
+      /* Their refusals are specific and ours never were. Captured before the
+         throw so the catch can show it rather than inventing a generic one. */
+      if (typeof result.message === 'string' && result.message !== '') {
+        serverMessage = result.message
+      }
       /* `response.ok` is not enough. A rejected key, an unapproved domain or a
          spam flag is a reply, not a network failure. */
       if (!response.ok || result.success !== true) {
-        throw new Error('Web3Forms rejected the submission')
+        throw new Error(serverMessage ?? 'Web3Forms rejected the submission')
       }
-    } catch {
+    } catch (error) {
       if (unloadingRef.current || attemptRef.current !== attempt) return
+      /* The one place the underlying error survives. A visitor never opens the
+         console, but the person testing this against the live API does, and a
+         `TypeError: Failed to fetch` distinguishes a blocked request from a
+         refused one — which is the distinction three diagnoses in a row got
+         wrong. */
+      console.error('[contact form] submission failed', error)
+      sendingRef.current = false
+
+      if (hcaptchaSiteKey !== null) {
+        /* No native re-POST: the token is spent, or spent-for-all-we-know. Stay
+           on the page, re-arm the widget, say what happened. See the top of
+           this file. */
+        captchaRef.current?.reset()
+        setFailureText(describeFailure(responded, serverMessage))
+        setPhase('failed')
+        return
+      }
+
       /* Idle first: if the navigation below happens the page is discarded and
          this never renders, and if it is cancelled the visitor gets a working
          form instead of a dead one. */
-      sendingRef.current = false
       setPhase('idle')
       fallBackToNativePost(form, !responded && !controller.signal.aborted)
       return
@@ -390,6 +506,7 @@ function ContactForm({
     if (hcaptchaSiteKey !== null) {
       const token = new FormData(form).get('h-captcha-response')
       if (typeof token !== 'string' || token === '') {
+        setFailureText(null)
         setPhase('unverified')
         return
       }
@@ -397,6 +514,7 @@ function ContactForm({
 
     sendingRef.current = true
     attemptRef.current += 1
+    setFailureText(null)
     setPhase('sending')
     void send(form)
   }
@@ -543,10 +661,10 @@ function ContactForm({
 
         {hcaptchaSiteKey === null ? null : (
           /*
-           * Cloudflare hCaptcha. The widget writes a `h-captcha-response`
-           * field into the form, and Web3Forms rejects the submission if that
-           * token is missing or already spent — the verification happens there,
-           * against the secret key in their dashboard, never here.
+           * hCaptcha. The widget writes a `h-captcha-response` field into the
+           * form, and Web3Forms rejects the submission if that token is missing
+           * or already spent — the verification happens there, against the
+           * secret key they hold, never here.
            *
            * It sits outside every `.form__branch`, so the payload filter never
            * touches it. It needs JavaScript, so with the bundle blocked there is
@@ -554,15 +672,24 @@ function ContactForm({
            * of switching it on: the form stops being usable without JavaScript.
            * The honeypot above still works either way.
            */
-          <>
-            <HCaptcha siteKey={hcaptchaSiteKey} />
-            {phase === 'unverified' ? (
-              <p className="form__error" role="alert">
-                {FORM.status.unverified}
-              </p>
-            ) : null}
-          </>
+          <HCaptcha siteKey={hcaptchaSiteKey} ref={captchaRef} />
         )}
+
+        {/*
+          Both resting problems, in one place directly under the widget they
+          almost always concern. `role="alert"` rather than the `#form-status`
+          region above: this appears in response to a press and needs
+          interrupting, where that one narrates a send already under way.
+
+          `failed` cannot occur with hCaptcha off — such a failure hands off to
+          the native POST and discards this page — so nothing here renders on a
+          captcha-less build.
+        */}
+        {phase === 'unverified' || (phase === 'failed' && failureText !== null) ? (
+          <p className="form__error" role="alert">
+            {phase === 'unverified' ? FORM.status.unverified : failureText}
+          </p>
+        ) : null}
 
         <SubmitButton variant="accent" size="lg" busy={busy}>
           {phase === 'sending' ? (

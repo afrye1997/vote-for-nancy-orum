@@ -1,8 +1,11 @@
 # Handoff
 
-> **Unfinished thread:** the captcha does not work. See
-> [HANDOFF-CAPTCHA.md](HANDOFF-CAPTCHA.md) for everything tried, what is
-> verified, and the one diagnostic that has not been run yet.
+> **Open thread:** the captcha. Four defects found and fixed, and the client
+> behaviour is now verified against the real bundle; what remains is a single
+> submission by a human in a browser, because `api.web3forms.com` is behind a
+> Cloudflare challenge and no terminal can reach it. See
+> [HANDOFF-CAPTCHA.md](HANDOFF-CAPTCHA.md) — including why the three earlier
+> diagnoses were all drawn from the wrong request's error message.
 
 Written 2026-08-10, at the end of the session that built this site. Read this
 first if you are picking the project up cold. `START-HERE.md` describes the
@@ -215,10 +218,11 @@ rather than pretending to accept submissions and discarding them.
   - **JavaScript on.** Confirm the email arrives, that a "Request a yard sign"
     submission carries the address field and a question does not, and that the
     browser lands on the campaign's own `/thanks/`. This is the run that proves
-    the one unproven assumption in the whole design: that a multipart POST with
+    the one unproven assumption in the whole design: that a JSON POST with
     `redirect` stripped comes back as readable JSON with `success: true`. If it
-    does not, every submission is delivered twice and nobody reaches `/thanks/` —
-    and nothing on screen would say so.
+    does not, the form now says so on the page rather than failing silently —
+    see HANDOFF-CAPTCHA.md, which is also where the multipart-to-JSON change and
+    its reasoning live.
   - **JavaScript off** (devtools ▸ Settings ▸ Debugger ▸ Disable JavaScript).
     Confirm the email arrives and, once `SITE_ORIGIN` is set, that the redirect
     lands on `/thanks/`. Note this path is the one that must work, and it is
@@ -345,7 +349,13 @@ Delete it once the real domain is settled.
 
 ## Next task: the contact Worker
 
-**Status: no longer urgent.** The form uses **hCaptcha**, which Web3Forms
+**Status: not urgent, but no longer parked either — one test result decides it.**
+If the browser submission described in HANDOFF-CAPTCHA.md comes back as a
+*network* failure rather than a refusal, the cause is the Cloudflare challenge in
+front of `api.web3forms.com`, no client-side change can fix it, and this Worker
+becomes the fix rather than a nice-to-have.
+
+The form uses **hCaptcha**, which Web3Forms
 verifies on the free plan. Turnstile was tried first and rejected at submit
 time with "You are trying to use a Pro feature" — their free tier verifies
 hCaptcha only. Set `HCAPTCHA_SITE_KEY` to Web3Forms' own published free-plan key,
