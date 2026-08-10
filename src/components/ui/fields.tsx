@@ -10,17 +10,22 @@
  * Every control has a real `<label>` bound by `htmlFor` (ENGINEERING.md §5) and
  * a `name`, because a native POST sends nothing for an unnamed field.
  *
- * `disabled` is the same rule from the other end: a disabled control is left out
- * of the form data set, by a native POST and by `new FormData(form)` alike.
- * InvolvedForm uses it to keep a hidden branch's answers out of the campaign's
- * inbox. It renders as no attribute at all when false, so the prerendered markup
- * is unchanged for every field that never passes it — which the build gate in
- * scripts/prerender.mjs enforces, because a field that ships disabled can never
- * be filled in by a visitor with no JavaScript.
+ * ⚠ NONE OF THESE TAKES A `disabled` PROP, and adding one back needs a better
+ * reason than "the field is hidden". `disabled` is a RENDERED attribute, so it
+ * describes whatever React last committed, while a submission is whatever the
+ * DOM says at the moment of submit. When a control is disabled to keep it out of
+ * a payload, those two disagree on the very first render that has not landed
+ * yet, and `new FormData(form)` silently drops a field the visitor filled in.
+ * InvolvedForm hit exactly that and now filters its payload at submit instead;
+ * the reasoning is at the top of that file. The build gate in
+ * scripts/prerender.mjs backs it up: no ` disabled=""` may reach the prerendered
+ * HTML, because a field that ships disabled can never be filled in at all by a
+ * visitor with no JavaScript.
  *
- * There is deliberately no `:disabled` style. A caller may only pass `disabled`
- * for a control it has measured to be `display: none` (see InvolvedForm), so a
- * disabled control here is never on screen and has nothing to style.
+ * A genuinely permanent disabled control — one that is disabled because it does
+ * not work, not because it is hidden — is a different thing and would be
+ * welcome. It would need a `:disabled` style, which does not exist yet, and a
+ * contrast pair in scripts/contrast.mjs.
  */
 
 export function TextField({
@@ -30,7 +35,6 @@ export function TextField({
   placeholder,
   type = 'text',
   required = false,
-  disabled = false,
   autoComplete,
 }: {
   readonly id: string
@@ -39,7 +43,6 @@ export function TextField({
   readonly placeholder?: string
   readonly type?: 'text' | 'email'
   readonly required?: boolean
-  readonly disabled?: boolean
   readonly autoComplete?: string
 }) {
   return (
@@ -54,7 +57,6 @@ export function TextField({
         type={type}
         placeholder={placeholder}
         required={required}
-        disabled={disabled}
         autoComplete={autoComplete}
       />
     </div>
@@ -68,7 +70,6 @@ export function TextAreaField({
   placeholder,
   hint,
   rows = 4,
-  disabled = false,
 }: {
   readonly id: string
   readonly name: string
@@ -76,7 +77,6 @@ export function TextAreaField({
   readonly placeholder?: string
   readonly hint?: string
   readonly rows?: number
-  readonly disabled?: boolean
 }) {
   const hintId = `${id}-hint`
   return (
@@ -90,7 +90,6 @@ export function TextAreaField({
         name={name}
         rows={rows}
         placeholder={placeholder}
-        disabled={disabled}
         aria-describedby={hint ? hintId : undefined}
       />
       {hint ? (
@@ -108,21 +107,19 @@ export function SelectField({
   label,
   placeholder,
   options,
-  disabled = false,
 }: {
   readonly id: string
   readonly name: string
   readonly label: string
   readonly placeholder: string
   readonly options: readonly string[]
-  readonly disabled?: boolean
 }) {
   return (
     <div className="field">
       <label className="field__label" htmlFor={id}>
         {label}
       </label>
-      <select className="field__control" id={id} name={name} defaultValue="" disabled={disabled}>
+      <select className="field__control" id={id} name={name} defaultValue="">
         <option value="">{placeholder}</option>
         {options.map((option) => (
           <option key={option} value={option}>
@@ -139,13 +136,11 @@ export function CheckboxField({
   name,
   label,
   defaultChecked = false,
-  disabled = false,
 }: {
   readonly id: string
   readonly name: string
   readonly label: string
   readonly defaultChecked?: boolean
-  readonly disabled?: boolean
 }) {
   return (
     <div>
@@ -157,7 +152,6 @@ export function CheckboxField({
           type="checkbox"
           value="yes"
           defaultChecked={defaultChecked}
-          disabled={disabled}
         />
         {label}
       </label>

@@ -203,17 +203,52 @@ rather than pretending to accept submissions and discarding them.
   `InvolvedForm`, as a hidden `access_key` input.
 - The key is embedded in the public HTML. That is how Web3Forms works — access
   keys are public by design — but say so before anyone is surprised.
-- Worth verifying after wiring: submit the form and confirm it arrives, and that
-  a "Request a yard sign" submission carries the address field. Verify it twice —
-  once normally, and once with JavaScript disabled in devtools, because those are
-  two different code paths (`fetch` and a native POST).
+- 🚩 **LAUNCH BLOCKER, not a nice-to-have: submit once on each path against the
+  real key before going live.** They are two different code paths and neither has
+  ever completed against the live API. Web3Forms answers every non-browser client
+  with a 403 — every `curl` attempt fails, including the preflight — so there is
+  no way to write a CI smoke test for this. It has to be a human in a browser.
+  - **JavaScript on.** Confirm the email arrives, that a "Request a yard sign"
+    submission carries the address field and a question does not, and that the
+    browser lands on the campaign's own `/thanks/`. This is the run that proves
+    the one unproven assumption in the whole design: that a multipart POST with
+    `redirect` stripped comes back as readable JSON with `success: true`. If it
+    does not, every submission is delivered twice and nobody reaches `/thanks/` —
+    and nothing on screen would say so.
+  - **JavaScript off** (devtools ▸ Settings ▸ Debugger ▸ Disable JavaScript).
+    Confirm the email arrives and, once `SITE_ORIGIN` is set, that the redirect
+    lands on `/thanks/`. Note this path is the one that must work, and it is
+    `x-www-form-urlencoded` — the encoding the vendor warns against. That warning
+    is about reading the answer as JSON; a native navigation wants the 3xx it
+    returns. Prove it anyway.
+  - **Check the `Reply-To` header on the mail that arrives.** See the note below.
+- ⚠ **`Reply-To` may not be set, and the form promises it is.** The email input
+  is `name="Email"` with a capital E, because these names are the labels the
+  campaign reads in its inbox. Web3Forms documents the reply-to address as coming
+  from a field named `email`, lowercase, in every example. If the header comes
+  back unset, replying to a constituent goes to Web3Forms rather than to them —
+  and the question branch's own hint says *"Nancy answers her own email — you'll
+  hear back at the address above."* The fix is one lowercase letter in
+  `InvolvedForm.tsx` (`name="Email"` → `name="email"`), at the cost of a
+  lowercase label in the notification email. Deliberately not applied blind; do
+  it the moment the header proves absent.
 - ⚠ **Tell the campaign that the notification emails change shape.** A hidden
-  branch's fields are now `disabled`, so they are left out of the submission
-  rather than arriving blank. The consequence worth flagging: a question or a
-  yard-sign request no longer carries `Wants updates: yes`, which until now every
-  submission carried, harvested from a checkbox two thirds of visitors never saw.
-  That is a consent fix, not a bug, but it changes who ends up on the mailing
-  list and it is the campaign's call, not a developer's.
+  branch's fields are left out of the submission rather than arriving blank, so a
+  question email is now five fields instead of nine. The consequence worth
+  flagging: a question or a yard-sign request no longer carries
+  `Wants updates: yes`, which until now every submission carried, harvested from
+  a checkbox two thirds of visitors never saw. That is a consent fix, not a bug,
+  but it changes who ends up on the mailing list and it is the campaign's call,
+  not a developer's. Two qualifications they need with it:
+  - **It applies to visitors with JavaScript only.** With the bundle off nothing
+    is disabled and every submission still carries `Wants updates: yes`, exactly
+    as today. If consistent consent matters more than the enhancement, the honest
+    fix is to stop pre-checking the box rather than to rely on suppression the
+    no-JavaScript path never gets.
+  - **An absent `Wants updates` is now ambiguous.** It means either "not the join
+    branch" or "joined and unticked the box" — an unchecked checkbox has always
+    sent nothing. If telling those apart matters, say so and it can be made
+    explicit.
 
 ### 2. `SITE_ORIGIN` — needs the domain first
 

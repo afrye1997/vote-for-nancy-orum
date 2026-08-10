@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { SubmitButton } from '../ui/Button'
 import { Photo } from '../ui/Photo'
 import { CheckboxField, RadioField, SelectField, TextAreaField, TextField } from '../ui/fields'
@@ -18,7 +18,7 @@ import { href } from '../../content/site'
  * so they are written for a human inbox rather than for a database.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * CSS DECIDES WHICH BRANCH IS LIVE. THIS FILE ONLY ASKS IT.
+ * CSS DECIDES WHICH BRANCH IS LIVE. THIS FILE ONLY ASKS IT, AND ONLY AT SUBMIT.
  * ─────────────────────────────────────────────────────────────────────────────
  * sections.css hides the inactive branches with `:has()`, and it owns that
  * alone — moving the display switch into React would break the form outright
@@ -28,43 +28,48 @@ import { href } from '../../content/site'
  * But `display: none` only hides a field; it does not take it out of the
  * submission. With CSS alone an "Ask a question" message also carried an empty
  * "Drop-off address", and every submission carried "Wants updates: yes" from a
- * checkbox two thirds of visitors never saw. `disabled` is the attribute that
- * removes a control from the form data set — for a native POST and for
- * `new FormData(form)` alike — and CSS cannot set it. React does, once hydrated.
+ * checkbox two thirds of visitors never saw.
  *
- * The rule that keeps that safe is the whole design:
+ * The obvious fix is to render `disabled` on the hidden branch's fields, and it
+ * is the wrong one. `disabled` is a rendered attribute, so it describes whatever
+ * React last committed, while a submission is whatever the DOM says RIGHT NOW —
+ * and those disagree every time a submit lands in the same tick as the radio
+ * change, before React has re-rendered. Measured, not theorised: select "Ask a
+ * question", type, and submit inside one tick, and `new FormData(form)` returns
+ * no `Question` key at all. The visitor's message is silently dropped, and no
+ * later filtering can put it back, because a filter can only delete. The same
+ * attribute is also the only way to end up with a field that is on screen and
+ * refuses to be typed in — which is what happens the moment React's idea of the
+ * checked radio and the browser's diverge, or the stylesheet fails to arrive.
  *
- *     NEVER DISABLE A FIELD WITHOUT FIRST MEASURING THAT IT IS HIDDEN.
+ * So nothing here is ever `disabled`. Exclusion happens once, at submit, by
+ * asking the browser which branches it is actually painting as `display: none`
+ * and deleting those fields from the payload:
  *
- * `measureHiddenBranches` reads each branch's computed `display` and returns
- * only the ones the browser is actually painting as `none`. That is an
- * observation, not an inference, and it is what makes the safety property true
- * by construction rather than by argument:
+ *     READ THE COMPUTED STYLE AT SUBMIT. NEVER CACHE THE ANSWER IN STATE.
  *
- *   · Stylesheet missing or blocked (a 404 on the hashed asset, Firefox's
- *     View ▸ Page Style ▸ No Style, a user stylesheet). Every branch computes to
- *     `block`, so nothing is disabled and every visible field still accepts
- *     input. An earlier version of this file tested `CSS.supports('selector(:has(*))')`
- *     instead, which asks whether the engine can PARSE `:has()` and says nothing
- *     about whether the rules arrived — and it shipped two visible, disabled
- *     fields in exactly this case. Measured, not assumed.
- *   · No `:has()` support. The `@supports not` block in sections.css opens all
- *     three branches; all three then compute to `flex`, so nothing is disabled.
- *     The measurement subsumes the feature test, which is why there is no
- *     longer a feature test.
- *   · Before hydration. Nothing is disabled, so a visitor with no JavaScript
- *     can fill in whichever branch the radios reveal. The build gate in
- *     prerender.mjs holds that floor: no ` disabled=""` may reach the HTML.
+ * That is an observation of the real thing, taken at the only moment it matters,
+ * so it cannot be stale and it cannot lose a field. It also needs no feature
+ * test and no interlock, because it degrades correctly on its own:
+ *
+ *   · Stylesheet missing or blocked — a 404 on the hashed asset, Firefox's
+ *     View ▸ Page Style ▸ No Style, a user stylesheet. Every branch computes to
+ *     `block`, nothing is filtered, and every field the visitor can see is sent.
+ *     An earlier draft gated on `CSS.supports('selector(:has(*))')`, which asks
+ *     whether the engine can PARSE `:has()` and says nothing about whether the
+ *     rules arrived; with the `<link>` removed it shipped two visible, disabled
+ *     fields. See the corrections log in ENGINEERING.md §1.
+ *   · No `:has()` support. The `@supports not` block opens all three branches,
+ *     all three compute to `flex`, nothing is filtered. The measurement subsumes
+ *     the feature test, which is why there is no feature test.
+ *   · No JavaScript. Nothing runs, the browser posts natively, and every branch
+ *     submits — exactly as before this change, which is the documented floor.
  *
  * Because CSS is the single authority, React holds no opinion about which radio
- * is checked — there is no mirrored `purpose` state to fall out of sync with the
- * DOM. The radios stay uncontrolled and carry no React event handlers at all, so
- * a click that lands before the bundle does, or a browser restoring form state
- * across a reload without firing `change`, simply changes what the next
- * measurement sees. Re-measured on `change`, on `focusin` (which catches a
- * silent restore the moment the visitor touches the form), on `pageshow`, and
- * once more inside the submit handler, where the payload is filtered from a
- * fresh reading rather than from whatever React last rendered.
+ * is checked. There is no mirrored `purpose` state to fall out of sync, so the
+ * radios stay uncontrolled and carry no React event handlers at all: a click
+ * that lands before the bundle does, or a browser restoring form state across a
+ * reload without firing `change`, simply changes what the next measurement sees.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * WHY THE SUBMIT IS INTERCEPTED
@@ -96,9 +101,9 @@ import { href } from '../../content/site'
  *   thank-you page for a message that was refused is the worst outcome
  *   available. Stripped, they see Web3Forms' real outcome page either way.
  * · Timed out. Ambiguous by definition — an abort cancels our read, not their
- *   processing — so it is treated as "may have been delivered" and also drops
- *   the redirect. The budget is deliberately long (see SEND_TIMEOUT_MS); a short
- *   one turns a slow mobile connection into two emails as a matter of routine.
+ *   processing — so it counts as "may have been delivered" and also drops the
+ *   redirect. The budget is deliberately long (see SEND_TIMEOUT_MS); a short one
+ *   turns a slow mobile connection into two emails as a matter of routine.
  *
  * The phase is reset to idle immediately before handing off, so a visitor who
  * presses Stop during the fallback navigation is left with a live form rather
@@ -107,11 +112,11 @@ import { href } from '../../content/site'
  *
  * ⚠ TURNSTILE CHANGES THIS. `cf-turnstile-response` is single-use, so once the
  * fetch has spent the token the native fallback carries a dead one and
- * Web3Forms will refuse it. The fallback therefore only rescues the
- * no-response case when Turnstile is on — which is the case it exists for. It
- * also means Turnstile all but removes the duplicate-delivery risk. Turnstile
- * needs JavaScript, so switching it on costs the no-JavaScript path entirely;
- * that trade is the campaign's, and it is recorded in HANDOFF.md.
+ * Web3Forms will refuse it. The fallback therefore only rescues the no-response
+ * case when Turnstile is on — which is the case it exists for. It also means
+ * Turnstile all but removes the duplicate-delivery risk. Turnstile needs
+ * JavaScript, so switching it on costs the no-JavaScript path entirely; that
+ * trade is the campaign's, and it is recorded in HANDOFF.md.
  *
  * ⚠ Do NOT reach for `<form action={fn}>` / `useActionState` here, whatever
  * ENGINEERING.md §2.3 says. React 19 renders a function action as
@@ -143,34 +148,24 @@ function branchKey(purposeId: string): string {
 const BRANCH_KEYS: readonly string[] = PURPOSES.map((purpose) => branchKey(purpose.id))
 
 /**
- * The branches the stylesheet is currently hiding, read from the browser rather
- * than worked out from state. This is the single safety check the whole file
- * rests on — see the note at the top. A branch whose element is missing counts
- * as visible, because "I could not find it" is not evidence that it is hidden.
- */
-function measureHiddenBranches(form: HTMLFormElement): readonly string[] {
-  return BRANCH_KEYS.filter((key) => {
-    const branch = form.querySelector(`.form__branch--${key}`)
-    return branch !== null && getComputedStyle(branch).display === 'none'
-  })
-}
-
-/**
- * Drop every named control inside a hidden branch from the payload.
+ * Drop every named control inside a branch the stylesheet is currently hiding.
  *
- * Measured here rather than reused from state because a React render is not
- * guaranteed to have landed between the last measurement and this submit; the
- * payload has to be right even when the rendered `disabled` attributes are a
- * beat stale. Reading the names out of the DOM rather than listing them also
- * means a field added to a branch later is covered without touching this file.
+ * The one place branch suppression happens, and it reads the browser rather than
+ * any cached state — see the note at the top of this file for why that is the
+ * whole design and not an implementation detail. A branch whose element is
+ * missing counts as visible, because "I could not find it" is not evidence that
+ * it is hidden.
  *
- * `delete` removes every entry under a name, so no name may appear both inside
- * and outside a branch. None does, and none should — they are the labels the
- * campaign reads in its inbox.
+ * Names come out of the DOM rather than a list here, so a field added to a
+ * branch later is covered without touching this file. `delete` removes every
+ * entry under a name, so no name may appear both inside and outside a branch.
+ * None does, and none should — they are the labels the campaign reads.
  */
 function dropHiddenBranchFields(form: HTMLFormElement, body: FormData): void {
-  for (const key of measureHiddenBranches(form)) {
-    for (const control of form.querySelectorAll(`.form__branch--${key} [name]`)) {
+  for (const key of BRANCH_KEYS) {
+    const branch = form.querySelector(`.form__branch--${key}`)
+    if (branch === null || getComputedStyle(branch).display !== 'none') continue
+    for (const control of branch.querySelectorAll('[name]')) {
       const name = control.getAttribute('name')
       if (name !== null) body.delete(name)
     }
@@ -250,7 +245,13 @@ function ContactForm({
   readonly thanksUrl: string | null
   readonly turnstileSiteKey: string | null
 }) {
-  const formRef = useRef<HTMLFormElement>(null)
+  /**
+   * A send is in flight. A ref, not the `phase` state below, because this has to
+   * be true the instant the handler runs: state updates are asynchronous, so
+   * three fast presses all read the same stale `idle` and fire three requests.
+   * Measured — it sent three. `phase` describes the button; this guards the send.
+   */
+  const sendingRef = useRef(false)
   /**
    * Which send is current. Bumped on every submit and on a bfcache restore, so a
    * continuation that was frozen mid-flight and thaws later cannot navigate the
@@ -261,50 +262,14 @@ function ContactForm({
   const unloadingRef = useRef(false)
   const abortRef = useRef<AbortController | null>(null)
 
-  /* Constants, never measurements: the first client render has to reproduce the
-     server's markup exactly (entry-client.tsx). Corrected in effects. */
-  const [hiddenBranches, setHiddenBranches] = useState<readonly string[]>([])
+  /* A constant, never a measurement: the first client render has to reproduce
+     the server's markup exactly (entry-client.tsx). */
   const [phase, setPhase] = useState<Phase>('idle')
 
-  /**
-   * Ask the browser which branches it is hiding, and match `disabled` to that.
-   * Cheap — three `querySelector`s and three style reads — which is what makes
-   * it affordable on `focusin` as well as on `change`. Bails out when the answer
-   * has not changed, so a focus walk across the card does not re-render.
-   */
-  const measure = useCallback(() => {
-    const form = formRef.current
-    if (form === null) return
-    const next = measureHiddenBranches(form)
-    setHiddenBranches((previous) =>
-      previous.length === next.length && previous.every((key, i) => key === next[i]) ? previous : next,
-    )
-  }, [])
-
   /*
-   * Synchronises with the system outside React that actually decides this: the
-   * browser's CSS engine. `focusin` is in the list because a form-state restore
-   * can move the checked radio without firing `change`, and re-measuring the
-   * moment the visitor touches the card corrects it before they can reach a
-   * field. Native listeners rather than React props, so the radios keep no React
-   * event handlers and React never marks them for update.
-   */
-  useEffect(() => {
-    const form = formRef.current
-    if (form === null) return
-    measure()
-    form.addEventListener('change', measure)
-    form.addEventListener('focusin', measure)
-    return () => {
-      form.removeEventListener('change', measure)
-      form.removeEventListener('focusin', measure)
-    }
-  }, [measure])
-
-  /*
-   * Synchronises with page lifecycle. Returning from the thank-you page restores
-   * this document with its JavaScript heap frozen mid-send, and re-runs no
-   * effect: without this the visitor comes back to a button that reads
+   * Synchronises with the page lifecycle. Returning from the thank-you page
+   * restores this document with its JavaScript heap frozen mid-send, and re-runs
+   * no effect: without this the visitor comes back to a button that reads
    * "Sending…" forever. Bumping the attempt retires the frozen continuation at
    * the same time, so it cannot resubmit or navigate when it finally settles.
    */
@@ -314,13 +279,12 @@ function ContactForm({
     }
     const onPageShow = (event: PageTransitionEvent) => {
       unloadingRef.current = false
-      if (event.persisted) {
-        attemptRef.current += 1
-        abortRef.current?.abort()
-        abortRef.current = null
-        setPhase('idle')
-      }
-      measure()
+      if (!event.persisted) return
+      attemptRef.current += 1
+      abortRef.current?.abort()
+      abortRef.current = null
+      sendingRef.current = false
+      setPhase('idle')
     }
     window.addEventListener('pagehide', onPageHide)
     window.addEventListener('pageshow', onPageShow)
@@ -328,7 +292,7 @@ function ContactForm({
       window.removeEventListener('pagehide', onPageHide)
       window.removeEventListener('pageshow', onPageShow)
     }
-  }, [measure])
+  }, [])
 
   const send = async (form: HTMLFormElement) => {
     const attempt = attemptRef.current
@@ -355,8 +319,8 @@ function ContactForm({
            Multipart and Accept are both CORS-safelisted, so this stays a simple
            request with no preflight. Sending urlencoded would come back as a
            redirect rather than JSON — the vendor says so explicitly. That
-           warning is about READING the answer, which is why the native POST
-           below is untouched: it wants the redirect. */
+           warning is about READING the answer, which is why the native POST is
+           untouched: a navigation wants the redirect. */
         headers: { Accept: 'application/json' },
         body,
         signal: controller.signal,
@@ -374,6 +338,7 @@ function ContactForm({
       /* Idle first: if the navigation below happens the page is discarded and
          this never renders, and if it is cancelled the visitor gets a working
          form instead of a dead one. */
+      sendingRef.current = false
       setPhase('idle')
       fallBackToNativePost(form, !responded && !controller.signal.aborted)
       return
@@ -391,16 +356,16 @@ function ContactForm({
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (phase !== 'idle') return
+    if (sendingRef.current) return
     /* React nulls `currentTarget` the moment dispatch ends, so read it now. */
     const form = event.currentTarget
+    sendingRef.current = true
     attemptRef.current += 1
     setPhase('sending')
     void send(form)
   }
 
   const busy = phase !== 'idle'
-  const isHidden = (purposeId: string) => hiddenBranches.includes(branchKey(purposeId))
 
   return (
     <section className="form-wrap container">
@@ -409,7 +374,6 @@ function ContactForm({
         id="involved-form"
         action={WEB3FORMS_ENDPOINT}
         method="POST"
-        ref={formRef}
         onSubmit={onSubmit}
       >
         <input type="hidden" name="access_key" value={web3formsKey} />
@@ -421,6 +385,10 @@ function ContactForm({
           class: this must be absent from the accessibility tree too, or a
           screen-reader user meets an unlabelled checkbox that will silently
           discard their message if they tick it.
+
+          It sits outside every `.form__branch`, so the payload filter leaves it
+          alone — as it must, since an unticked box contributes nothing and a
+          ticked one is the whole signal.
         */}
         <input type="checkbox" name="botcheck" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
 
@@ -470,6 +438,15 @@ function ContactForm({
           required
         />
 
+        {/*
+          The three branches. Which one is visible is decided entirely by
+          sections.css; which one is SENT is decided by reading that back in
+          `dropHiddenBranchFields` at submit. Nothing here is ever `disabled` —
+          see the note at the top of this file, and do not add it back.
+
+          Every control inside a branch must carry a `name`, or it will not be
+          filtered when its branch is hidden.
+        */}
         <div className="form__branch form__branch--join">
           <SelectField
             id="help"
@@ -477,15 +454,8 @@ function ContactForm({
             label={FORM.help.label}
             placeholder={FORM.help.placeholder}
             options={FORM.help.options}
-            disabled={isHidden('purpose-join')}
           />
-          <CheckboxField
-            id="updates"
-            name="Wants updates"
-            label={FORM.updates}
-            defaultChecked
-            disabled={isHidden('purpose-join')}
-          />
+          <CheckboxField id="updates" name="Wants updates" label={FORM.updates} defaultChecked />
         </div>
 
         <div className="form__branch form__branch--sign">
@@ -502,7 +472,6 @@ function ContactForm({
             label={FORM.signOffer.addressLabel}
             placeholder={FORM.signOffer.addressPlaceholder}
             autoComplete="street-address"
-            disabled={isHidden('purpose-sign')}
           />
         </div>
 
@@ -513,7 +482,6 @@ function ContactForm({
             label={FORM.question.label}
             placeholder={FORM.question.placeholder}
             hint={FORM.question.hint}
-            disabled={isHidden('purpose-question')}
           />
         </div>
 
@@ -527,7 +495,11 @@ function ContactForm({
           and adds no row to this card.
         */}
         <p className="visually-hidden" id="form-status" role="status">
-          {phase === 'sending' ? FORM.status.announcing : phase === 'sent' ? FORM.status.sentAnnouncement : ''}
+          {phase === 'sending'
+            ? FORM.status.announcing
+            : phase === 'sent'
+              ? FORM.status.sentAnnouncement
+              : ''}
         </p>
 
         <SubmitButton variant="accent" size="lg" busy={busy}>

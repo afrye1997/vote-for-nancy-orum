@@ -330,23 +330,13 @@ for (const { path } of written) {
  * because its absence means the gate silently stopped working. Without one, say
  * plainly that the check did not run.
  */
-const involvedHtml = existsSync(join(DIST, 'involved/index.html'))
-  ? await readFile(join(DIST, 'involved/index.html'), 'utf8')
-  : ''
-if (WEB3FORMS_KEY) {
-  if (!involvedHtml.includes('<form')) {
-    failures.push(
-      '  involved/index.html has no <form> despite WEB3FORMS_KEY being set — the ' +
-        ' disabled="" gate scanned nothing',
-    )
-  } else {
-    console.log('  form gate: form rendered, no prerendered disabled controls')
-  }
-} else {
-  console.warn(
-    '\n  ⚠ The form was not rendered (no WEB3FORMS_KEY), so the ` disabled=""`\n' +
-      '    gate checked nothing. Before trusting it, build with a key:\n' +
-      '    WEB3FORMS_KEY=test-key-0000 npm run build\n',
+const formRendered = existsSync(join(DIST, 'involved/index.html'))
+  ? (await readFile(join(DIST, 'involved/index.html'), 'utf8')).includes('<form')
+  : false
+if (WEB3FORMS_KEY && !formRendered) {
+  failures.push(
+    '  involved/index.html has no <form> despite WEB3FORMS_KEY being set —' +
+      ' the ` disabled=""` gate scanned nothing',
   )
 }
 
@@ -430,6 +420,17 @@ if (wrongSize.length) {
   failures.push('  fix the width/height in src/content/images.ts — run `npm run images` to reprint them')
 } else if (declaredSizes.size) {
   console.log(`  dimensions: all ${declaredSizes.size} match their files`)
+}
+
+if (formRendered) {
+  console.log('  form gate:  rendered, and no control shipped disabled')
+} else {
+  console.warn(
+    `\n  ⚠ The form was not rendered${WEB3FORMS_KEY ? '' : ' (no WEB3FORMS_KEY)'}, so the\n` +
+      '    ` disabled=""` gate had no controls to scan. A green build is not\n' +
+      '    evidence of the no-JavaScript floor. Check it with a key:\n' +
+      '    WEB3FORMS_KEY=test-key-0000 npm run build\n',
+  )
 }
 
 if (failures.length) {

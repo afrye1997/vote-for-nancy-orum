@@ -9,7 +9,8 @@
     "preview": "vite preview --outDir dist",
     "lint": "oxlint .",
     "contrast": "node scripts/contrast.mjs",
-    "images": "node scripts/images.mjs"
+    "images": "node scripts/images.mjs",
+    "deploy": "npm run build && wrangler pages deploy dist --project-name=vote-for-nancy-orum"
   },
   "dependencies": {
     "react": "^19.2.8",
