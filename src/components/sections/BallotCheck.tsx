@@ -1,5 +1,4 @@
 import { LinkButton } from '../ui/Button'
-import { WardLookup } from './WardLookup'
 import { Photo } from '../ui/Photo'
 import { BALLOT } from '../../content/involved'
 import { IMAGES, imgSources } from '../../content/images'
@@ -24,7 +23,7 @@ export function BallotCheck({ base }: { readonly base: string }) {
       <div className="ballot">
         <p className="eyebrow">{BALLOT.eyebrow}</p>
         <h2 className="ballot__title">{BALLOT.heading}</h2>
-        <WardLookup />
+        <p className="ballot__lede">{BALLOT.lookupLede}</p>
         <div className="ballot__answer">
           <p className="ballot__answer-title">{BALLOT.answerTitle}</p>
           <p className="ballot__answer-body">{AT_LARGE_NOTICE.full}</p>

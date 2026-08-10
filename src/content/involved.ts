@@ -20,10 +20,20 @@
  *
  * The question the widget asked has a fixed answer, so the block states it
  * instead of pretending to compute it. The ward map stays, relabelled to say
- * what it actually shows — where Nancy lives, not who may vote for her — and
- * the address field is replaced by a link to the state's own voter lookup,
- * which is the only tool here that can tell a visitor something true about
- * their own registration.
+ * what it actually shows — where Nancy lives, not who may vote for her.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * AND WHY THE ADDRESS FIELD IS A LINK
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Arkansas VoterView has the real lookup, but a browser cannot call it: no CORS
+ * headers, an anti-CSRF token bound to VoterView's own session cookie, an HTML
+ * response rather than JSON, and no server on this side to proxy through.
+ * Reaching it would mean the campaign running a scraper against a state
+ * election system. The request shape and what a proxy would need are recorded
+ * in HANDOFF.md if that is ever worth doing.
+ *
+ * Until then a text field that ignores what you type and opens a different site
+ * is a worse lie than no field. So it is a link, and VoterView answers.
  */
 
 export const INVOLVED_HERO = {
@@ -45,11 +55,16 @@ export const BALLOT = {
   mapCaption:
     'Ward 2 is the shaded area. It is where Nancy lives and the seat she is running ' +
     'for — not a limit on who votes in this race. Source: NWARPC, 2022 ward plan.',
-  label: 'Type your street address — we\u2019ll take you to the official lookup.',
-  placeholder: '12 Chelsea Rd, Bella Vista, AR',
-  buttonLabel: 'Check',
-  privacy: 'Never saved or shared — it goes straight to the state\u2019s own tool.',
-  lookupCta: 'Check your registration',
+  /**
+   * The mockup drew an address field. It is a link instead — see the note at
+   * the top of this file. A box that does nothing with what you type is worse
+   * than no box.
+   */
+  lookupLede:
+    'Arkansas VoterView will tell you your ward, your polling place, and whether ' +
+    'your registration is current. It is the state\u2019s own tool and it is the ' +
+    'authoritative answer.',
+  lookupCta: 'Look it up on VoterView',
   involvedCta: 'Get involved',
   datesHeading: 'Dates worth putting in your phone',
 } as const

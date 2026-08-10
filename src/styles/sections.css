@@ -1063,73 +1063,9 @@
   }
 }
 
-
-/* ── Ward lookup pill ────────────────────────────────────────────────────── */
-
-.ward-lookup__label {
-  display: block;
-  margin-top: var(--space-2);
+.ballot__lede {
+  margin-top: var(--space-3);
   font-size: 15px;
   line-height: 1.6;
   color: var(--slate-700);
-}
-
-.ward-lookup {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: var(--space-5) auto 0;
-  padding: 6px 6px 6px 20px;
-  border: 1px solid var(--border-control);
-  border-radius: var(--radius-pill);
-  background: #ffffff;
-  box-shadow: var(--shadow-card);
-}
-
-/* The whole pill lights up, not just the input inside it. */
-.ward-lookup:focus-within {
-  border-color: var(--focus-ring);
-  box-shadow:
-    var(--shadow-card),
-    0 0 0 3px rgba(82, 181, 46, 0.35);
-}
-
-.ward-lookup__icon {
-  flex: 0 0 auto;
-  color: var(--slate-600);
-}
-
-.ward-lookup__input {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  color: var(--navy-900);
-}
-
-.ward-lookup__submit {
-  flex: 0 0 auto;
-  padding: 12px 24px;
-  border: none;
-  border-radius: var(--radius-pill);
-  background: var(--brand-accent);
-  color: var(--navy-900);
-  font-family: var(--font-body);
-  font-size: 15px;
-  font-weight: var(--weight-semibold);
-  cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-organic);
-}
-
-.ward-lookup__submit:hover {
-  background: var(--green-700);
-  color: var(--text-on-primary);
-}
-
-.ward-lookup__submit:active {
-  transform: translateY(1px);
 }

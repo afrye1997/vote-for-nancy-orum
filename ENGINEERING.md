@@ -19,7 +19,7 @@ rule is violated, justify it in the commit message rather than deleting it.
 | Rendering | React as a **build-time template** — `renderToStaticMarkup` to static HTML | Ships ~0 KB of client React |
 | Lint | oxlint, react rules **explicitly enabled** | They are off by default. Assuming otherwise is silently false |
 | Host | Static files — GitHub Pages, Cloudflare, anywhere | Output is plain HTML; the host is not a dependency |
-| Forms | Web3Forms via native HTML `POST` | Works with JavaScript disabled |
+| Forms | Web3Forms — native HTML `POST`, with `fetch` layered over it | The POST works with JavaScript disabled; the fetch only removes the need for an absolute redirect URL |
 
 **Dependency rule:** every new dependency is justified in writing, once, at the
 point it is added. Prefer the platform.
@@ -36,6 +36,14 @@ Real examples from this project's log:
 - `eslint-plugin-react-hooks` is at **v7**, not v6.
 - oxlint's react rules are **off by default**.
 - Cloudflare steers new static projects to **Workers**, not Pages.
+- React 19's **function form actions cannot be used on a page that must work
+  without JavaScript.** `<form action={fn}>` server-renders as
+  `action="javascript:throw new Error('React form unexpectedly submitted.')"`
+  and drops `method` and `encType` outright, so the form does nothing at all
+  with the bundle off. `useFormStatus` and `useActionState` only report pending
+  for a function action, so they go with it. §2.3 lists all three; the form in
+  `sections/InvolvedForm.tsx` uses `onSubmit` + `preventDefault()` instead, and
+  says so at the top of the file.
 
 ---
 
@@ -72,7 +80,10 @@ that survives review must name the external system it synchronizes with.
 - **`ref` is a normal prop.** No `forwardRef`.
 - **Document metadata is native.** `<title>`, `<meta>`, `<link rel="canonical">`
   hoist to `<head>` from anywhere in the tree. No `react-helmet`.
-- **Form primitives:** `useActionState`, `useFormStatus`, `useOptimistic`.
+- **Form primitives:** `useActionState`, `useFormStatus`, `useOptimistic` —
+  **except on a form that must submit without JavaScript.** See the corrections
+  log in §1: a function action replaces the form's `action` with a `javascript:`
+  URL and discards its `method`.
 - **`<Suspense>` + error boundaries** are the loading and failure pattern — not
   `isLoading`/`error` triplets threaded through props.
 

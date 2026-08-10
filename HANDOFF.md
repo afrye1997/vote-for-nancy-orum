@@ -37,7 +37,7 @@ complete HTML file at build time; `src/entry-client.tsx` hydrates it. Each URL
 works with JavaScript off; React takes over an already-painted page.
 
 This changed mid-session. It was originally build-time-only with 0 KB of client
-React, per ENGINEERING.md §1. The client bundle is now **70.8 KB gzipped**,
+React, per ENGINEERING.md §1. The client bundle is now **74.8 KB gzipped**,
 inside §5's 150 KB budget but against §1's stated goal. The decision was
 explicit: the carousel, the form branching and the donate dialog should be React
 state rather than CSS approximations.
@@ -107,7 +107,7 @@ The harness lived in the session scratchpad and is gone; rebuild it:
 |---|---|---|
 | Get involved | Ward-address lookup replaced by a ballot explainer | Deliberate, see below |
 | Get involved | Election dates section added | Not in the mockup — remove for strict 1:1 |
-| Get involved | Form branching + donate dialog still CSS, not React state | Should move now that it hydrates |
+| Get involved | Donate dialog still CSS, not React state | `DonateRow.tsx` argues it should stay a page |
 | About | Full bio removed to match | `<Biography />` still exists, one line to restore |
 | All | Header has no scrim, per the mockup | Nav fails 4.5:1 on the Get involved hero |
 | Home | Entrance animations compressed from 2300ms to 520ms | End state identical |
@@ -131,6 +131,30 @@ explainer plus a link to the state's real voter lookup. Reasoning is at the top
 of `content/involved.ts`; the harmful phrasings are in the forbidden-strings
 scan.
 
+**The ward lookup is a link, not a field.** Arkansas VoterView has the real
+data, in two steps:
+
+```
+GET  /VoterView/Address/GetListOfStreetIdByAddress?AddressValue=…&term=…
+     -> [{ value: 1646756, label: "500 Woodlane Street …" }]   (StreetKey)
+POST /VoterView/VotingPlace/GetPollingPlaceOrVoteCentersByStreetKey
+     body: ResidentialAddressValue, StreetKey, hidden, __RequestVerificationToken
+     -> HTML "Where To Vote" page; Districts section carries the ward
+```
+
+A browser cannot call it. No CORS headers; the `__RequestVerificationToken`
+must be fresh and paired with the session cookie it was minted against, which
+is exactly the defence that stops another origin doing this; the response is
+HTML, not JSON; and this site has no server to proxy through. Making it work
+means a Worker the campaign runs that holds a VoterView session and scrapes the
+districts out — a scraper against a state election system from a candidate's
+site, plus voters' home addresses passing through campaign infrastructure. That
+is a decision for the campaign, not a detail of a form control.
+
+Note also that the ward does not decide eligibility, so even a perfect lookup
+answers the wrong question. VoterView additionally gives them their polling
+place, which is what they actually need.
+
 **Carousel clones are `aria-hidden` and carry no `id`.** Six commitments,
 twelve slides. Without this a screen reader meets each commitment twice and the
 `#commitment-03` links break.
@@ -143,7 +167,10 @@ twelve slides. Without this a screen reader meets each commitment twice and the
 deliberate bad value:
 
 - **Forbidden strings** — wrong stats, fictional contacts, at-large violations,
-  `INSERT HERE`, `href="#"`.
+  `INSERT HERE`, `href="#"`, and ` disabled=""` anywhere in the prerendered HTML.
+  The last one is the form's no-JavaScript floor: CSS reveals a branch on
+  `:checked`, and a revealed field that was prerendered `disabled` can never be
+  filled in. React may only add `disabled` after hydration.
 - **Missing images** — every referenced file present in both AVIF and fallback.
   A warning normally; a hard failure once `SITE_ORIGIN` is set.
 - **Image dimensions** — every `width`/`height` attribute checked against the
@@ -172,7 +199,16 @@ rather than pretending to accept submissions and discarding them.
 - The key is embedded in the public HTML. That is how Web3Forms works — access
   keys are public by design — but say so before anyone is surprised.
 - Worth verifying after wiring: submit the form and confirm it arrives, and that
-  a "Request a yard sign" submission carries the address field.
+  a "Request a yard sign" submission carries the address field. Verify it twice —
+  once normally, and once with JavaScript disabled in devtools, because those are
+  two different code paths (`fetch` and a native POST).
+- ⚠ **Tell the campaign that the notification emails change shape.** A hidden
+  branch's fields are now `disabled`, so they are left out of the submission
+  rather than arriving blank. The consequence worth flagging: a question or a
+  yard-sign request no longer carries `Wants updates: yes`, which until now every
+  submission carried, harvested from a checkbox two thirds of visitors never saw.
+  That is a consent fix, not a bug, but it changes who ends up on the mailing
+  list and it is the campaign's call, not a developer's.
 
 ### 2. `SITE_ORIGIN` — needs the domain first
 
@@ -182,7 +218,10 @@ Setting it turns on four things at once:
   yet**; the tag is omitted rather than pointed at a missing file)
 - `<link rel="canonical">` on every page
 - The form's `redirect` to `/thanks/` — Web3Forms needs an absolute URL, so
-  without this it shows its own confirmation page instead of ours
+  without this a **no-JavaScript** submission shows its own confirmation page
+  instead of ours. A hydrated browser already reaches `/thanks/` on its own: the
+  submit is intercepted, posted with `fetch`, and navigated relatively. That is
+  the majority of visitors, and it is why this is no longer launch-blocking
 - Missing images become a build failure instead of a warning
 
 Domain is not bought yet. NEEDED-FROM-CAMPAIGN.md §10 recommends

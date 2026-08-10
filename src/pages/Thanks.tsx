@@ -4,12 +4,13 @@ import { THANKS } from '../content/involved'
 import { href } from '../content/site'
 
 /**
- * Where Web3Forms lands people after a successful submission.
+ * Where a successful submission lands. A hydrated browser navigates here itself
+ * once its `fetch` comes back; with JavaScript off, Web3Forms redirects here,
+ * but only once SITE_ORIGIN is set — the `redirect` field takes an absolute URL.
  *
- * The mockup showed this as the form card replacing its own contents. A native
- * POST leaves the page, so this is a real document — which is the better
- * outcome: it can be linked, it survives a refresh, and the campaign can point
- * an analytics goal at it.
+ * The mockup showed this as the form card replacing its own contents. Leaving
+ * the page is the better outcome anyway: this can be linked, it survives a
+ * refresh, and the campaign can point an analytics goal at it.
  *
  * It is marked noindex, which is set on its PAGES_NAV entry rather than
  * rendered here — `renderToStaticMarkup` produces a fragment with no document
