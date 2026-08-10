@@ -238,9 +238,14 @@ Every one of these was found the hard way.
 - **Headless Chrome floors the viewport at 500px.** A `--window-size=430`
   screenshot is a *crop* of a 500px render and looks like catastrophic overflow.
   Test narrow layouts through an iframe, which gets its own viewport.
-- **Scroll events do not fire under `--virtual-time-budget`.** Anything
-  scroll-driven cannot be verified headlessly; check hydration and structure
-  programmatically, then confirm motion by hand.
+- **Headless Chrome under `--virtual-time-budget` does not run the rendering
+  lifecycle.** Measured: zero `requestAnimationFrame` callbacks, zero
+  `IntersectionObserver` callbacks, zero scroll events. So the carousel's
+  settle-and-teleport and the stats count-up cannot be verified there — not
+  because they are broken, but because nothing that drives them ever fires.
+  Verify structure and hydration programmatically (slide counts, ids, computed
+  styles, `__reactFiber$` keys on a node), then confirm motion by eye. Do not
+  read "the value never changed" as a bug without checking this first.
 
 ---
 

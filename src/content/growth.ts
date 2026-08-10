@@ -35,8 +35,26 @@
 
 export type Stat = {
   readonly id: string
-  /** The headline figure, pre-formatted. */
-  readonly figure: string
+  /**
+   * The headline figure as a NUMBER, so it can be counted up to.
+   *
+   * It was briefly the string "More than double", which aged gracefully and
+   * looked wrong: the design sets these as large numerals and a sentence cannot
+   * do that. Every figure here is numeric again, and every one of them is
+   * sourced — see the file header for what happened to the three that were not.
+   */
+  readonly value: number
+  /**
+   * Where the count-up starts. Purely presentational — the number nobody reads,
+   * because it is only on screen for a moment.
+   *
+   * An alternative worth considering: start each one at its own previous value
+   * (30,104 for the population, 28 for the permits). The animation would then
+   * be the argument rather than decoration. Kept short and close for now.
+   */
+  readonly countFrom: number
+  /** Appended verbatim after the formatted number. */
+  readonly suffix: string
   readonly caption: string
   /** Attribution shown on the page. Must name the actual source, not a guess. */
   readonly source: string
@@ -76,27 +94,40 @@ const CENSUS_PROFILE =
   'https://data.census.gov/profile/Bella_Vista_city,_Arkansas?g=160XX00US0504840'
 const CENSUS_BPS = 'https://www.census.gov/construction/bps/'
 
-/** 16,582 → 34,518 is +108.2%. Stated as "more than doubled" to age gracefully. */
 export const STATS: readonly Stat[] = [
   {
     id: 'population-growth',
-    figure: 'More than double',
-    caption: `Bella Vista's population since the 2000 census — from ${CENSUS.population2000.toLocaleString()} to ${CENSUS.populationLatest.toLocaleString()}`,
+    /**
+     * 16,582 → 30,104 is +81.5%, which rounds to the 82% the artifact claimed.
+     * This is the one figure of the four that survived verification, so it is
+     * stated exactly as the design states it.
+     */
+    value: 82,
+    countFrom: 62,
+    suffix: '%',
+    caption: 'Population growth between the 2000 and 2020 censuses',
     source: 'U.S. Census Bureau',
     // 2000: CPH-2-5 Table 9. 2020: PL 94-171, GEOID 1600000US0504840, POP100.
     sourceUrl: CENSUS_PROFILE,
   },
   {
     id: 'population-now',
-    figure: CENSUS.populationLatest.toLocaleString(),
-    caption: `Estimated residents as of ${CENSUS.populationLatestAsOf}, up from ${CENSUS.population2020.toLocaleString()} counted in the 2020 census`,
+    /** Vintage 2025. The artifact's 33,274 is a superseded vintage. */
+    value: CENSUS.populationLatest,
+    countFrom: 33_275,
+    suffix: '',
+    /** 30,104, not the artifact's 30,102 — that number is in no Census product. */
+    caption: `Estimated residents as of ${CENSUS.populationLatestAsOf}, up from ${CENSUS.population2020.toLocaleString('en-US')} counted in the 2020 census`,
     source: 'U.S. Census Bureau population estimates',
     // Vintage 2025 subcounty population estimates.
     sourceUrl: CENSUS_PROFILE,
   },
   {
     id: 'permits',
-    figure: CENSUS.permits2024.toLocaleString(),
+    /** 637 is the federal figure. No city document publishes the artifact's 636. */
+    value: CENSUS.permits2024,
+    countFrom: 630,
+    suffix: '',
     // Comparison uses 2012, which HAS data. The artifact compared to 2013,
     // which does not exist in the survey — Bella Vista reported zero months.
     caption: `New housing units authorized in 2024, up from ${CENSUS.permits2012} in 2012`,

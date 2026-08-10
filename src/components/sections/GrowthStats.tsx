@@ -1,3 +1,4 @@
+import { CountUp } from '../ui/CountUp'
 import { GROWTH_INTRO, STATS } from '../../content/growth'
 
 /**
@@ -27,7 +28,9 @@ export function GrowthStats() {
       <div className="stats">
         {STATS.map((stat) => (
           <div className="stat" key={stat.id}>
-            <p className="stat__figure">{stat.figure}</p>
+            <p className="stat__figure">
+              <CountUp from={stat.countFrom} to={stat.value} suffix={stat.suffix} />
+            </p>
             <p className="stat__caption">{stat.caption}</p>
             <p className="stat__source">
               <a href={stat.sourceUrl} target="_blank" rel="noopener noreferrer">
