@@ -1,5 +1,9 @@
 # Handoff
 
+> **Unfinished thread:** the captcha does not work. See
+> [HANDOFF-CAPTCHA.md](HANDOFF-CAPTCHA.md) for everything tried, what is
+> verified, and the one diagnostic that has not been run yet.
+
 Written 2026-08-10, at the end of the session that built this site. Read this
 first if you are picking the project up cold. `START-HERE.md` describes the
 repo as it was *before* the design landed; this describes what is actually here.
