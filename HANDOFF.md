@@ -339,6 +339,75 @@ Delete it once the real domain is settled.
 
 ---
 
+## Next task: the contact Worker
+
+**Why.** Web3Forms only verifies Turnstile tokens on their Pro plan — a free-tier
+submission carrying a token is rejected with "You are trying to use a Pro
+feature". So Turnstile is currently off (`TURNSTILE_SITE_KEY` unset) and the
+honeypot is the only protection.
+
+The deeper problem is that `WEB3FORMS_KEY` is a build variable baked into the
+HTML, so it is public. That is what makes spam trivial: bots POST straight to
+`api.web3forms.com` with the key and never load the page. Any client-side check
+— Turnstile, a CAPTCHA library, a localStorage flag — guards a door nobody is
+using.
+
+A Worker fixes both at once, for free.
+
+**Shape.**
+
+```
+POST /api/contact  ->  Worker
+                       1. read cf-turnstile-response from the body
+                       2. POST it to
+                          https://challenges.cloudflare.com/turnstile/v0/siteverify
+                          with { secret, response, remoteip }
+                       3. reject unless success === true
+                       4. forward the rest to https://api.web3forms.com/submit
+                          with access_key injected server-side
+                       5. return JSON the existing form code already handles
+everything else    ->  static assets, unchanged
+```
+
+**Config.** `wrangler.jsonc` gains `"main": "src/worker.ts"` and
+`"assets": { ..., "binding": "ASSETS" }`. With both `main` and `assets` set,
+requests matching a static file are served directly and the Worker only runs for
+paths that do not — so `/api/contact` reaches it with no routing config. Do not
+set `run_worker_first`.
+
+**Secrets move from build to runtime.** This is the inversion to get right:
+
+```bash
+wrangler secret put WEB3FORMS_KEY      # was a build variable
+wrangler secret put TURNSTILE_SECRET   # never existed here before
+```
+
+`TURNSTILE_SITE_KEY` stays a **build** variable — it is public and belongs in the
+HTML. `WEB3FORMS_KEY` must be **removed** from the build variables, or it keeps
+being baked into the page and the whole point is lost.
+
+**Client change.** `InvolvedForm`'s `ContactForm` posts to
+`https://api.web3forms.com/submit`; point it at `/api/contact` and drop the
+`access_key` hidden input. Keep the existing phase machine, the abort/timeout
+handling and the `dropHiddenBranchFields` logic — none of that changes.
+
+Note this ends the no-JavaScript path for the form: a native POST would go to
+the Worker without a token and be rejected. Decide whether to keep a
+JS-less fallback or accept the loss and say so in the markup.
+
+**Testing — do not skip.** This is an auth path.
+
+```bash
+wrangler dev            # needs both secrets in .dev.vars
+```
+
+Cover all four: valid token succeeds; missing token rejected; **reused token
+rejected** (siteverify tokens are single-use — replaying one is the case that
+silently passes if the code ignores `success`); and Web3Forms erroring returns
+something the form's error state handles rather than hanging.
+
+---
+
 ## Gotchas that cost real time
 
 Every one of these was found the hard way.
