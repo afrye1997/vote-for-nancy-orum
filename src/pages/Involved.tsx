@@ -8,12 +8,12 @@ export function Involved({
   base,
   web3formsKey,
   thanksUrl,
-  turnstileSiteKey,
+  hcaptchaSiteKey,
 }: {
   readonly base: string
   readonly web3formsKey: string | null
   readonly thanksUrl: string | null
-  readonly turnstileSiteKey: string | null
+  readonly hcaptchaSiteKey: string | null
 }) {
   return (
     <Page base={base} current="involved" tone="dark">
@@ -26,7 +26,7 @@ export function Involved({
         base={base}
         web3formsKey={web3formsKey}
         thanksUrl={thanksUrl}
-        turnstileSiteKey={turnstileSiteKey}
+        hcaptchaSiteKey={hcaptchaSiteKey}
       />
     </Page>
   )

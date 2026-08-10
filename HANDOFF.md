@@ -341,10 +341,14 @@ Delete it once the real domain is settled.
 
 ## Next task: the contact Worker
 
-**Why.** Web3Forms only verifies Turnstile tokens on their Pro plan — a free-tier
-submission carrying a token is rejected with "You are trying to use a Pro
-feature". So Turnstile is currently off (`TURNSTILE_SITE_KEY` unset) and the
-honeypot is the only protection.
+**Status: no longer urgent.** The form uses **hCaptcha**, which Web3Forms
+verifies on the free plan. Turnstile was tried first and rejected at submit
+time with "You are trying to use a Pro feature" — their free tier verifies
+hCaptcha only. Build variable is `HCAPTCHA_SITE_KEY`; the hCaptcha **secret**
+goes in the Web3Forms dashboard.
+
+The Worker below is still worth building eventually, for the reason that has
+nothing to do with captchas:
 
 The deeper problem is that `WEB3FORMS_KEY` is a build variable baked into the
 HTML, so it is public. That is what makes spam trivial: bots POST straight to

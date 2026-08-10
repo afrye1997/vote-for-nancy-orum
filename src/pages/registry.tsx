@@ -25,11 +25,11 @@ export type PageProps = {
   /** Absolute URL, or null when SITE_ORIGIN is unset. */
   readonly thanksUrl: string | null
   /**
-   * Cloudflare Turnstile site key. Public by design — the secret half lives in
+   * hCaptcha site key. Public by design — the secret half lives in
    * the Web3Forms dashboard and never touches this repo. Null disables the
    * widget entirely.
    */
-  readonly turnstileSiteKey: string | null
+  readonly hcaptchaSiteKey: string | null
 }
 
 export const PAGE_COMPONENTS: Record<string, ComponentType<PageProps> | undefined> = {

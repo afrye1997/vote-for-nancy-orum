@@ -22,7 +22,7 @@ export type RenderOpts = {
   web3formsKey: string | null
   /** Absolute origin, e.g. https://nancyorum.com. Null until the domain exists. */
   origin: string | null
-  turnstileSiteKey: string | null
+  hcaptchaSiteKey: string | null
 }
 
 export const PAGES = PAGES_NAV.map((p) => ({
@@ -45,7 +45,7 @@ function pageProps(opts: RenderOpts): PageProps {
     base: opts.base,
     web3formsKey: opts.web3formsKey,
     thanksUrl: opts.origin === null ? null : `${opts.origin}${opts.base}thanks/`,
-    turnstileSiteKey: opts.turnstileSiteKey,
+    hcaptchaSiteKey: opts.hcaptchaSiteKey,
   }
 }
 

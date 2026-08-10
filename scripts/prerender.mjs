@@ -36,11 +36,11 @@ const WEB3FORMS_KEY = process.env.WEB3FORMS_KEY ?? null
 /** Absolute origin, e.g. https://nancyorum.com — required for social previews. */
 const ORIGIN = process.env.SITE_ORIGIN ?? null
 /**
- * Cloudflare Turnstile site key. Public — it is meant to be in the HTML. The
+ * hCaptcha site key. Public — it is meant to be in the HTML. The
  * secret key is entered in the Web3Forms dashboard, which is what actually
  * verifies the token, so it never appears in this repo or in the build.
  */
-const TURNSTILE_SITE_KEY = process.env.TURNSTILE_SITE_KEY ?? null
+const HCAPTCHA_SITE_KEY = process.env.HCAPTCHA_SITE_KEY ?? null
 
 /**
  * Expected exports from the SSR bundle:
@@ -54,13 +54,13 @@ const renderOpts = {
   base: BASE,
   web3formsKey: WEB3FORMS_KEY,
   origin: ORIGIN,
-  turnstileSiteKey: TURNSTILE_SITE_KEY,
+  hcaptchaSiteKey: HCAPTCHA_SITE_KEY,
 }
 
 /* Loaded on every page rather than only the form's: one more cached file, and
    it keeps the head identical across pages. Deferred, so it never blocks. */
-const TURNSTILE_SCRIPT = TURNSTILE_SITE_KEY
-  ? '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>'
+const HCAPTCHA_SCRIPT = HCAPTCHA_SITE_KEY
+  ? '<script src="https://js.hcaptcha.com/1/api.js?render=explicit" async defer></script>'
   : ''
 
 /**
@@ -133,7 +133,7 @@ function document({ title, description, body, props, cssHref, jsHref, ogImage, c
      those is missing. A tag pointing at a file that 404s is worse than no tag,
      because the scrapers cache the failure long after the file arrives. -->`
   }
-${FONT_LINKS}${TURNSTILE_SCRIPT ? '\n' + TURNSTILE_SCRIPT : ''}
+${FONT_LINKS}${HCAPTCHA_SCRIPT ? '\n' + HCAPTCHA_SCRIPT : ''}
 ${cssHref ? `<link rel="stylesheet" href="${cssHref}">` : '<!-- no stylesheet emitted -->'}
 </head>
 <body>
@@ -361,7 +361,7 @@ console.log(
   }`,
 )
 console.log(`  web3forms: ${WEB3FORMS_KEY ? 'configured' : 'NOT CONFIGURED — form will not submit'}`)
-console.log(`  turnstile: ${TURNSTILE_SITE_KEY ? 'configured' : 'off — honeypot only'}`)
+console.log(`  hcaptcha: ${HCAPTCHA_SITE_KEY ? 'configured' : 'off — honeypot only'}`)
 
 /**
  * Loud, because this is the state a launch actually ships in: the domain is

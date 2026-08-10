@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { SubmitButton } from '../ui/Button'
 import { Photo } from '../ui/Photo'
-import { Turnstile } from '../ui/Turnstile'
+import { HCaptcha } from '../ui/HCaptcha'
 import { CheckboxField, RadioField, SelectField, TextAreaField, TextField } from '../ui/fields'
 import { DonateRow } from './DonateRow'
 import { FORM, PURPOSES } from '../../content/involved'
@@ -118,11 +118,11 @@ import { href } from '../../content/site'
  * than a button permanently reading "Sending…" — the one dead end a design with
  * no error UI cannot otherwise escape.
  *
- * ⚠ TURNSTILE CHANGES THIS. `cf-turnstile-response` is single-use, so once the
+ * ⚠ TURNSTILE CHANGES THIS. `h-captcha-response` is single-use, so once the
  * fetch has spent the token the native fallback carries a dead one and
  * Web3Forms will refuse it. The fallback therefore only rescues the no-response
- * case when Turnstile is on — which is the case it exists for. It also means
- * Turnstile all but removes the duplicate-delivery risk. Turnstile needs
+ * case when hCaptcha is on — which is the case it exists for. It also means
+ * hCaptcha all but removes the duplicate-delivery risk. hCaptcha needs
  * JavaScript, so switching it on costs the no-JavaScript path entirely; that
  * trade is the campaign's, and it is recorded in HANDOFF.md.
  *
@@ -214,13 +214,13 @@ export function InvolvedForm({
   base,
   web3formsKey,
   thanksUrl,
-  turnstileSiteKey,
+  hcaptchaSiteKey,
 }: {
   readonly base: string
   readonly web3formsKey: string | null
   /** Absolute URL, or null when SITE_ORIGIN is unset. */
   readonly thanksUrl: string | null
-  readonly turnstileSiteKey: string | null
+  readonly hcaptchaSiteKey: string | null
 }) {
   if (web3formsKey === null) {
     return (
@@ -238,7 +238,7 @@ export function InvolvedForm({
       base={base}
       web3formsKey={web3formsKey}
       thanksUrl={thanksUrl}
-      turnstileSiteKey={turnstileSiteKey}
+      hcaptchaSiteKey={hcaptchaSiteKey}
     />
   )
 }
@@ -251,12 +251,12 @@ function ContactForm({
   base,
   web3formsKey,
   thanksUrl,
-  turnstileSiteKey,
+  hcaptchaSiteKey,
 }: {
   readonly base: string
   readonly web3formsKey: string
   readonly thanksUrl: string | null
-  readonly turnstileSiteKey: string | null
+  readonly hcaptchaSiteKey: string | null
 }) {
   /**
    * A send is in flight. A ref, not the `phase` state below, because this has to
@@ -374,21 +374,21 @@ function ContactForm({
     const form = event.currentTarget
 
     /*
-     * Refuse to send without a Turnstile token.
+     * Refuse to send without a hCaptcha token.
      *
      * Web3Forms rejects an unverified submission anyway, but only after a round
      * trip — so the visitor fills the form, presses the button, waits, and is
      * told it failed for a reason the page never mentioned. Checking here turns
      * that into "finish the check above" before anything is sent.
      *
-     * The widget writes `cf-turnstile-response` into the form itself, so the
+     * The widget writes `h-captcha-response` into the form itself, so the
      * form data is the authoritative source: no token means unsolved, expired,
      * or the widget never loaded. It is not security — a browser can be made to
      * send anything, which is exactly why the secret key still verifies this
      * server-side at Web3Forms. It is honesty about what is about to happen.
      */
-    if (turnstileSiteKey !== null) {
-      const token = new FormData(form).get('cf-turnstile-response')
+    if (hcaptchaSiteKey !== null) {
+      const token = new FormData(form).get('h-captcha-response')
       if (typeof token !== 'string' || token === '') {
         setPhase('unverified')
         return
@@ -541,9 +541,9 @@ function ContactForm({
               : ''}
         </p>
 
-        {turnstileSiteKey === null ? null : (
+        {hcaptchaSiteKey === null ? null : (
           /*
-           * Cloudflare Turnstile. The widget writes a `cf-turnstile-response`
+           * Cloudflare hCaptcha. The widget writes a `h-captcha-response`
            * field into the form, and Web3Forms rejects the submission if that
            * token is missing or already spent — the verification happens there,
            * against the secret key in their dashboard, never here.
@@ -555,7 +555,7 @@ function ContactForm({
            * The honeypot above still works either way.
            */
           <>
-            <Turnstile siteKey={turnstileSiteKey} />
+            <HCaptcha siteKey={hcaptchaSiteKey} />
             {phase === 'unverified' ? (
               <p className="form__error" role="alert">
                 {FORM.status.unverified}
