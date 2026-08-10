@@ -419,6 +419,31 @@ function ContactForm({
        * it is the entire no-JavaScript thank-you page.
        */
       body.delete('redirect')
+      /*
+       * ⚠ THE hCAPTCHA WIDGET ALSO WRITES A reCAPTCHA FIELD. SENDING IT IS FATAL.
+       *
+       * hCaptcha is built as a drop-in replacement for reCAPTCHA, so its widget
+       * injects TWO textareas into the form, not one: `h-captcha-response` and
+       * an empty `g-recaptcha-response` for compatibility with servers that
+       * only know the old name. Measured on the deployed page — both are there,
+       * every time, before anything is solved.
+       *
+       * Web3Forms decides which captcha you are using by which field arrives.
+       * `g-recaptcha-response` puts it on the reCaptcha path, reCaptcha is a Pro
+       * feature, and the submission is refused with
+       *
+       *     "You are trying to use a Pro feature, Please Upgrade to use reCaptcha."
+       *
+       * before the valid hCaptcha token beside it is ever examined. Presence is
+       * enough; the field is empty and it still triggers this. hCaptcha itself
+       * is free on their plan, so the message reads like a billing problem and
+       * is not one — it is this line.
+       *
+       * This is why the form failed, and it had nothing to do with the transport
+       * or the site key. Do not remove this delete, and do not "simplify" the
+       * payload builder into something that forwards every field the DOM has.
+       */
+      body.delete('g-recaptcha-response')
       dropHiddenBranchFields(form, body)
 
       const response = await fetch(WEB3FORMS_ENDPOINT, {

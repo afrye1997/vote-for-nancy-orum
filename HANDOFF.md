@@ -1,11 +1,12 @@
 # Handoff
 
-> **Open thread:** the captcha. Four defects found and fixed, and the client
-> behaviour is now verified against the real bundle; what remains is a single
-> submission by a human in a browser, because `api.web3forms.com` is behind a
-> Cloudflare challenge and no terminal can reach it. See
-> [HANDOFF-CAPTCHA.md](HANDOFF-CAPTCHA.md) — including why the three earlier
-> diagnoses were all drawn from the wrong request's error message.
+> **Open thread:** the captcha — root cause found and fixed. The hCaptcha widget
+> also injects an empty `g-recaptcha-response` field, which made Web3Forms treat
+> every submission as a Pro reCaptcha one and refuse it. Nothing to do with the
+> plan, the site key, or the transport. See
+> [HANDOFF-CAPTCHA.md](HANDOFF-CAPTCHA.md), which also covers why the earlier
+> diagnoses were all drawn from the wrong request's error message. Awaiting one
+> confirming submission in a browser.
 
 Written 2026-08-10, at the end of the session that built this site. Read this
 first if you are picking the project up cold. `START-HERE.md` describes the

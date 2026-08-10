@@ -6,17 +6,60 @@ first for the project as a whole; this covers one thread.
 **Goal.** Stop bot spam reaching the campaign's Web3Forms inbox, on the free
 plan, without breaking the contact form.
 
-**Status.** Four defects found and fixed, including the one that caused three
-wrong diagnoses in a row. The client behaviour is now verified end to end
-against the real bundle. **It has still never been submitted against the live
-API by a human in a browser, and that is the only thing that can call this
-done.** See "What is left" below.
+**Status.** **Root cause found and fixed.** It was one stray form field, and it
+had nothing to do with the plan, the site key, or the transport. Awaiting one
+confirming submission in a browser.
 
 **Escape hatch, unchanged.** If the form must work before anyone can test it,
 unset `HCAPTCHA_SITE_KEY` in the Cloudflare build variables and trigger a
 build — the widget and its script vanish, the submit guard goes dormant, and
 the form posts as it did before any of this. The honeypot and Web3Forms'
 Advanced Spam Filter still run.
+
+---
+
+## The bug
+
+**The hCaptcha widget injects two textareas, and one of them makes Web3Forms
+think you are using reCaptcha.**
+
+hCaptcha is designed as a drop-in replacement for reCAPTCHA, so alongside
+`h-captcha-response` it writes an empty `g-recaptcha-response` for servers that
+only know the old name. Measured on the deployed page — both are present, every
+time, before anything is solved:
+
+```
+{ "name": "g-recaptcha-response", "tag": "textarea", "value": "" }
+{ "name": "h-captcha-response",  "tag": "textarea", "value": "" }
+```
+
+Their docs do not mention this. It was found by enumerating the live form's
+fields, not by reading.
+
+Web3Forms decides which captcha you are using from which field arrives.
+`g-recaptcha-response` puts the submission on the reCaptcha path, reCaptcha is
+Pro, and it is refused with
+
+> You are trying to use a Pro feature, Please Upgrade to use reCaptcha.
+
+before the valid hCaptcha token sitting next to it is ever looked at. Presence
+alone is enough — the field is empty and it still triggers this.
+
+**The fix is one line** in `ContactForm`'s send path, next to the existing
+`body.delete('redirect')`:
+
+```js
+body.delete('g-recaptcha-response')
+```
+
+Two things worth keeping in mind about how this presented:
+
+- **The error names a plan problem and is not one.** hCaptcha is free on
+  Web3Forms; nothing needed upgrading. Anyone reading that message at face value
+  goes looking at billing, which is where this thread nearly went.
+- **It was never the transport or the key.** The multipart-to-JSON change and
+  the site-key correction were both right on their own merits, and neither was
+  the fix. This field was being sent the whole time, under every attempt.
 
 ---
 
@@ -136,29 +179,25 @@ there is no CI smoke test for the form.
 
 ## What is left
 
-**One human, one browser, one submission.** Everything above establishes that
-the client does the right thing with the right payload shape; none of it proves
-Web3Forms accepts it, because nothing here can reach them.
+**One confirming submission.** Load `/involved/` fresh, solve the captcha, send.
+Expect to land on `/thanks/` with the email arriving. Fold the remaining
+`WEB3FORMS_KEY` checks in `HANDOFF.md` §1 into the same sitting — both branch
+paths, and the `Reply-To` pass/fail.
 
-Load `/involved/` fresh, solve the captcha, submit, and:
+If it still fails, the page now quotes the reason. Two readings worth knowing:
 
-- **If it succeeds** you land on the campaign's own `/thanks/` and the email
-  arrives. Fold the remaining `WEB3FORMS_KEY` checks in `HANDOFF.md` §1 into the
-  same sitting — both branch paths, and the `Reply-To` pass/fail.
-- **If it fails you now get told why, on the page.** Write down the quoted
-  message verbatim; that is the first real evidence this thread has ever had.
-  Open the console too for the underlying error.
-
-Two readings worth knowing in advance:
-
-- *"Could not validate hCaptcha"* — the token is genuinely being rejected. The
-  payload shape is right, so suspect the key pairing or their dashboard state,
-  not this code.
+- *"Could not validate hCaptcha"* — the token itself is being rejected. The
+  payload shape is right, so suspect their dashboard state, not this code.
 - *A network error with nothing quoted* — the request never got an answer.
   Suspect the Cloudflare challenge in front of their API being applied to a
-  cross-origin `fetch`, which no amount of client code can solve. That would
-  make the Worker in `HANDOFF.md` the fix, since a server-to-server POST is not
-  challenged the same way.
+  cross-origin `fetch`, which no client code can solve. That would make the
+  Worker in `HANDOFF.md` the fix.
+
+**A note on the test harness.** The headless suite described above stubbed the
+widget with only `h-captcha-response`, so it reproduced a friendlier form than
+the real one and sailed past the actual bug. The stub now injects both fields.
+The general lesson, which this thread has now paid for twice: a stub that is
+kinder than production tests the stub.
 
 ---
 
