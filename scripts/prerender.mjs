@@ -111,9 +111,10 @@ function document({ title, description, body, props, cssHref, jsHref, ogImage, c
 <meta property="og:image" content="${ogImage}">
 <meta name="twitter:image" content="${ogImage}">`
       : `
-<!-- og:image omitted until an asset exists. A tag pointing at a missing file
-     is worse than no tag. Facebook and Twitter also require an ABSOLUTE url,
-     so this needs SITE_ORIGIN set. -->`
+<!-- og:image omitted. It needs BOTH an absolute url (SITE_ORIGIN — Facebook and
+     Twitter reject a relative one) and public/img/og-card.jpg to exist; one of
+     those is missing. A tag pointing at a file that 404s is worse than no tag,
+     because the scrapers cache the failure long after the file arrives. -->`
   }
 ${FONT_LINKS}
 ${cssHref ? `<link rel="stylesheet" href="${cssHref}">` : '<!-- no stylesheet emitted -->'}
@@ -129,7 +130,27 @@ ${jsHref ? `<script type="module" src="${jsHref}"></script>` : '<!-- no client b
 
 const cssHref = await findAsset('.css')
 const jsHref = await findAsset('.js')
-const ogImage = ORIGIN ? `${ORIGIN}${BASE}img/og-card.jpg` : null
+
+/**
+ * The social preview card.
+ *
+ * Needs two things, and until now only checked for one. An absolute origin,
+ * because Facebook and Twitter both reject a relative og:image — and the file
+ * itself, which nobody has supplied (NEEDED-FROM-CAMPAIGN.md).
+ *
+ * Emitting the tag on the strength of SITE_ORIGIN alone points every crawler at
+ * a 404, which is worse than saying nothing: the scrapers cache the failure, so
+ * shares keep coming up blank for as long as that cache lives — well past the
+ * day the file is finally added. Omitting the tag leaves them to fall back on
+ * the page title and description, which are real.
+ *
+ * This warns rather than failing the build. The asset is owed by the campaign
+ * and no amount of editing code produces it, so a hard failure would only block
+ * deploys of work that is otherwise finished.
+ */
+const OG_CARD = 'img/og-card.jpg'
+const ogCardPresent = existsSync(join(DIST, OG_CARD))
+const ogImage = ORIGIN && ogCardPresent ? `${ORIGIN}${BASE}${OG_CARD}` : null
 const written = []
 
 for (const page of PAGES) {
@@ -293,8 +314,28 @@ for (const w of written) console.log(`  ${w.path.padEnd(20)} ${w.kb.padStart(6)}
 console.log(`\n  base:      ${BASE}`)
 console.log(`  stylesheet: ${cssHref ?? 'none emitted'}`)
 console.log(`  client js:  ${jsHref ?? 'NONE — pages will not hydrate'}`)
-console.log(`  og:image:  ${ogImage ?? 'not set — needs SITE_ORIGIN'}`)
+console.log(
+  `  og:image:  ${
+    ogImage ?? (ORIGIN ? `omitted — public/${OG_CARD} does not exist` : 'not set — needs SITE_ORIGIN')
+  }`,
+)
 console.log(`  web3forms: ${WEB3FORMS_KEY ? 'configured' : 'NOT CONFIGURED — form will not submit'}`)
+
+/**
+ * Loud, because this is the state a launch actually ships in: the domain is
+ * bought, SITE_ORIGIN is set, everything looks finished, and every share of the
+ * site comes up as a bare grey rectangle. Nothing else in the output surfaces
+ * it — the missing-image scan reads src and srcset attributes, and og:image is
+ * a meta content attribute, so it never appeared there.
+ */
+if (ORIGIN && !ogCardPresent) {
+  console.warn(
+    `\n  ⚠ No social preview card. SITE_ORIGIN is set, so every page would have\n` +
+      `    carried an og:image; public/${OG_CARD} does not exist, so none do.\n` +
+      `    Shares to Facebook, Twitter, iMessage and Slack will show no image.\n` +
+      `    Needs a 1200×630 JPEG — see NEEDED-FROM-CAMPAIGN.md.\n`,
+  )
+}
 
 if (missingImages.length) {
   const list = missingImages.map((f) => `  ${f}`).join('\n')
