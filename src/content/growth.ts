@@ -126,7 +126,7 @@ export const STATS: readonly Stat[] = [
     id: 'permits',
     /** 637 is the federal figure. No city document publishes the artifact's 636. */
     value: CENSUS.permits2024,
-    countFrom: 630,
+    countFrom: 620,
     suffix: '',
     // Comparison uses 2012, which HAS data. The artifact compared to 2013,
     // which does not exist in the survey — Bella Vista reported zero months.
