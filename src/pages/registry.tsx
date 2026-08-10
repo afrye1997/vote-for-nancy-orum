@@ -24,6 +24,12 @@ export type PageProps = {
   readonly web3formsKey: string | null
   /** Absolute URL, or null when SITE_ORIGIN is unset. */
   readonly thanksUrl: string | null
+  /**
+   * Cloudflare Turnstile site key. Public by design — the secret half lives in
+   * the Web3Forms dashboard and never touches this repo. Null disables the
+   * widget entirely.
+   */
+  readonly turnstileSiteKey: string | null
 }
 
 export const PAGE_COMPONENTS: Record<string, ComponentType<PageProps> | undefined> = {

@@ -8,10 +8,12 @@ export function Involved({
   base,
   web3formsKey,
   thanksUrl,
+  turnstileSiteKey,
 }: {
   readonly base: string
   readonly web3formsKey: string | null
   readonly thanksUrl: string | null
+  readonly turnstileSiteKey: string | null
 }) {
   return (
     <Page base={base} current="involved" tone="dark">
@@ -20,7 +22,12 @@ export function Involved({
         <p className="involved__intro">{INVOLVED_INTRO}</p>
       </div>
       <BallotCheck base={base} />
-      <InvolvedForm base={base} web3formsKey={web3formsKey} thanksUrl={thanksUrl} />
+      <InvolvedForm
+        base={base}
+        web3formsKey={web3formsKey}
+        thanksUrl={thanksUrl}
+        turnstileSiteKey={turnstileSiteKey}
+      />
     </Page>
   )
 }

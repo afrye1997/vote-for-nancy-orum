@@ -78,11 +78,13 @@ export function InvolvedForm({
   base,
   web3formsKey,
   thanksUrl,
+  turnstileSiteKey,
 }: {
   readonly base: string
   readonly web3formsKey: string | null
   /** Absolute URL, or null when SITE_ORIGIN is unset. */
   readonly thanksUrl: string | null
+  readonly turnstileSiteKey: string | null
 }) {
   if (web3formsKey === null) {
     return (
@@ -95,7 +97,14 @@ export function InvolvedForm({
     )
   }
 
-  return <ContactForm base={base} web3formsKey={web3formsKey} thanksUrl={thanksUrl} />
+  return (
+    <ContactForm
+      base={base}
+      web3formsKey={web3formsKey}
+      thanksUrl={thanksUrl}
+      turnstileSiteKey={turnstileSiteKey}
+    />
+  )
 }
 
 /**
@@ -106,10 +115,12 @@ function ContactForm({
   base,
   web3formsKey,
   thanksUrl,
+  turnstileSiteKey,
 }: {
   readonly base: string
   readonly web3formsKey: string
   readonly thanksUrl: string | null
+  readonly turnstileSiteKey: string | null
 }) {
   const formRef = useRef<HTMLFormElement>(null)
   /* Constants, never measurements: the first client render has to reproduce the
@@ -348,6 +359,20 @@ function ContactForm({
                 </span>
               ))}
         </SubmitButton>
+        {turnstileSiteKey === null ? null : (
+          /*
+           * Cloudflare Turnstile. The widget writes a `cf-turnstile-response`
+           * field into the form, and Web3Forms rejects the submission if that
+           * token is missing or already spent — the verification happens there,
+           * against the secret key in their dashboard, never here.
+           *
+           * It needs JavaScript, so with the bundle blocked there is no token
+           * and Web3Forms turns the submission away. That is the cost of
+           * switching it on: the form stops being usable without JavaScript.
+           * The honeypot above still works either way.
+           */
+          <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light" />
+        )}
         <p className="note">{FORM.privacy}</p>
         <DonateRow />
       </form>
