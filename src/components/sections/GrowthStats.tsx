@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { CountUp } from '../ui/CountUp'
 import { GROWTH_INTRO, STATS } from '../../content/growth'
 
@@ -18,6 +19,32 @@ import { GROWTH_INTRO, STATS } from '../../content/growth'
  * page a non-technical visitor can actually read.
  */
 export function GrowthStats() {
+  const statsRef = useRef<HTMLDivElement>(null)
+  const [counting, setCounting] = useState(false)
+
+  /**
+   * One observer for the whole row, so all three counters start on the same
+   * frame and — running for the same duration — land on the same frame. Each
+   * counter watching itself only looked synchronised while they shared a line;
+   * stacked into one column on a phone they fired one at a time.
+   *
+   * `false` on the server and on the first client render, so hydration matches.
+   */
+  useEffect(() => {
+    const el = statsRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return
+        observer.disconnect()
+        setCounting(true)
+      },
+      { threshold: 0.4 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <section className="section container" style={{ paddingTop: 0 }}>
       <div className="section__head section__head--growth">
@@ -25,11 +52,16 @@ export function GrowthStats() {
         <h2 className="section__title">{GROWTH_INTRO.heading}</h2>
         <p className="section__lede">{GROWTH_INTRO.lede}</p>
       </div>
-      <div className="stats">
+      <div className="stats" ref={statsRef}>
         {STATS.map((stat) => (
           <div className="stat" key={stat.id}>
             <p className="stat__figure">
-              <CountUp from={stat.countFrom} to={stat.value} suffix={stat.suffix} />
+              <CountUp
+                from={stat.countFrom}
+                to={stat.value}
+                suffix={stat.suffix}
+                start={counting}
+              />
             </p>
             <p className="stat__caption">{stat.caption}</p>
             <p className="stat__source">
