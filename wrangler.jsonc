@@ -19,6 +19,25 @@
   // deliberately moving this forward.
   "compatibility_date": "2026-08-10",
 
+  /*
+   * Declared explicitly because the Cloudflare dashboard holds this setting
+   * too, and whatever is in this file wins on every deploy. Leaving it out does
+   * not mean "leave the dashboard alone" — it means the deploy silently resets
+   * it, so a value chosen in the UI survives until the next push and then
+   * quietly does not.
+   *
+   * Off, because there is nothing to observe. This Worker has no script: every
+   * response is a file Cloudflare hands back from ./dist, so the logs would
+   * carry no application events. Form submissions go from the visitor's browser
+   * straight to Web3Forms and never touch this Worker at all.
+   *
+   * Turn it on if a launch-week problem needs request-level detail — it is a
+   * one-line change and the dashboard will stop warning either way.
+   */
+  "observability": {
+    "enabled": false
+  },
+
   "assets": {
     "directory": "./dist",
 
