@@ -1,0 +1,37 @@
+{
+  // Cloudflare Workers deploy config.
+  //
+  // This is a static-assets Worker: there is no `main` entry script, because
+  // there is no server-side work to do. Every URL is a complete HTML file
+  // written by scripts/prerender.mjs at build time, so Cloudflare only has to
+  // hand out files. Adding a Worker script to serve them would put a cold start
+  // in front of a static asset for nothing.
+  //
+  // Cloudflare runs `npm run build` and then this deploys ./dist. Neither
+  // WEB3FORMS_KEY nor SITE_ORIGIN belongs here — they are read by the build,
+  // not at request time, so they are set as build variables in the Cloudflare
+  // dashboard.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vote-for-nancy-orum",
+
+  // Pins the Workers runtime's behaviour to what existed on this date, so a
+  // future platform change cannot alter how the site is served without someone
+  // deliberately moving this forward.
+  "compatibility_date": "2026-08-10",
+
+  "assets": {
+    "directory": "./dist",
+
+    /*
+     * Serve dist/404.html for an unknown path, with a real 404 status.
+     *
+     * NOT "single-page-application", which is the wrong answer here twice over.
+     * It would return dist/index.html with a 200 for every unrecognised URL, so
+     * a mistyped address would render the homepage while claiming to be the
+     * page the visitor asked for — and it would tell crawlers that every URL on
+     * the domain exists, including the ones that do not. This site prerenders
+     * each page to its own file precisely so that neither of those is true.
+     */
+    "not_found_handling": "404-page"
+  }
+}
