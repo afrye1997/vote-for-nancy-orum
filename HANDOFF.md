@@ -291,6 +291,36 @@ Commission filing burden, so it is her call, not a developer's).
 
 ---
 
+## Deploying
+
+**GitHub is the repository and nothing else.** No Actions, no Cloudflare Git
+integration, no CI. Pushing does not deploy.
+
+**Cloudflare Pages, by direct upload.** The build runs on the developer's
+machine and the output is uploaded:
+
+```bash
+npx wrangler login        # once
+
+WEB3FORMS_KEY=… TURNSTILE_SITE_KEY=0x4AAA… SITE_ORIGIN=https://… npm run deploy
+```
+
+That is where the environment variables have to be. They are read at build time
+and baked into the HTML, so with the build running locally the Cloudflare
+dashboard's build variables apply to nothing — setting them there and expecting
+them to work is how a deploy silently ships the "form isn't connected" card.
+
+Two consequences of no CI worth stating plainly: a deploy is only as verified as
+the machine that ran it, so run `npm run lint` and `npm run contrast` before
+`npm run deploy` (the build gates run automatically as part of it). And the
+repo can drift from what is live — the deployed site is whatever was last
+uploaded, not whatever is on `main`.
+
+`assets/` is gitignored, so GitHub is **not** a complete backup: the 48 MB of
+original photography exists only on the build machine and in the design project.
+
+---
+
 ## Gotchas that cost real time
 
 Every one of these was found the hard way.
