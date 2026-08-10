@@ -1,35 +1,69 @@
 {
-  // Cloudflare Pages, deployed by direct upload — no Git integration.
+  // Cloudflare Workers deploy config.
   //
-  //   npm run deploy      builds, then uploads ./dist
-  //
-  // There is no `main` entry script and no Worker: every URL is a complete HTML
-  // file written by scripts/prerender.mjs at build time, so Cloudflare only has
-  // to hand out files.
-  //
-  // ───────────────────────────────────────────────────────────────────────────
-  // ENVIRONMENT VARIABLES DO NOT BELONG HERE
-  // ───────────────────────────────────────────────────────────────────────────
-  // WEB3FORMS_KEY, TURNSTILE_SITE_KEY and SITE_ORIGIN are read by the BUILD and
-  // baked into the HTML. With direct upload the build runs on this machine, so
-  // they go in the shell that runs `npm run deploy`, not in the Cloudflare
-  // dashboard:
-  //
-  //   WEB3FORMS_KEY=… TURNSTILE_SITE_KEY=… SITE_ORIGIN=https://… npm run deploy
-  //
-  // Dashboard variables would only matter if Cloudflare were doing the build,
-  // which it is not. Setting them there and expecting them to apply is the easy
-  // mistake — the deploy would silently ship the "form isn't connected" card.
+  // This is a static-assets Worker: there is no `main` entry script, because
+  // there is no server-side work to do. Every URL is a complete HTML file
+  // written by scripts/prerender.mjs at build time, so Cloudflare only has to
+  // hand out files. Adding a Worker script to serve them would put a cold start
+  // in front of a static asset for nothing.
   //
   // ───────────────────────────────────────────────────────────────────────────
-  // 404s
+  // THIS PROJECT IS BUILT BY CLOUDFLARE, ON EVERY PUSH TO main
   // ───────────────────────────────────────────────────────────────────────────
-  // Pages serves dist/404.html for an unknown path with a real 404 status,
-  // automatically, because the file exists. Nothing to configure — and notably
-  // NOT an SPA fallback, which would return the homepage with a 200 for every
-  // mistyped URL and tell crawlers that every address on the domain exists.
+  // Workers Builds is connected to the GitHub repo. Pushing IS deploying — the
+  // build history is in the dashboard under Deployments, and a failed build
+  // leaves the previous version serving.
+  //
+  // This file was briefly rewritten as a Pages config (`pages_build_output_dir`)
+  // on the belief that nothing was connected and deploys were manual. That is
+  // not a valid key for `wrangler deploy`, and the build failed. If deploys ever
+  // start failing right after a config change, check which product the project
+  // actually is before changing anything else.
+  //
+  // Because Cloudflare runs the build, WEB3FORMS_KEY, TURNSTILE_SITE_KEY and
+  // SITE_ORIGIN belong in the dashboard as BUILD variables — they are read by
+  // the build and baked into the HTML, not read at request time. Runtime
+  // bindings would arrive after the build had already finished and do nothing.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "vote-for-nancy-orum",
+
+  // Pins the Workers runtime's behaviour to what existed on this date, so a
+  // future platform change cannot alter how the site is served without someone
+  // deliberately moving this forward.
   "compatibility_date": "2026-08-10",
-  "pages_build_output_dir": "./dist"
+
+  /*
+   * Declared explicitly because the Cloudflare dashboard holds this setting
+   * too, and whatever is in this file wins on every deploy. Leaving it out does
+   * not mean "leave the dashboard alone" — it means the deploy silently resets
+   * it, so a value chosen in the UI survives until the next push and then
+   * quietly does not.
+   *
+   * Off, because there is nothing to observe. This Worker has no script: every
+   * response is a file Cloudflare hands back from ./dist, so the logs would
+   * carry no application events. Form submissions go from the visitor's browser
+   * straight to Web3Forms and never touch this Worker at all.
+   *
+   * Turn it on if a launch-week problem needs request-level detail — it is a
+   * one-line change and the dashboard will stop warning either way.
+   */
+  "observability": {
+    "enabled": false
+  },
+
+  "assets": {
+    "directory": "./dist",
+
+    /*
+     * Serve dist/404.html for an unknown path, with a real 404 status.
+     *
+     * NOT "single-page-application", which is the wrong answer here twice over.
+     * It would return dist/index.html with a 200 for every unrecognised URL, so
+     * a mistyped address would render the homepage while claiming to be the
+     * page the visitor asked for — and it would tell crawlers that every URL on
+     * the domain exists, including the ones that do not. This site prerenders
+     * each page to its own file precisely so that neither of those is true.
+     */
+    "not_found_handling": "404-page"
+  }
 }

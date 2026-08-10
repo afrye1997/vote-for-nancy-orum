@@ -293,31 +293,29 @@ Commission filing burden, so it is her call, not a developer's).
 
 ## Deploying
 
-**GitHub is the repository and nothing else.** No Actions, no Cloudflare Git
-integration, no CI. Pushing does not deploy.
+**Cloudflare Workers Builds is connected to the GitHub repo. Pushing to `main`
+builds and deploys.** Build history is in the Cloudflare dashboard under
+Deployments; a failed build leaves the previous version serving.
 
-**Cloudflare Pages, by direct upload.** The build runs on the developer's
-machine and the output is uploaded:
+`npm run deploy` also exists for a manual push from this machine
+(`npm run build && wrangler deploy`), but the normal path is `git push`.
 
-```bash
-npx wrangler login        # once
+Because **Cloudflare** runs the build, `WEB3FORMS_KEY`, `TURNSTILE_SITE_KEY` and
+`SITE_ORIGIN` go in the dashboard as **build** variables — not runtime
+bindings, and not `vars` in wrangler.jsonc. They are read at build time and
+baked into the HTML; a runtime binding arrives after the build has finished and
+does nothing. Changing one needs a new build, not just a save.
 
-WEB3FORMS_KEY=… TURNSTILE_SITE_KEY=0x4AAA… SITE_ORIGIN=https://… npm run deploy
-```
+A cautionary note, because it cost a failed deploy: this session asserted there
+was no CI after checking the repo for workflow files and finding none. The
+connection is dashboard-side and invisible from the tree. `wrangler.jsonc` was
+then rewritten as a Pages config, which is not valid for `wrangler deploy`, and
+the build broke. Verify which product a project actually is before changing its
+config.
 
-That is where the environment variables have to be. They are read at build time
-and baked into the HTML, so with the build running locally the Cloudflare
-dashboard's build variables apply to nothing — setting them there and expecting
-them to work is how a deploy silently ships the "form isn't connected" card.
-
-Two consequences of no CI worth stating plainly: a deploy is only as verified as
-the machine that ran it, so run `npm run lint` and `npm run contrast` before
-`npm run deploy` (the build gates run automatically as part of it). And the
-repo can drift from what is live — the deployed site is whatever was last
-uploaded, not whatever is on `main`.
-
-`assets/` is gitignored, so GitHub is **not** a complete backup: the 48 MB of
-original photography exists only on the build machine and in the design project.
+There is also a stray Pages project named `vote-for-nancy-orum` created during
+that mistake, serving at vote-for-nancy-orum.pages.dev. It is not the live site.
+Delete it once the real domain is settled.
 
 ---
 
