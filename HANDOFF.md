@@ -344,8 +344,11 @@ Delete it once the real domain is settled.
 **Status: no longer urgent.** The form uses **hCaptcha**, which Web3Forms
 verifies on the free plan. Turnstile was tried first and rejected at submit
 time with "You are trying to use a Pro feature" — their free tier verifies
-hCaptcha only. Build variable is `HCAPTCHA_SITE_KEY`; the hCaptcha **secret**
-goes in the Web3Forms dashboard.
+hCaptcha only. Set `HCAPTCHA_SITE_KEY` to Web3Forms' own published free-plan key,
+`50b2fe65-b00b-4b9e-ad62-3ba471098be2`, and enable hCaptcha in their dashboard.
+On the free plan they hold the matching secret; supplying your own key/secret
+pair is a paid feature and a token minted against a different site key will not
+verify. There is no hCaptcha account of ours and no hostname list to manage.
 
 The Worker below is still worth building eventually, for the reason that has
 nothing to do with captchas:

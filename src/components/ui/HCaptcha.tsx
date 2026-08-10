@@ -5,9 +5,28 @@ import { useEffect, useRef } from 'react'
  *
  * Replaces Turnstile, which Web3Forms only verifies on their Pro plan — a
  * free-tier submission carrying a Turnstile token is rejected outright.
- * hCaptcha is on the free plan, and the integration is otherwise identical:
- * the widget writes `h-captcha-response` into the enclosing form, and
- * Web3Forms checks it against the secret key in their dashboard.
+ * hCaptcha is on the free plan: the widget writes `h-captcha-response` into the
+ * enclosing form and Web3Forms verifies it server-side.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * THE SITE KEY IS WEB3FORMS', NOT OURS
+ * ─────────────────────────────────────────────────────────────────────────────
+ * On the free plan Web3Forms supplies the hCaptcha site key and holds the
+ * matching secret — their docs publish it as
+ * 50b2fe65-b00b-4b9e-ad62-3ba471098be2. Bringing your own key/secret pair is a
+ * paid feature, and a token minted against a different site key will not
+ * verify against their secret. So HCAPTCHA_SITE_KEY is set to their published
+ * value, not to a key from an hCaptcha account of ours.
+ *
+ * Hostname allow-listing is therefore theirs to manage, which is why no
+ * hostname configuration exists on our side.
+ *
+ * Their documented integration loads `web3forms.com/client/script.js` and lets
+ * it auto-render into `<div class="h-captcha" data-captcha="true">`. That is
+ * the auto-scan pattern described below, and it is exactly what does not
+ * survive hydration — their own React guidance says to set the token manually
+ * instead, which is the shape used here. The field the server reads is the
+ * same either way.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * WHY EXPLICIT RENDER, NOT THE `h-captcha` CLASS
