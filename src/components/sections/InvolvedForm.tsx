@@ -17,6 +17,13 @@ import { href } from '../../content/site'
  * Field `name`s are the words the campaign will read in the notification email,
  * so they are written for a human inbox rather than for a database.
  *
+ * ⚠ ONE EXCEPTION, AND IT IS LOAD-BEARING: `email` is lowercase. Web3Forms
+ * reserves that exact name and derives the `Reply-To` header from it — "By
+ * default, we take `email` as the `replyto` address" — so capitalising it to
+ * match its siblings would silently cost every reply. Do not tidy it. The
+ * notification renders the row label from the `name`, so lowercase is the whole
+ * price. See ENGINEERING.md §1.
+ *
  * ─────────────────────────────────────────────────────────────────────────────
  * CSS DECIDES WHICH BRANCH IS LIVE. THIS FILE ONLY ASKS IT, AND ONLY AT SUBMIT.
  * ─────────────────────────────────────────────────────────────────────────────
@@ -428,9 +435,12 @@ function ContactForm({
             required
           />
         </div>
+        {/* `email`, lowercase, is a Web3Forms reserved name: it is what sets the
+            `Reply-To` header, and it is the only field here not named for the
+            inbox. The visible label is FORM.email.label and is unaffected. */}
         <TextField
           id="email"
-          name="Email"
+          name="email"
           type="email"
           label={FORM.email.label}
           placeholder={FORM.email.placeholder}

@@ -53,6 +53,18 @@ Real examples from this project's log:
   `#drop-address` and `#question` fully visible and refusing input. Reproduced,
   not theorised. **If behaviour depends on what CSS did, read `getComputedStyle`;
   do not infer it from a feature test.**
+- **Web3Forms takes `Reply-To` from a field named `email`, lowercase, and the
+  form's human-readable naming scheme has exactly one reserved name — that one.**
+  The field shipped as `name="Email"` to match its siblings, which are written as
+  the labels the campaign reads in its inbox. Every reply-to passage in the
+  vendor's docs writes lowercase `` `email` ``, and there is not one
+  `name="Email"` anywhere in their corpus. The single capital-`Email` sentence
+  they publish is on the **Pro autoresponder** page — recipient selection, not
+  header construction — and was added two years after the reply-to page was last
+  edited. Nothing states the match is case-insensitive; HTML control names are
+  case-sensitive strings by spec. **When a vendor reserves a name, spell it their
+  way and take the cosmetic loss.** `src/components/sections/InvolvedForm.tsx`
+  now carries the exception in its docblock so it does not get tidied back.
 
 ---
 

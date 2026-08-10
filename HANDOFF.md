@@ -221,17 +221,37 @@ rather than pretending to accept submissions and discarding them.
     `x-www-form-urlencoded` — the encoding the vendor warns against. That warning
     is about reading the answer as JSON; a native navigation wants the 3xx it
     returns. Prove it anyway.
-  - **Check the `Reply-To` header on the mail that arrives.** See the note below.
-- ⚠ **`Reply-To` may not be set, and the form promises it is.** The email input
-  is `name="Email"` with a capital E, because these names are the labels the
-  campaign reads in its inbox. Web3Forms documents the reply-to address as coming
-  from a field named `email`, lowercase, in every example. If the header comes
-  back unset, replying to a constituent goes to Web3Forms rather than to them —
-  and the question branch's own hint says *"Nancy answers her own email — you'll
-  hear back at the address above."* The fix is one lowercase letter in
-  `InvolvedForm.tsx` (`name="Email"` → `name="email"`), at the cost of a
-  lowercase label in the notification email. Deliberately not applied blind; do
-  it the moment the header proves absent.
+  - 🚩 **`Reply-To` is a named pass/fail on BOTH runs above, not a footnote.**
+    Open the message → Gmail's ⋮ menu → **Show original** → look for a line
+    beginning `Reply-To:`. It must read the address that was typed into the form.
+    A `Reply-To:` pointing at anything `@web3forms.com`, or no such line at all,
+    is a fail. The five-second version: press **Reply** and read the `To:` field.
+    Save the "Show original" text into this file once, so the result is recorded
+    rather than remembered.
+- ✅ **`Reply-To` fix — APPLIED, awaiting the confirmation above.** The email
+  input is now `name="email"`, lowercase. Web3Forms reserves that exact name and
+  derives the reply-to address from it: *"By default, we take `email` as the
+  `replyto` address."* It was `name="Email"` because every other field name here
+  is written as the label the campaign reads in its inbox, and no primary source
+  says a capital `E` works — the single capital-`Email` sentence in the vendor's
+  docs is on the **Pro autoresponder** page, a different feature and a different
+  code path, added two years after the reply-to page was last touched. Betting a
+  constituent's reply on it was not worth one uppercase letter, especially when
+  the question branch's own hint promises *"Nancy answers her own email — you'll
+  hear back at the address above."*
+  - **It is one character and it covers both paths.** The hydrated `fetch` copies
+    the DOM verbatim and the native POST sends the same name, so there is no
+    path where this works and the other does not, and no empty-value hazard —
+    which is exactly why a hidden `replyto` input was rejected instead. That
+    shape would ship `replyto=` on the no-JavaScript submission, and whether the
+    service ignores an explicit empty override or honours it is undocumented.
+  - **The cost is the row label in the notification, and it may be zero.** If the
+    template uppercases field names for display — which is what the vendor's own
+    screenshot pair shows — the row reads `EMAIL` before and after. If it does
+    not, one row reads `email:` instead of `Email:`. The on-screen label the
+    visitor sees is `FORM.email.label` in `src/content/involved.ts` and is
+    untouched, still capitalised. **Do not "fix" the case back.** The docblock at
+    the top of `InvolvedForm.tsx` and the inline comment on the field both say so.
 - ⚠ **Tell the campaign that the notification emails change shape.** A hidden
   branch's fields are left out of the submission rather than arriving blank, so a
   question email is now five fields instead of nine. The consequence worth
