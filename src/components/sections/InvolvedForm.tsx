@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { SubmitButton } from '../ui/Button'
 import { Photo } from '../ui/Photo'
+import { Turnstile } from '../ui/Turnstile'
 import { CheckboxField, RadioField, SelectField, TextAreaField, TextField } from '../ui/fields'
 import { DonateRow } from './DonateRow'
 import { FORM, PURPOSES } from '../../content/involved'
@@ -554,7 +555,7 @@ function ContactForm({
            * The honeypot above still works either way.
            */
           <>
-            <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light" />
+            <Turnstile siteKey={turnstileSiteKey} />
             {phase === 'unverified' ? (
               <p className="form__error" role="alert">
                 {FORM.status.unverified}
