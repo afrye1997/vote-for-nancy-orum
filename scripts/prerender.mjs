@@ -260,7 +260,11 @@ const FORBIDDEN = [
   // branch on :checked, and a revealed disabled field cannot be typed in.
   // React may only add `disabled` after hydration. React 19 renders boolean
   // attributes as `name=""`, and `aria-disabled="true"` does not match.
-  [' disabled=""', 'a field was prerendered disabled — with JavaScript off it can never be filled in'],
+  //
+  // This one only means anything on a build that RENDERED the form — see the
+  // check below, which is what stops a keyless build from reporting a pass it
+  // never actually performed.
+  [' disabled=""', 'a control was prerendered disabled — with JavaScript off it can never be filled in'],
 ]
 
 const failures = []
@@ -314,6 +318,36 @@ for (const { path } of written) {
     const h = Number(/\bheight="(\d+)"/.exec(tag)?.[1])
     if (src) declaredSizes.set(src.slice(BASE.length), { w, h, page: path })
   }
+}
+
+/**
+ * Did the ` disabled=""` gate above actually have anything to scan?
+ *
+ * Without WEB3FORMS_KEY the involved page renders a "not connected yet" card and
+ * no form at all, so that gate passes over a document with no form controls in
+ * it. A green build then reads as proof of a property nobody checked, which is
+ * worse than no gate. So: with a key, the form must be there — a hard failure,
+ * because its absence means the gate silently stopped working. Without one, say
+ * plainly that the check did not run.
+ */
+const involvedHtml = existsSync(join(DIST, 'involved/index.html'))
+  ? await readFile(join(DIST, 'involved/index.html'), 'utf8')
+  : ''
+if (WEB3FORMS_KEY) {
+  if (!involvedHtml.includes('<form')) {
+    failures.push(
+      '  involved/index.html has no <form> despite WEB3FORMS_KEY being set — the ' +
+        ' disabled="" gate scanned nothing',
+    )
+  } else {
+    console.log('  form gate: form rendered, no prerendered disabled controls')
+  }
+} else {
+  console.warn(
+    '\n  ⚠ The form was not rendered (no WEB3FORMS_KEY), so the ` disabled=""`\n' +
+      '    gate checked nothing. Before trusting it, build with a key:\n' +
+      '    WEB3FORMS_KEY=test-key-0000 npm run build\n',
+  )
 }
 
 /**

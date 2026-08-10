@@ -13,8 +13,8 @@ import { href } from '../content/site'
  * refresh, and the campaign can point an analytics goal at it.
  *
  * It is marked noindex, which is set on its PAGES_NAV entry rather than
- * rendered here — `renderToStaticMarkup` produces a fragment with no document
- * to hoist metadata into, so the `<head>` is prerender.mjs's job.
+ * rendered here — `renderToString` produces a fragment with no document to
+ * hoist metadata into, so the `<head>` is prerender.mjs's job.
  */
 export function Thanks({ base }: { readonly base: string }) {
   return (

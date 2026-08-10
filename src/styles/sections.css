@@ -791,12 +791,23 @@
  * component state; here it is :has(), so it works with JavaScript switched off
  * — which is the whole reason the form posts natively (ENGINEERING.md §1).
  *
- * These rules own VISIBILITY, and they own it alone. React owns only whether a
- * hidden branch's fields are `disabled`, which is what keeps them out of the
- * submission, and it applies that solely where these rules are what is doing
- * the hiding. Do not move the display switch into React: with JavaScript off
- * the server render is committed to one branch, and clicking a radio would then
- * change nothing at all.
+ * These rules own VISIBILITY, and they own it alone. React holds no opinion
+ * about which radio is checked; it READS the computed `display` of each branch
+ * and only ever adds `disabled` to a branch this stylesheet is already hiding,
+ * which is what keeps a hidden branch's answers out of the submission. So these
+ * rules are the single authority and there is nothing for React to fall out of
+ * sync with.
+ *
+ * Do not move the display switch into React: with JavaScript off the server
+ * render is committed to one branch, and clicking a radio would then change
+ * nothing at all.
+ *
+ * Two consequences worth knowing before you edit anything below. Changing a
+ * branch from `display: none` to `visibility: hidden`, `opacity: 0` or an
+ * off-screen position would leave the fields visible to the measurement and so
+ * still submitted. And a new field dropped inside a `.form__branch` is covered
+ * automatically — InvolvedForm reads the names out of the DOM rather than
+ * listing them.
  */
 .form__branch {
   display: none;
@@ -821,10 +832,11 @@
 }
 
 /* Without :has() every branch stays open and the button keeps its default
-   label. Longer than intended, never broken. InvolvedForm tests for :has()
-   before it disables anything, so a browser that lands here gets three open
-   branches that all still accept input — three open branches, two of which
-   refused to be typed in, is the one outcome worse than today's. */
+   label. Longer than intended, never broken. Nothing is disabled here either,
+   and it needs no feature test to arrange that: InvolvedForm disables a branch
+   only when it measures that branch's computed `display` as `none`, and these
+   rules make all three `flex`. Three open branches, two of which refused to be
+   typed in, is the one outcome worse than today's. */
 @supports not selector(:has(*)) {
   .form__branch {
     display: flex;

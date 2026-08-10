@@ -16,7 +16,7 @@ rule is violated, justify it in the commit message rather than deleting it.
 | Build | Vite 8 | Rolldown, fast HMR |
 | Language | TypeScript 6, `strict` | Non-negotiable on anything that ships publicly |
 | Styling | Tailwind 4 via `@tailwindcss/vite` | CSS-first config through `@theme`, no JS config file |
-| Rendering | React as a **build-time template** — `renderToStaticMarkup` to static HTML | Ships ~0 KB of client React |
+| Rendering | React prerendered with `renderToString`, then hydrated | Every URL is a complete document that renders without JavaScript; the bundle only upgrades it |
 | Lint | oxlint, react rules **explicitly enabled** | They are off by default. Assuming otherwise is silently false |
 | Host | Static files — GitHub Pages, Cloudflare, anywhere | Output is plain HTML; the host is not a dependency |
 | Forms | Web3Forms — native HTML `POST`, with `fetch` layered over it | The POST works with JavaScript disabled; the fetch only removes the need for an absolute redirect URL |
@@ -44,6 +44,15 @@ Real examples from this project's log:
   for a function action, so they go with it. §2.3 lists all three; the form in
   `sections/InvolvedForm.tsx` uses `onSubmit` + `preventDefault()` instead, and
   says so at the top of the file.
+- **`CSS.supports('selector(:has(*))')` does not tell you a rule applied.** It
+  asks whether the engine can parse `:has()`, which is true in every current
+  browser whether or not the stylesheet ever arrived. An earlier version of
+  `InvolvedForm.tsx` gated its `disabled` attributes on it; with the `<link>`
+  removed from the built page — a 404 on the hashed asset, Firefox's
+  View ▸ Page Style ▸ No Style, a user stylesheet — the hydrated page showed
+  `#drop-address` and `#question` fully visible and refusing input. Reproduced,
+  not theorised. **If behaviour depends on what CSS did, read `getComputedStyle`;
+  do not infer it from a feature test.**
 
 ---
 

@@ -72,8 +72,10 @@ export const BALLOT = {
 /**
  * The three things a visitor might be here to do. `submitLabel` changes with
  * the selection, exactly as in the mockup; that switch is CSS, so it survives
- * with JavaScript off. Which branch of fields is SENT is a second layer — see
- * the "hidden branch" note at the top of InvolvedForm.tsx.
+ * with JavaScript off. `id` doubles as the branch key — `purpose-join` drives
+ * `.form__branch--join` and `.form__submit-label--join` — so renaming one here
+ * renames both. Which branch of fields is SENT is a second layer, decided by
+ * measuring what CSS hid; see the note at the top of InvolvedForm.tsx.
  */
 export type Purpose = {
   readonly id: string
@@ -140,17 +142,21 @@ export const FORM = {
    * why there is no failure copy: a failed send falls back to that same native
    * POST rather than explaining itself.
    *
-   * `sending` and `announcing` differ deliberately. The button's accessible name
-   * is re-read when it changes and the live region reads its own line; identical
-   * wording in both is heard as a stutter.
+   * Each state gives the button a short label and the live region a sentence.
+   * They differ deliberately: the button's accessible name is re-read when it
+   * changes and the region reads its own line, so identical wording in both is
+   * heard as a stutter. They must never disagree either — an earlier draft had
+   * the region announcing "Sent" while the button still read "Sending…".
    */
   status: {
     /** Replaces the three purpose labels on the button while a POST is in flight. */
     sending: 'Sending…',
     /** The live region, while a POST is in flight. */
     announcing: 'Sending your message to the campaign.',
-    /** The live region, between a successful send and the thank-you page. */
-    sent: 'Sent. Taking you to the thank-you page.',
+    /** The button, between a confirmed send and the thank-you page. */
+    sent: 'Sent',
+    /** The live region, for that same moment. */
+    sentAnnouncement: 'Sent. Taking you to the thank-you page.',
   },
   /**
    * Rendered in place of the form when no Web3Forms key is configured. A form

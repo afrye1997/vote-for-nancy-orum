@@ -1,5 +1,3 @@
-import type { ChangeEventHandler } from 'react'
-
 /**
  * Form controls.
  *
@@ -16,7 +14,13 @@ import type { ChangeEventHandler } from 'react'
  * of the form data set, by a native POST and by `new FormData(form)` alike.
  * InvolvedForm uses it to keep a hidden branch's answers out of the campaign's
  * inbox. It renders as no attribute at all when false, so the prerendered markup
- * is unchanged for every field that never passes it.
+ * is unchanged for every field that never passes it — which the build gate in
+ * scripts/prerender.mjs enforces, because a field that ships disabled can never
+ * be filled in by a visitor with no JavaScript.
+ *
+ * There is deliberately no `:disabled` style. A caller may only pass `disabled`
+ * for a control it has measured to be `display: none` (see InvolvedForm), so a
+ * disabled control here is never on screen and has nothing to style.
  */
 
 export function TextField({
@@ -167,19 +171,20 @@ export function RadioField({
   label,
   value,
   defaultChecked = false,
-  onChange,
 }: {
   readonly id: string
   readonly name: string
   readonly label: string
   readonly value: string
-  readonly defaultChecked?: boolean
   /**
-   * Uncontrolled on purpose — `defaultChecked` and no `checked`, so React never
-   * writes back to the DOM after hydration. A caller that needs to know the
-   * selection observes it here and mirrors it; it must not own it.
+   * Uncontrolled on purpose — `defaultChecked` and no `checked`, and no event
+   * handler either, so React never writes back to the DOM after hydration and
+   * never marks the input for update. A radio clicked before the bundle arrives,
+   * or restored by the browser across a reload without firing `change`, keeps
+   * its state. A caller that needs to know the selection listens on the form and
+   * reads the DOM; it must not own it.
    */
-  readonly onChange?: ChangeEventHandler<HTMLInputElement>
+  readonly defaultChecked?: boolean
 }) {
   return (
     <label className="choice" htmlFor={id}>
@@ -190,7 +195,6 @@ export function RadioField({
         type="radio"
         value={value}
         defaultChecked={defaultChecked}
-        onChange={onChange}
       />
       {label}
     </label>

@@ -171,6 +171,11 @@ deliberate bad value:
   The last one is the form's no-JavaScript floor: CSS reveals a branch on
   `:checked`, and a revealed field that was prerendered `disabled` can never be
   filled in. React may only add `disabled` after hydration.
+  ⚠ **That gate only means something on a build with `WEB3FORMS_KEY` set**, since
+  without a key the involved page renders a card instead of a form and the scan
+  has no controls to look at. The build now fails if a keyed build produces no
+  `<form>`, and warns loudly on a keyless one that the check did not run. A plain
+  `npm run build` is not evidence here.
 - **Missing images** — every referenced file present in both AVIF and fallback.
   A warning normally; a hard failure once `SITE_ORIGIN` is set.
 - **Image dimensions** — every `width`/`height` attribute checked against the
