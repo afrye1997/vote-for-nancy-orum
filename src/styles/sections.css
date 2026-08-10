@@ -1082,3 +1082,12 @@
   line-height: 1.6;
   color: var(--slate-700);
 }
+
+/* Not the danger token: --danger is navy-700, which reads as ordinary body
+   copy here. This needs to look like something to act on. */
+.form__error {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: #a3341c;
+}

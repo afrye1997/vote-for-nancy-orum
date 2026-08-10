@@ -46,6 +46,7 @@ const T = {
   eyebrow: '#2C7E11',
   slate500: '#687386',
   borderControl: '#8391AA',
+  formError: '#A3341C',
 }
 
 function rgb(hex) {
@@ -130,6 +131,7 @@ const PAIRS = [
   ['focus ring on card', T.navy900, T.white, 3.0],
   ['focus ring over scrim', T.white, scrimHero, 3.0],
   ['input border', T.borderControl, T.white, 3.0],
+  ['form error on card', T.formError, T.white, 4.5],
   ['card border', T.frost200, T.white, 1.0],
 ]
 

@@ -202,7 +202,12 @@ function fallBackToNativePost(form: HTMLFormElement, keepRedirect: boolean): voi
 }
 
 /** `sent` is the moment between a confirmed send and the navigation. */
-type Phase = 'idle' | 'sending' | 'sent'
+/**
+ * `unverified` is a resting state, not a failure: nothing was sent and the
+ * visitor only has to finish the check above. It behaves like `idle` for the
+ * button and the abort logic, so `busy` deliberately excludes it.
+ */
+type Phase = 'idle' | 'sending' | 'sent' | 'unverified'
 
 export function InvolvedForm({
   base,
@@ -366,13 +371,36 @@ function ContactForm({
     if (sendingRef.current) return
     /* React nulls `currentTarget` the moment dispatch ends, so read it now. */
     const form = event.currentTarget
+
+    /*
+     * Refuse to send without a Turnstile token.
+     *
+     * Web3Forms rejects an unverified submission anyway, but only after a round
+     * trip — so the visitor fills the form, presses the button, waits, and is
+     * told it failed for a reason the page never mentioned. Checking here turns
+     * that into "finish the check above" before anything is sent.
+     *
+     * The widget writes `cf-turnstile-response` into the form itself, so the
+     * form data is the authoritative source: no token means unsolved, expired,
+     * or the widget never loaded. It is not security — a browser can be made to
+     * send anything, which is exactly why the secret key still verifies this
+     * server-side at Web3Forms. It is honesty about what is about to happen.
+     */
+    if (turnstileSiteKey !== null) {
+      const token = new FormData(form).get('cf-turnstile-response')
+      if (typeof token !== 'string' || token === '') {
+        setPhase('unverified')
+        return
+      }
+    }
+
     sendingRef.current = true
     attemptRef.current += 1
     setPhase('sending')
     void send(form)
   }
 
-  const busy = phase !== 'idle'
+  const busy = phase === 'sending' || phase === 'sent'
 
   return (
     <section className="form-wrap container">
@@ -543,7 +571,14 @@ function ContactForm({
            * of switching it on: the form stops being usable without JavaScript.
            * The honeypot above still works either way.
            */
-          <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light" />
+          <>
+            <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light" />
+            {phase === 'unverified' ? (
+              <p className="form__error" role="alert">
+                {FORM.status.unverified}
+              </p>
+            ) : null}
+          </>
         )}
         <p className="note">{FORM.privacy}</p>
         <DonateRow />

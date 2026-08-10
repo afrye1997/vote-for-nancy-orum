@@ -156,6 +156,8 @@ export const FORM = {
     /** The button, between a confirmed send and the thank-you page. */
     sent: 'Sent',
     /** The live region, for that same moment. */
+    /** Shown when the button is pressed before Turnstile has issued a token. */
+    unverified: 'Please finish the security check above, then send.',
     sentAnnouncement: 'Sent. Taking you to the thank-you page.',
   },
   /**
