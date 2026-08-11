@@ -43,6 +43,26 @@ const CLONES = 3
 const REAL = COMMITMENTS.length
 const SETTLE_MS = 150
 
+/** How long the swipe hint stays up when nobody touches anything. */
+const HINT_MS = 3600
+
+/** The widths that lose the arrows, and so need the hint. Matches sections.css. */
+const NARROW = '(max-width: 1100px)'
+
+/**
+ * …and a finger to swipe with.
+ *
+ * `any-pointer`, not `pointer`: a laptop with a touchscreen reports a mouse as
+ * its primary pointer and still has a screen to swipe. The test is paired with
+ * `navigator.maxTouchPoints` for the same reason — between them a phone cannot
+ * miss out, and the cost of the pair being too generous is a hint on a device
+ * that could also have dragged the rail with a mouse.
+ *
+ * A desktop browser window narrowed to phone width therefore does NOT show it.
+ * Use the device toolbar in dev tools, which emulates touch, or a real phone.
+ */
+const TOUCH = '(any-pointer: coarse)'
+
 type Slide = { commitment: Commitment; key: string; clone: boolean }
 
 const REAL_SLIDES: Slide[] = COMMITMENTS.map((commitment, i) => ({
@@ -70,6 +90,9 @@ export function PlatformRail({ base }: { readonly base: string }) {
   const [ready, setReady] = useState(false)
   /** Index into the rendered slides, not into COMMITMENTS. */
   const [centre, setCentre] = useState(0)
+  const [hint, setHint] = useState(false)
+  /** Set by the hint's effect, so anything that moves the rail can call it. */
+  const dismissHint = useRef(() => {})
 
   const slides = ready ? LOOPED_SLIDES : REAL_SLIDES
   /** Which of the six is showing, whichever copy of it is centred. */
@@ -161,9 +184,64 @@ export function PlatformRail({ base }: { readonly base: string }) {
     }
   }, [ready])
 
+  /**
+   * The swipe hint.
+   *
+   * Below 1100px the arrows are gone and the neighbouring cards are a sliver,
+   * so nothing on the card says it moves. A pill fades in over the photograph
+   * the first time the rail is scrolled into view, and leaves the moment a
+   * finger lands on it — or after HINT_MS, for the visitor who reads it and
+   * does nothing. Once per page load: the observer disconnects on its first
+   * hit, so scrolling back up does not bring it round again.
+   *
+   * Dismissal is bound to the pointer rather than to the rail's scroll, because
+   * the rail is scrolled programmatically — the jump onto the first real card,
+   * and every index-pill tap — and those must not count as "they already know".
+   * The pill-tap case is handled by `scrollToIndex` calling this instead.
+   */
+  useEffect(() => {
+    const rail = railRef.current
+    if (!rail || typeof IntersectionObserver === 'undefined') return
+    const touch = window.matchMedia(TOUCH).matches || navigator.maxTouchPoints > 0
+    if (!touch || !window.matchMedia(NARROW).matches) return
+
+    let timer: ReturnType<typeof setTimeout>
+
+    const dismiss = () => {
+      clearTimeout(timer)
+      setHint(false)
+      rail.removeEventListener('pointerdown', dismiss)
+      rail.removeEventListener('keydown', dismiss)
+    }
+    dismissHint.current = dismiss
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return
+        observer.disconnect()
+        setHint(true)
+        timer = setTimeout(dismiss, HINT_MS)
+        rail.addEventListener('pointerdown', dismiss, { passive: true })
+        rail.addEventListener('keydown', dismiss)
+      },
+      /* A ratio would be the wrong test — a card is taller than a phone, so the
+         rail can fill the screen and still never reach a threshold like 0.35.
+         The bottom edge is pulled in instead: this fires when the top of the
+         rail rises past 60% of the viewport, whatever the card's height. */
+      { threshold: 0, rootMargin: '0px 0px -40% 0px' },
+    )
+    observer.observe(rail)
+
+    return () => {
+      observer.disconnect()
+      dismiss()
+    }
+  }, [])
+
   const scrollToIndex = (index: number) => {
     const rail = railRef.current
     const left = offsetTo(index)
+    dismissHint.current()
     if (rail && left !== null) rail.scrollTo({ left, behavior: 'smooth' })
   }
 
@@ -226,6 +304,55 @@ export function PlatformRail({ base }: { readonly base: string }) {
           ))}
         </div>
         <RailArrow direction="next" onClick={() => scrollToIndex(centre + 1)} />
+        {/*
+          Decorative, and hidden from screen readers on purpose: "swipe" is not
+          the gesture a screen-reader user makes here, and the rail is already
+          reachable by the index links and by the keyboard.
+        */}
+        <p className="rail-hint" data-show={hint ? '' : undefined} aria-hidden="true">
+          <svg
+            className="rail-hint__glyph"
+            width="50"
+            height="24"
+            viewBox="0 0 50 24"
+            aria-hidden="true"
+          >
+            {/* The two chevrons the hand travels between. */}
+            <g
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M8 7 3 12l5 5" />
+              <path d="M42 7l5 5-5 5" />
+            </g>
+            {/*
+              A hand: three rounded boxes — index finger, fist, thumb — filled
+              and overlapping, rather than an outline. At this size an outlined
+              hand turns to mush, and it is the thumb that keeps the silhouette
+              legible as a hand rather than a lollipop.
+
+              The group is centred by its coordinates and not by a `transform`
+              attribute, because the swipe animation drives `transform` on this
+              same element and would overwrite it.
+            */}
+            <g className="rail-hint__hand" fill="currentColor">
+              <rect x="22.8" y="1.5" width="4.2" height="12" rx="2.1" />
+              <rect x="22" y="10" width="12" height="12" rx="4.6" />
+              <rect
+                x="18.4"
+                y="11.5"
+                width="3.6"
+                height="7.5"
+                rx="1.8"
+                transform="rotate(-30 20.2 15.25)"
+              />
+            </g>
+          </svg>
+          <span>Swipe</span>
+        </p>
         {/*
           The "5 / 6" readout was removed from the page at the campaign's
           request, 2026-08-11. The live region itself stays, hidden: it is the

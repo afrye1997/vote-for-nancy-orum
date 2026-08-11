@@ -328,7 +328,10 @@
 .plank-card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  /* The whole distance between the title and the sentence under it, now that
+     the faces' facing paddings are gone. The flip sets this to 0 — there the
+     faces are stacked in depth, not in the column. */
+  gap: var(--space-3);
   /*
    * `width: 100%` is load-bearing, not defensive. The cell is a flex container,
    * so on the main axis this anchor sizes to its content unless told otherwise
@@ -378,11 +381,36 @@
   padding: 22px;
 }
 
+/*
+ * Where there is no flip the two faces sit one above the other, and they have
+ * to read as one card rather than as two cards touching.
+ *
+ * Two things were making them look like two. The faces each carry their own
+ * 22px, so the title and the sentence below it were separated by 22 + 22 + the
+ * card's gap — 52px of nothing on a phone, which is more space than the title
+ * itself occupies. And the front face was centred while the back was ranged
+ * left, so a centred heading sat over left-aligned text.
+ *
+ * So: the inner paddings collapse and the gap alone spaces them, and centring
+ * is left to the flip, where the front face IS the whole card and centring is
+ * right. Both are restored inside that media query — which must stay BELOW
+ * these rules, since it wins on source order, not on specificity.
+ */
 .plank-card__face--front {
-  align-items: center;
-  text-align: center;
+  padding-bottom: 0;
 }
 
+.plank-card__face--back {
+  padding-top: 0;
+}
+
+/*
+ * No `--tracking-wide` here. That token is 0.08em and every other thing wearing
+ * it — the eyebrow, the stat source — is uppercase, which is what tracking that
+ * wide is for. On this sentence-case line it just pulled the words apart, and
+ * on a phone, where the line sits directly under the title, that was the first
+ * thing you saw.
+ */
 .plank-card__cta {
   display: inline-flex;
   align-items: center;
@@ -390,7 +418,6 @@
   margin-top: var(--space-3);
   font-size: 13px;
   font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wide);
   color: var(--brand-primary);
 }
 
@@ -440,6 +467,14 @@
     border-radius: var(--radius-lg);
   }
 
+  /* Alone on the card, and centred in it — the collapsed inner padding and the
+     ranged-left title above are for the stacked card, which this is not. */
+  .plank-card__face--front {
+    align-items: center;
+    padding-bottom: 22px;
+    text-align: center;
+  }
+
   /*
    * The hovered card is blue.
    *
@@ -455,6 +490,7 @@
    * card, it is a bug.
    */
   .plank-card__face--back {
+    padding-top: 22px;
     transform: rotateY(180deg);
     background: var(--brand-primary);
   }
@@ -1316,13 +1352,30 @@
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 1100px) {
+  /*
+   * Narrow: the card is centred, not flushed left.
+   *
+   * Everything the rail's script does is measured from the middle — it scrolls
+   * a card's centre to the rail's centre, and whichever card is nearest the
+   * middle is the one it lights up. Snapping to `start` contradicted that: the
+   * browser parked the card against the left gutter while the script was still
+   * aiming at the centre, so the card came to rest a little off its own snap
+   * point, out of line with the gutter every other block on the page keeps, and
+   * with all of the peek on one side. Centring is what the script already
+   * assumes, and the padding is what lets the outermost card reach the middle
+   * before the clones exist. `scroll-snap-align: center` is inherited from the
+   * base rule; the point here is that it is no longer overridden.
+   */
   .rail {
-    padding-inline: var(--gutter);
+    --plank-w: min(520px, 84vw);
+    /* Tighter than the desktop rail: the gap is what the peek is cut out of,
+       and at 24px the neighbouring cards all but disappear. */
+    gap: var(--space-4);
+    padding-inline: calc(50% - var(--plank-w) / 2);
   }
 
   .plank {
-    flex-basis: min(520px, 84vw);
-    scroll-snap-align: start;
+    flex-basis: var(--plank-w);
   }
 
   .strength-grid {
@@ -1479,6 +1532,72 @@
   /* No room for arrows outside the cards; the index and a swipe do the job. */
   .rail-arrow {
     display: none;
+  }
+}
+
+/*
+ * ── The swipe hint ───────────────────────────────────────────────────────────
+ *
+ * Shown only where the arrows are not, and only for a few seconds — see the
+ * effect in PlatformRail.tsx for when it comes and goes.
+ *
+ * It sits over the photograph rather than over the body copy: the pill is
+ * opaque, and a photograph is the one part of the card nobody is mid-sentence
+ * in. `top` is the middle of that band — the rail's top padding plus half the
+ * height of .plank__media.
+ */
+.rail-hint {
+  position: absolute;
+  top: calc(var(--space-4) + 110px);
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 15px;
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-pill);
+  background: rgba(18, 35, 91, 0.88);
+  box-shadow: var(--shadow-raised);
+  font-size: 13px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.02em;
+  color: #fff;
+  opacity: 0;
+  /* Never in the way of the gesture it is asking for. */
+  pointer-events: none;
+  transition: opacity var(--dur-slow) var(--ease-organic);
+}
+
+.rail-hint[data-show] {
+  opacity: 1;
+}
+
+.rail-hint__glyph {
+  display: block;
+}
+
+@media (min-width: 1101px) {
+  .rail-hint {
+    display: none;
+  }
+}
+
+/* Only the hand moves; the chevrons it travels between hold still. The units
+   are the glyph's own — the group's transform-box is its view box. */
+@media (prefers-reduced-motion: no-preference) {
+  .rail-hint[data-show] .rail-hint__hand {
+    animation: rail-hint-swipe 1700ms var(--ease-organic) infinite;
+  }
+}
+
+@keyframes rail-hint-swipe {
+  0%,
+  100% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
   }
 }
 
