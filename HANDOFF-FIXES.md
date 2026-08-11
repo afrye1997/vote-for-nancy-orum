@@ -20,6 +20,45 @@ false negatives. All three commands were run green against a build with
 
 ---
 
+## Where this is deployed
+
+Nowhere in this repo said so, which cost a round of guessing. The site is a
+**Cloudflare Workers static-assets project** — not Pages — and Workers Builds
+deploys it on every push to `main`:
+
+    https://vote-for-nancy-orum.votenancyorum.workers.dev
+
+`nancyorum.com` is not bought yet (HANDOFF.md §2). `npx wrangler deployments
+list` shows the history; wrangler is already authenticated as
+votenancyorum@gmail.com.
+
+⚠ `wrangler pages deploy` is the wrong command and will not update this site —
+it would create a separate Pages project of the same name and say nothing about
+it. `wrangler.jsonc` has the history of that mistake at the top.
+
+⚠ Do not `npm run deploy` or `wrangler deploy` from a laptop. There is no `.env`
+in this project, so a local build has no `WEB3FORMS_KEY` and no
+`HCAPTCHA_SITE_KEY`: it would ship the "not configured" card in place of the
+form and the captcha switched off, both silently, on a green build. The build
+variables live in the Cloudflare dashboard and are read only by Workers Builds.
+
+To check which Web3Forms key is actually live:
+
+```bash
+curl -s https://vote-for-nancy-orum.votenancyorum.workers.dev/involved/ \
+  | grep -o 'name="access_key" value="[^"]*"'
+```
+
+A wrong key fails silently — the form reports success, Web3Forms accepts the
+submission, and it lands in somebody else's inbox with no error anywhere.
+
+**An empty commit does not reliably trigger a build.** `12405ea` was pushed with
+`--allow-empty` and produced no deployment, where the two real commits before it
+each deployed within 40 seconds. Use a commit that changes a file, or "Retry
+deployment" in the dashboard.
+
+---
+
 ## Still needs a real browser
 
 No browser automation is available on this machine — no Playwright, no
