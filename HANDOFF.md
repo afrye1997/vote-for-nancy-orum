@@ -315,11 +315,27 @@ Setting it turns on four things at once:
   the majority of visitors, and it is why this is no longer launch-blocking
 - Missing images become a build failure instead of a warning
 
-Domain is not bought yet. NEEDED-FROM-CAMPAIGN.md §10 recommends
-`nancyorum.com` at **Cloudflare Registrar** — sold at cost with free WHOIS
-privacy, which keeps a candidate's home address out of public records. Register
-the account in the campaign's name, not a developer's. **After purchase, click
-the ICANN verification email** — ignoring it suspends the domain.
+**The domain is bought: `votefornancyorum.com`.** Settled 2026-08-11,
+superseding NEEDED-FROM-CAMPAIGN.md §10's recommendation of `nancyorum.com` —
+that section is now a record of the reasoning, not a live instruction.
+
+It is attached to the **Worker**, verified by both hosts serving the same
+`/assets/index-*.js`. It was briefly attached to the abandoned Pages project
+instead, which served a build with no `WEB3FORMS_KEY` — so the public domain
+showed the form's "not configured" card while the Worker was fine. See
+HANDOFF-FIXES.md for the diagnosis and the bundle-hash check that finds it.
+
+Three things still worth confirming, none of them blocking:
+
+- **`www.votefornancyorum.com` does not resolve.** People type it. Add it
+  alongside the apex under the Worker's Domains tab.
+- **WHOIS privacy must be on.** This is a candidate's home address, and it is
+  public by default at some registrars. Cloudflare Registrar includes it free;
+  if the domain is registered elsewhere, check.
+- **The ICANN verification email must have been clicked** — ignoring it suspends
+  the domain, usually a few days later, which would look like a sudden outage.
+
+Registration should be in the campaign's name, not a developer's.
 
 `SITE_BASE` stays `/`. It only needs a prefix for a GitHub Pages project site,
 which is not the plan.
