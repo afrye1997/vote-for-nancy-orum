@@ -52,10 +52,25 @@ curl -s https://vote-for-nancy-orum.votenancyorum.workers.dev/involved/ \
 A wrong key fails silently — the form reports success, Web3Forms accepts the
 submission, and it lands in somebody else's inbox with no error anywhere.
 
-**An empty commit does not reliably trigger a build.** `12405ea` was pushed with
-`--allow-empty` and produced no deployment, where the two real commits before it
-each deployed within 40 seconds. Use a commit that changes a file, or "Retry
-deployment" in the dashboard.
+⚠ **`wrangler deployments list` is capped at 10 entries — do not count it to
+detect a new deployment.** A poll loop comparing `grep -c '^Created:'` against a
+baseline can never see an increase, so every build looks like a build that never
+ran. That produced a confident and completely wrong "Workers Builds is failing"
+diagnosis on 2026-08-11; builds were landing in ~30s the whole time. An earlier
+note here claiming `--allow-empty` commits do not trigger a build came from the
+same broken measurement and is withdrawn — it was never tested by any method
+that could have detected one.
+
+Check the deployed artefact instead, which is the thing you actually care about:
+
+```bash
+curl -s https://vote-for-nancy-orum.votenancyorum.workers.dev/involved/ \
+  | grep -o 'name="access_key" value="[^"]*"'
+```
+
+If it still shows the old value, the build has not landed. If it shows the new
+one, it has. The Deployments tab in the dashboard is the only place that shows
+*failed* builds at all — wrangler lists successes only.
 
 ---
 
