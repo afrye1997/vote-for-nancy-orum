@@ -117,22 +117,46 @@
  * `no-preference` query. Delays are compressed to a quarter of the original;
  * the effect still reads as a stagger and the last clause lands under a second.
  */
-.hero__title span {
+/*
+ * Direct children only. The last clause now contains a nested span for the word
+ * set in green, and a descendant selector caught that too — giving the accent
+ * its own opacity:0 and its own 600ms animation running on a different clock to
+ * the clause around it, and making it an inline-block inside a line of type
+ * that wants to stay one flow.
+ */
+.hero__title > span {
   display: inline-block;
 }
 
+/*
+ * The one green word in a white headline. --lime-300 rather than the brand
+ * green: this sits over the hero scrim, where the darker greens do not clear
+ * 4.5:1. scripts/contrast.mjs measures it against the scrim's worst case.
+ */
+.hero__title-accent {
+  color: var(--lime-300);
+}
+
+/*
+ * Slowed at the campaign's request, but not back to the mockup's 300/1300/2300.
+ * The headline is the largest element on the page, and an element at opacity 0
+ * does not count as painted — stretch the last clause far enough out and the
+ * page's Largest Contentful Paint is the animation rather than the network.
+ * These land the third clause at 1.74s, roughly the mockup's feel at a little
+ * over half its cost. Going further is a real LCP trade, not just a taste one.
+ */
 @media (prefers-reduced-motion: no-preference) {
-  .hero__title span {
+  .hero__title > span {
     opacity: 0;
-    animation: fade-up 600ms var(--ease-organic) forwards;
+    animation: fade-up 900ms var(--ease-organic) forwards;
   }
 
-  .hero__title span:nth-child(2) {
-    animation-delay: 260ms;
+  .hero__title > span:nth-child(2) {
+    animation-delay: 420ms;
   }
 
-  .hero__title span:nth-child(3) {
-    animation-delay: 520ms;
+  .hero__title > span:nth-child(3) {
+    animation-delay: 840ms;
   }
 }
 
@@ -281,23 +305,198 @@
   list-style: none;
 }
 
+/* The li is now only a grid cell; the card is the <a> inside it. Flex here so
+   that anchor stretches to the row height instead of shrink-wrapping its text,
+   which would leave short cards floating above a gap. */
+.plank-grid > li {
+  display: flex;
+}
+
+/*
+ * ── The commitment cards ──────────────────────────────────────────────────────
+ *
+ * THE BASE STATE IS NOT THE FLIP. Everything below the media query is a plain
+ * stacked card — centred title, then the line, then the prompt — and that is
+ * what a phone, a reduced-motion visitor and anything that cannot do 3D
+ * transforms all get. It reads perfectly well; it just does not spin.
+ *
+ * The flip is layered on afterwards, and only where both of the things it needs
+ * are true: a pointer that can actually hover, and a visitor who has not asked
+ * for less motion. A hover-only reveal on a touch screen hides the sentence
+ * that explains the commitment behind a gesture that does not exist there.
+ */
 .plank-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  /*
+   * `width: 100%` is load-bearing, not defensive. The cell is a flex container,
+   * so on the main axis this anchor sizes to its content unless told otherwise
+   * — and "Listen first" is the shortest title of the six, so its card came out
+   * visibly narrower than its neighbours while the grid column stayed the same
+   * width. The card must fill the column, not the text.
+   */
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    box-shadow 220ms var(--ease-organic),
+    border-color 220ms var(--ease-organic);
+}
+
+/*
+ * ⚠ HOVER IS TRIGGERED FROM THE GRID CELL, NEVER FROM THE CARD.
+ *
+ * The card rotates. Hanging `:hover` on a rotating element builds an
+ * oscillator: as the card turns, its projected geometry sweeps out from under
+ * any pointer that is not on the rotation axis, `:hover` stops matching, the
+ * transition reverses, the card swings back under the pointer, `:hover` matches
+ * again. Measured before this was fixed — a pointer held still 12px inside the
+ * card's left edge produced 39 direction reversals in 3 seconds and never
+ * reached the flipped state. Dead centre looked fine, because that is the one
+ * column the axis runs through, which is exactly what makes this easy to miss.
+ *
+ * `.plank-grid > li` does not transform, so its box is wherever it was at rest
+ * and hit-testing against it is stable for the whole rotation.
+ *
+ * `:focus-visible` stays on the card itself: focus does not depend on geometry,
+ * and the anchor is the focusable thing.
+ */
+.plank-grid > li:hover .plank-card {
+  border-color: var(--blue-300);
+  box-shadow: var(--shadow-raised);
+}
+
+/* Padding lives on the faces, not the card: once they are stacked for the flip
+   each face has to fill the card on its own. */
+.plank-card__face {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: 22px;
 }
 
-.plank-card__title {
-  font-family: var(--font-display);
-  font-weight: var(--weight-display);
-  font-size: 19px;
-  color: var(--navy-900);
+.plank-card__face--front {
+  align-items: center;
+  text-align: center;
 }
 
-.plank-card__num {
+.plank-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-3);
+  font-size: 13px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
   color: var(--brand-primary);
 }
 
+.plank-card__cta svg {
+  transition: transform 220ms var(--ease-organic);
+}
+
+.plank-grid > li:hover .plank-card__cta svg {
+  transform: translateX(3px);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /*
+   * Perspective on the cell rather than the card, because an element cannot
+   * supply the perspective it is itself rotating in.
+   *
+   * Set far back on purpose. The rotation has always been exactly a half turn,
+   * but at a close perspective the near edge of a 350px card swings a long way
+   * toward the viewer on the way round, and the exaggerated foreshortening
+   * reads as more travel than 180°. Pushing the vanishing point out flattens
+   * that swing, so what you see matches what the transform actually does.
+   */
+  .plank-grid > li {
+    perspective: 2400px;
+  }
+
+  .plank-card {
+    display: grid;
+    gap: 0;
+    transform-style: preserve-3d;
+    transition:
+      transform 620ms var(--ease-organic),
+      box-shadow 220ms var(--ease-organic),
+      border-color 220ms var(--ease-organic);
+  }
+
+  /*
+   * Both faces in the same grid cell. This is what makes the card exactly as
+   * tall as its taller face with no measured min-height to go stale — the back
+   * carries a sentence and a prompt, the front carries a title, and the cell
+   * resolves to whichever wins. A fixed height here would clip the back the
+   * first time someone edited a lede.
+   */
+  .plank-card__face {
+    grid-area: 1 / 1;
+    backface-visibility: hidden;
+    border-radius: var(--radius-lg);
+  }
+
+  /*
+   * The hovered card is blue.
+   *
+   * The colour is on the BACK FACE, not on the card, which is what makes it
+   * arrive with the turn rather than before it: the white front is still the
+   * side facing you for the first half of the rotation, and the blue is what
+   * comes round. Colouring `.plank-card:hover` itself would flash the whole
+   * card blue at the moment the pointer lands, while you were still looking at
+   * the title.
+   *
+   * It is scoped inside this query with the flip. Where there is no flip the
+   * two faces stack, and a blue lower half under a white upper half is not a
+   * card, it is a bug.
+   */
+  .plank-card__face--back {
+    transform: rotateY(180deg);
+    background: var(--brand-primary);
+  }
+
+  .plank-card__face--back .plank-card__body {
+    color: var(--frost-100);
+  }
+
+  .plank-card__face--back .plank-card__cta {
+    color: #ffffff;
+  }
+
+  /* Cell, not card — see the oscillator note above. */
+  .plank-grid > li:hover .plank-card,
+  .plank-card:focus-visible {
+    transform: rotateY(180deg);
+    border-color: var(--brand-primary);
+  }
+}
+
+/* The front face carries the whole card on its own, so it is set larger and
+   heavier than it was when it sat above a paragraph. */
+.plank-card__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.25;
+  color: var(--navy-900);
+}
+
+/*
+ * The one word of each title in the campaign green.
+ *
+ * --eyebrow, not --brand-accent. tokens.css records that green-700 measured
+ * 4.27:1 on the tinted surface and was darkened to this for exactly this kind
+ * of use; the brighter brand green does not clear 4.5:1 against a white card.
+ */
+.plank-card__accent {
+  color: var(--eyebrow);
+}
+
 .plank-card__body {
-  margin-top: var(--space-2);
   font-size: 15px;
   line-height: 1.6;
   color: var(--slate-700);
@@ -483,20 +682,37 @@
   list-style: none;
 }
 
+/*
+ * "What I bring to the table", enlarged twice at the campaign's request: 10% on
+ * 2026-08-10, then another 10% on the whole block on 2026-08-11. Both bumps are
+ * left as the arithmetic rather than folded into a result, so the base each one
+ * grew from is still readable — --text-lg is 18px, the body was 14.5px to match
+ * the other card bodies, and the padding was 22px.
+ *
+ * The second bump covers the eyebrow and the card padding too, which is what
+ * makes it the block growing rather than just its type. That is also why it is
+ * scoped: `.eyebrow` is shared by eleven components, so the rule below has to
+ * be reachable only from inside this section.
+ */
 .strength {
-  padding: 22px;
+  padding: calc(22px * 1.1);
+}
+
+/* 13px is .eyebrow's base in components.css. */
+.strengths .eyebrow {
+  font-size: calc(13px * 1.1);
 }
 
 .strength__title {
   font-family: var(--font-display);
   font-weight: var(--weight-display);
-  font-size: var(--text-lg);
+  font-size: calc(var(--text-lg) * 1.1 * 1.1);
   color: var(--brand-primary);
 }
 
 .strength__body {
   margin-top: var(--space-2);
-  font-size: 14.5px;
+  font-size: calc(14.5px * 1.1 * 1.1);
   line-height: 1.6;
   color: var(--slate-700);
 }
@@ -613,6 +829,40 @@
   color: var(--slate-700);
 }
 
+/*
+ * The divider. Reset first — a bare <hr> comes with a border on all four sides,
+ * a default margin, and in some engines a 3D groove.
+ *
+ * 2px in --border-strong rather than the 1px --border-soft hairline it started
+ * as, which all but disappeared against --frost-50. Chosen by rendering the
+ * candidates over the real page: --border-soft stays invisible at any weight
+ * worth using, and --navy-900 at this width stops being a divider and becomes a
+ * bar across the page, heavier than the type it separates.
+ */
+.rule {
+  height: 0;
+  margin: 0;
+  border: 0;
+  border-top: 2px solid var(--border-strong);
+}
+
+/*
+ * Centred in the gap it divides, rather than hung off the paragraph above it.
+ *
+ * --section-y, matching the ballot section's own top padding below the line, so
+ * the clearance is identical on both sides and stays that way if the section
+ * rhythm is ever retuned.
+ *
+ * ⚠ This does NOT add to `.involved__intro`'s 40px bottom margin — adjacent
+ * vertical margins collapse to the larger of the two, so the gap above the line
+ * is 72px, not 112px. An earlier attempt set 16px here expecting 40 + 16 and
+ * got 40, because 40 already won. If you need a value below 40px to have any
+ * effect at all, the paragraph's margin is what has to change.
+ */
+.involved__intro + .rule {
+  margin-top: var(--section-y);
+}
+
 /* ── Ballot block ────────────────────────────────────────────────────────── */
 
 .ballot {
@@ -706,6 +956,124 @@
   height: auto;
 }
 
+/*
+ * ── Get involved: dates beside the form ───────────────────────────────────────
+ *
+ * KeyDates and InvolvedForm are both written to stand alone on a full-width
+ * page, so each carries its own max-width, auto margins and vertical padding.
+ * Dropped into a grid column that sizing fights the column: the form would
+ * centre itself inside its half at 720px and the dates would cap at 640px.
+ *
+ * Rather than give either component a "narrow" prop, the split neutralises the
+ * page-level sizing for its own children. The grid then owns the widths, and
+ * both components remain usable on their own elsewhere.
+ */
+/*
+ * `stretch`, not `start`: both columns run to the same baseline so the donate
+ * card and the form card end on one line.
+ *
+ * Which column is taller is not fixed, which is why this is done with stretch
+ * and `margin-top: auto` rather than by nudging a height until it matches. The
+ * form grows and shrinks as the purpose radio changes — "Ask a question" adds a
+ * textarea, "Request a yard sign" adds an address and the sign offer — so any
+ * measured value would be correct for exactly one of the three branches and
+ * wrong the moment someone pressed a radio. Whichever side is taller sets the
+ * row; the other fills to meet it.
+ */
+.involved-split {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 56px;
+  align-items: stretch;
+  padding-block: 56px 72px;
+}
+
+/* The card fills its column rather than shrink-wrapping its fields, so its
+   bottom edge is the row's bottom edge. */
+.involved-split .form-wrap,
+.involved-split .form {
+  height: 100%;
+}
+
+/*
+ * The left column: the calendar, then the donate prompt beneath it. One grid
+ * item holding two, because the grid has exactly two columns and a third child
+ * would wrap onto a new row rather than stack.
+ */
+.involved-split__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* Pinned to the bottom of the column, so it meets the form card's lower edge
+   whichever of the two happens to be setting the row height. */
+.involved-split__aside .donate-row {
+  margin-top: auto;
+}
+
+/*
+ * In this column the prompt is a card, not a strip, and it is centred.
+ *
+ * `.donate-row` is built to spread across a wide band with `space-between`; at
+ * ~425px that leaves the button hard against the right edge with a ragged
+ * sentence beside it. Here it reads top to bottom and down the middle —
+ * question, reason, button, caveat — which sets it apart from the left-aligned
+ * calendar above rather than half-matching it.
+ *
+ * `text-align` centres the copy, `align-items` centres the flex children. Both
+ * are needed: the first does nothing to the button's box, the second does
+ * nothing to a wrapped line of text.
+ */
+.involved-split__aside .donate-row {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+}
+
+/* The question earns its own line at this width; run in, it reads as one long
+   sentence with a bold clause rather than a prompt and its answer. */
+.involved-split__aside .donate-row__lead {
+  display: block;
+  margin-bottom: 2px;
+  font-size: var(--text-base);
+}
+
+.involved-split__aside .donate-row__actions {
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.involved-split .container,
+.involved-split .form-wrap {
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
+.involved-split .form-wrap {
+  padding-block: 0;
+}
+
+.involved-split .dates {
+  max-width: none;
+  margin: var(--space-4) 0 0;
+}
+
+/*
+ * The date column is roughly 380px here, and "Tuesday, November 3, 2026" needs
+ * most of that on its own. Two columns would leave the description a sliver, so
+ * inside the split each entry stacks: date, then what it is.
+ */
+.involved-split .dates__item {
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
+}
+
 .dates {
   max-width: 640px;
   margin: var(--space-12) auto 0;
@@ -745,11 +1113,50 @@
   padding-block: 56px 72px;
 }
 
+/*
+ * "Join the campaign" and BallotCheck both jump to #involved-form, which is on
+ * the form itself. Without this the form's top edge lands flush against the top
+ * of the window, with its heading touching the viewport edge and the header
+ * overlapping it on the narrow layout where the header is in the flow.
+ */
+#involved-form {
+  scroll-margin-top: 24px;
+}
+
+/*
+ * The header's Volunteer button targets this field directly. Without the margin
+ * the select lands flush against the top of the window with its own label — the
+ * question it is answering — scrolled off above it. Deeper than the form's own
+ * offset so the field arrives inside the card rather than at its edge.
+ */
+#help {
+  scroll-margin-top: 120px;
+}
+
 .form {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
   padding: 30px;
+}
+
+/*
+ * The submit sizes to its label, not to the column.
+ *
+ * `.form` is a flex column, and flex items stretch on the cross axis unless
+ * told otherwise — that, not any rule on `.btn`, is what made this button as
+ * wide as the fields above it. `align-self` opts this one item out.
+ *
+ * Selected structurally rather than by adding a class to SubmitButton: that is
+ * a design-system component, and Button.tsx states it holds no domain
+ * knowledge. Where this particular button sits is this form's business.
+ *
+ * The width now tracks the label, so it changes with the selected purpose and
+ * again while sending. That is intended — the button is as wide as what it
+ * currently says.
+ */
+.form > button[type='submit'] {
+  align-self: center;
 }
 
 .form__title {
@@ -934,6 +1341,13 @@
     gap: var(--space-8);
   }
 
+  /* One column. Dates first, as in the source order — someone who came here to
+     check a deadline should not have to scroll past the whole form to find it. */
+  .involved-split {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
   .split--about {
     padding-top: var(--space-8);
   }
@@ -1055,14 +1469,6 @@
 
 .rail-arrow--next {
   right: calc(50% - 330px);
-}
-
-.rail-counter {
-  margin-top: 4px;
-  text-align: center;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--slate-600);
 }
 
 .plank__eyebrow {

@@ -6,7 +6,7 @@ import { href } from '../../content/site'
 export function PowerMessage({ base }: { readonly base: string }) {
   return (
     <section className="split split--centered container">
-      <div>
+      <div className="reveal">
         <p className="eyebrow">{POWER_MESSAGE.eyebrow}</p>
         <h2 className="section__title">{POWER_MESSAGE.heading}</h2>
         <div className="prose lede" style={{ marginTop: 16 }}>
@@ -21,7 +21,7 @@ export function PowerMessage({ base }: { readonly base: string }) {
           </LinkButton>
         </div>
       </div>
-      <div className="card card--tint">
+      <div className="card card--tint reveal">
         <p className="eyebrow">{VISION.eyebrow}</p>
         <ul className="vision__list">
           {VISION.items.map((item) => (

@@ -119,6 +119,9 @@ The harness lived in the session scratchpad and is gone; rebuild it:
 | About | Full bio removed to match | `<Biography />` still exists, one line to restore |
 | All | Header has no scrim, per the mockup | Nav fails 4.5:1 on the Get involved hero |
 | Home | Entrance animations compressed from 2300ms to 520ms | End state identical |
+| All | Header logo is the `footer-sign` yard-sign lockup, not the mockup's two knockouts | **Requested by the campaign, 2026-08-10.** Not a fix — both knockouts were legible on the tone each was chosen for |
+| All | Header logo is 146px, was 140px | Consequence of the above. The sign's glow fades to transparent, so only ~64% of the box is type; the box runs larger to keep the lettering its old size |
+| Home | The six commitment cards are links, with an "Explore this commitment" prompt on hover/focus | **Requested by the campaign, 2026-08-11.** Each targets `platform/#commitment-NN`, ids the rail already renders. The prompt occupies its line at all times so hover cannot reflow the row |
 
 ---
 

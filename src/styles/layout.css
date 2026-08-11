@@ -75,6 +75,14 @@
   text-decoration: none;
 }
 
+/*
+ * Back to 140px, the height this knockout was drawn for. It can run taller than
+ * the full-bleed signs did in the same 150px bar because it is not a rectangle:
+ * the PNG carries its own transparent margin, so a 140px box shows roughly 90px
+ * of ink and never touches the edges the way an all-ink crop at 140px did.
+ *
+ * No border-radius — the corners are transparent, so there is nothing to round.
+ */
 .site-header__logo img {
   height: 140px;
   width: auto;
@@ -208,10 +216,22 @@
   font-weight: var(--weight-semibold);
 }
 
+/*
+ * The address and the icon row are one unit, set off from the notice above.
+ * The space below it is deliberately tighter than the space above it — that
+ * difference is the only thing grouping the written address with the mail
+ * button underneath rather than with the at-large notice on top of it.
+ */
+.site-footer__contact {
+  margin-top: var(--space-4);
+}
+
 .site-footer__social {
   display: flex;
   justify-content: flex-end;
-  margin-top: var(--space-3);
+  /* Two icons now, so the row needs a gap it never needed with one. */
+  gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 .site-footer__social a {
@@ -233,8 +253,8 @@
 
 /*
  * The mockup is a fixed 1120px desktop composition with no breakpoints. Below
- * roughly 900px the overlaid header stops working — the 140px logo and the nav
- * cannot share a row, and light nav text ends up over the pale part of the hero
+ * roughly 900px the overlaid header stops working — the logo and the nav cannot
+ * share a row, and light nav text ends up over the pale part of the hero
  * photograph. From here down the header becomes a normal solid block in the
  * flow, which also removes the need for the top offset on inner pages.
  */
@@ -248,12 +268,16 @@
   /*
    * A light bar, not a navy one.
    *
-   * Navy was the obvious choice and it made the logo disappear on every page:
-   * the light-page lockup is navy throughout, and the dark-page lockup sets
-   * "ORUM" in navy too — it survives on photography because of its white
-   * outline, not because of its colour. Neither has anywhere to go on a navy
-   * bar. On a light surface the navy lockup reads on both, so the header goes
-   * light and Header.tsx swaps in that file below this width.
+   * The reasoning dates from the two-knockout header and is kept because it
+   * still decides this rule: navy was the obvious choice and it made the logo
+   * disappear on every page, since the light-page lockup was navy throughout
+   * and the dark-page lockup set "ORUM" in navy too — that one survived on
+   * photography because of its white outline, not its colour. Neither had
+   * anywhere to go on a navy bar, so the bar went light.
+   *
+   * The header now renders the campaign sign, which brings its own background
+   * and would sit on either bar. The light bar stays: the nav links below it
+   * are navy at this width, and they are what needs the pale surface.
    */
   .site-header {
     position: static;
@@ -272,6 +296,11 @@
     padding-block: var(--space-3);
   }
 
+  /*
+   * Smaller than the desktop bar's 108px. The sign has a row to itself here,
+   * but that row is on a phone, and 92px is what keeps the ward banner legible
+   * without the masthead eating the screen before the hero.
+   */
   .site-header__logo img {
     height: 92px;
   }

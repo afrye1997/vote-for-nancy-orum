@@ -169,7 +169,11 @@ export const COMMITTEE_NAME: string = 'Committee to Elect Nancy Orum'
  * the campaign never learns they tried. Both are in the build's forbidden
  * strings so neither can come back.
  *
- * The email and Facebook page below are the campaign's, supplied 2026-08-09.
+ * The email and Facebook page below are the campaign's. The email was supplied
+ * 2026-08-09; the Facebook page was corrected 2026-08-10, when the campaign sent
+ * a share link that resolved to a different profile id than the one we had. The
+ * page we were linking (…382668) returns no public title; the one below is
+ * "Nancy Orum For Bella Vista City Council Ward 2 Position 2".
  *
  * `phone` is null, not a placeholder: publishing no phone number is a normal
  * choice for a local race (NEEDED-FROM-CAMPAIGN.md §4) and null renders nothing
@@ -180,8 +184,15 @@ export const CONTACT = {
   email: 'votenancyorum@gmail.com',
   /** null publishes no phone number. A string here would be rendered as-is. */
   phone: null as string | null,
-  /** null renders no Facebook link at all, rather than a dead href="#". */
-  facebookUrl: 'https://www.facebook.com/profile.php?id=61575923382668' as string | null,
+  /**
+   * null renders no Facebook link at all, rather than a dead href="#".
+   *
+   * Stored as the canonical profile URL, not the /share/1DNLqVzJSt/ shortlink the
+   * campaign sent: the shortlink is a 302 to exactly this, and it arrived with a
+   * `mibextid` tracking param attached by whichever phone copied it. Linking the
+   * destination directly drops a redirect hop and the tracking param.
+   */
+  facebookUrl: 'https://www.facebook.com/profile.php?id=61592888948160' as string | null,
 } as const
 
 /**
@@ -192,12 +203,16 @@ export const CONTACT = {
  * Set this to the campaign's real contribution page — ActBlue, WinRed, Anedot,
  * or whatever processor the committee actually uses.
  *
- * While it is null the Donate button renders as DISABLED with a visible
- * "not set up yet" note. It is deliberately NOT hidden: the campaign asked for
- * the button, so it should be visible and obviously unfinished rather than
- * quietly missing. And a live-looking Donate button pointing nowhere is the
- * worst of the three options — a supporter who clicks it and lands on an error
- * page usually does not come back.
+ * While it is null every Donate button on the site points at `donate/`, the
+ * page that says donations are not open yet and offers a way back in. The
+ * button is deliberately NOT hidden and NOT dimmed: the campaign asked for it,
+ * and a supporter who wants to give should always land somewhere that answers
+ * them rather than on a dead control. What must never happen is the third
+ * option — a live-looking Donate button wired to nothing, because a supporter
+ * who clicks it and hits an error page usually does not come back.
+ *
+ * Setting this constant retargets all of those at the processor in one edit,
+ * and `donate/` stops being linked from anywhere.
  *
  * THINGS THE CAMPAIGN NEEDS BEFORE THIS GOES LIVE (see RESEARCH.md §4):
  * - A registered committee with a bank account. Contributions cannot be

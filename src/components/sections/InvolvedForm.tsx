@@ -3,7 +3,6 @@ import { SubmitButton } from '../ui/Button'
 import { Photo } from '../ui/Photo'
 import { HCaptcha, type HCaptchaHandle } from '../ui/HCaptcha'
 import { CheckboxField, RadioField, SelectField, TextAreaField, TextField } from '../ui/fields'
-import { DonateRow } from './DonateRow'
 import { FORM, PURPOSES } from '../../content/involved'
 import { IMAGES, imgSources } from '../../content/images'
 import { href } from '../../content/site'
@@ -312,7 +311,7 @@ export function InvolvedForm({
   if (web3formsKey === null) {
     return (
       <section className="form-wrap container" id="involved-form">
-        <div className="card form">
+        <div className="card form reveal">
           <h2 className="form__title">{FORM.notConfigured.title}</h2>
           <p className="lede">{FORM.notConfigured.body}</p>
         </div>
@@ -370,6 +369,49 @@ function ContactForm({
   const [phase, setPhase] = useState<Phase>('idle')
   /** Meaningful only in the `failed` phase. See the note on Phase. */
   const [failureText, setFailureText] = useState<string | null>(null)
+
+  /*
+   * The header's Volunteer button lands on `#help` — the "How would you like to
+   * help?" select — and this puts the cursor in it and opens the list.
+   *
+   * ─────────────────────────────────────────────────────────────────────────
+   * WHY OPENING IT IS BEST-EFFORT AND FOCUS IS NOT
+   * ─────────────────────────────────────────────────────────────────────────
+   * `showPicker()` requires transient user activation. A click that navigates
+   * from another page does not carry activation across the navigation, so on
+   * arrival it throws NotAllowedError and the list stays shut. Pressing
+   * Volunteer while already on this page IS a same-document activation, and
+   * there it genuinely opens.
+   *
+   * There is no way around that, and no custom dropdown is worth building to
+   * beat it: a native <select> is the control that already works with a
+   * keyboard, a screen reader and a phone's own picker. So the guaranteed half
+   * is focus — the field is highlighted and one keypress from open, wherever
+   * the visitor came from — and the opening is the part that happens when the
+   * browser allows it.
+   *
+   * `hashchange` covers the same-page press, where nothing remounts.
+   */
+  useEffect(() => {
+    const openHelp = () => {
+      if (window.location.hash !== '#help') return
+      const field = document.getElementById('help')
+      if (!(field instanceof HTMLSelectElement)) return
+      /* preventScroll: the browser has already scrolled the anchor into view,
+         and focusing again would fight the smooth scroll still in flight. */
+      field.focus({ preventScroll: true })
+      const picker = (field as HTMLSelectElement & { showPicker?: () => void }).showPicker
+      if (typeof picker !== 'function') return
+      try {
+        picker.call(field)
+      } catch {
+        /* No activation, or no support. Focus above is the whole fallback. */
+      }
+    }
+    openHelp()
+    window.addEventListener('hashchange', openHelp)
+    return () => window.removeEventListener('hashchange', openHelp)
+  }, [])
 
   /*
    * Synchronises with the page lifecycle. Returning from the thank-you page
@@ -549,7 +591,7 @@ function ContactForm({
   return (
     <section className="form-wrap container">
       <form
-        className="card form"
+        className="card form reveal"
         id="involved-form"
         action={WEB3FORMS_ENDPOINT}
         method="POST"
@@ -735,7 +777,6 @@ function ContactForm({
           )}
         </SubmitButton>
         <p className="note">{FORM.privacy}</p>
-        <DonateRow />
       </form>
     </section>
   )

@@ -76,6 +76,7 @@ const TARGETS = {
   'tanyard-creek-falls.png': { px: 1040, jpeg: true },
   'hero-arms-crossed.jpeg': { px: 1800 },
   'community-event.jpeg': { px: 1800 },
+  'campaign-booth.jpeg': { px: 1040 },
   'family-square.jpeg': { px: 1800 },
   'nancy-orum-headshot.jpeg': { px: 1040 },
 }

@@ -28,7 +28,45 @@ import { useEffect, useState } from 'react'
  * each travels differs; the time it takes does not.
  */
 
-const DURATION_MS = 3000
+const DURATION_MS = 1500
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * THE SHAPE OF THE SECOND AND A HALF
+ * ─────────────────────────────────────────────────────────────────────────────
+ * One second of steady climb, then half a second of visible settling.
+ *
+ * A single ease-out over the whole run does not read that way. Ease-out cubic
+ * is most of the way there long before the end, so the tail is not "slower" so
+ * much as stopped — the digits sit still while the animation is technically
+ * still running. Splitting the curve puts real movement in the first phase and
+ * keeps the tail actually counting, just slowly.
+ *
+ * SLOW_AT is not a taste value. It is the fraction that makes the two pieces
+ * hand off at the same speed: solving `SLOW_AT / SLOW_FROM = 3(1 - SLOW_AT) /
+ * (1 - SLOW_FROM)` at SLOW_FROM = 2/3 gives exactly 6/7. Round it and the
+ * number visibly stumbles at the seam — either braking to a stop and starting
+ * again, or lurching faster into the phase that is supposed to be the slow one.
+ *
+ * Change DURATION_MS alone and the shape holds, because both constants are
+ * fractions of the run rather than milliseconds. Change SLOW_FROM and SLOW_AT
+ * has to be re-solved from the equation above or the seam will show. (This has
+ * now been 3s/1s, 2s/0.5s and 1.5s/0.5s; each time only the two lines below
+ * changed, and only SLOW_FROM ever forced a re-solve.)
+ */
+const SLOW_FROM = 2 / 3
+const SLOW_AT = 6 / 7
+
+/** Fraction of the distance covered at `t`, where `t` is 0→1 across DURATION_MS. */
+function eased(t: number): number {
+  if (t < SLOW_FROM) {
+    /* Linear. The deceleration is the tail's job; doing any of it here is what
+       flattens the handoff into a stall. */
+    return (SLOW_AT * t) / SLOW_FROM
+  }
+  const p = (t - SLOW_FROM) / (1 - SLOW_FROM)
+  return SLOW_AT + (1 - SLOW_AT) * (1 - (1 - p) ** 3)
+}
 
 /**
  * Thousands separators, computed rather than delegated to `toLocaleString`.
@@ -68,8 +106,7 @@ export function CountUp({
     const tick = (now: number) => {
       if (!startedAt) startedAt = now
       const t = Math.min(1, (now - startedAt) / DURATION_MS)
-      /* Ease out cubic: quick off the mark, settles onto the real figure. */
-      setValue(from + (to - from) * (1 - (1 - t) ** 3))
+      setValue(from + (to - from) * eased(t))
       if (t < 1) raf = requestAnimationFrame(tick)
     }
 

@@ -7,14 +7,14 @@ import { href } from '../../content/site'
 export function AboutIntro({ base }: { readonly base: string }) {
   return (
     <section className="split split--about split--centered container">
-      <div className="about-portrait">
+      <div className="about-portrait reveal">
         <Photo
           {...imgSources(base, IMAGES.aboutArkansas)}
           image={IMAGES.aboutArkansas}
           eager
         />
       </div>
-      <div>
+      <div className="reveal">
         <p className="eyebrow">{ABOUT_INTRO.eyebrow}</p>
         <h1 className="section__title" style={{ fontSize: 'var(--text-4xl)' }}>
           {ABOUT_INTRO.heading}

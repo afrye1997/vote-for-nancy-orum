@@ -36,6 +36,15 @@ export type Commitment = {
   readonly pill: string
   /** Shortened for the home-page card grid. */
   readonly cardTitle: string
+  /**
+   * The one word of `cardTitle` set in the campaign green on the home cards.
+   *
+   * Stored as the word rather than an index, and matched against `cardTitle` at
+   * render time, so the title above stays the only place the wording lives.
+   * Reword a title past its accent and the colour simply stops applying — the
+   * card loses a highlight, never a word. Same arrangement as SITE.taglineAccent.
+   */
+  readonly cardAccent: string
   /** The one-line claim. Doubles as the home card's body. */
   readonly lede: string
   readonly paragraphs: readonly string[]
@@ -59,6 +68,13 @@ export const PLATFORM_PREVIEW = {
   eyebrow: 'The platform',
   heading: 'Six commitments to Bella Vista',
   cta: 'Read the full platform',
+  /**
+   * Shown on the home cards on hover and on keyboard focus.
+   *
+   * Deliberately not "Read more": each card links to that commitment's own
+   * section on the platform page, not to a longer version of the card.
+   */
+  cardCta: 'Explore this commitment',
 } as const
 
 export const COMMITMENTS: readonly Commitment[] = [
@@ -68,6 +84,7 @@ export const COMMITMENTS: readonly Commitment[] = [
     title: 'Listen first',
     pill: 'Listen first',
     cardTitle: 'Listen first',
+    cardAccent: 'Listen',
     lede: 'Good leadership begins with listening.',
     paragraphs: [
       'As a teacher, I learned that people thrive when they feel heard, respected, and valued. As a Realtor, I use those same skills every day to understand people’s priorities and help them navigate important decisions. I will bring that approach to City Council.',
@@ -82,6 +99,7 @@ export const COMMITMENTS: readonly Commitment[] = [
     title: 'Plan for thoughtful growth',
     pill: 'Thoughtful growth',
     cardTitle: 'Plan for thoughtful growth',
+    cardAccent: 'growth',
     lede: 'Growth should strengthen Bella Vista — not diminish what makes it special.',
     paragraphs: [
       'Northwest Arkansas continues to grow, and Bella Vista will continue to experience the opportunities and challenges that come with that growth. My years with the Bentonville School District allowed me to witness tremendous growth firsthand — anticipating future needs, planning ahead, adapting when circumstances changed, and bringing people together around shared goals.',
@@ -96,6 +114,7 @@ export const COMMITMENTS: readonly Commitment[] = [
     title: 'Protect the character of Bella Vista',
     pill: 'Protect our character',
     cardTitle: 'Protect our character',
+    cardAccent: 'character',
     lede: 'Progress and preservation can work together.',
     paragraphs: [
       'Our lakes, trails, trees, natural beauty, neighborhoods, and quality of life are among the reasons people choose Bella Vista. Growth should never mean forgetting who we are.',
@@ -110,13 +129,14 @@ export const COMMITMENTS: readonly Commitment[] = [
     title: 'Build stronger partnerships',
     pill: 'Stronger partnerships',
     cardTitle: 'Build stronger partnerships',
+    cardAccent: 'partnerships',
     lede: 'We don’t have to solve every challenge alone.',
     paragraphs: [
       'Bella Vista is surrounded by successful cities, schools, businesses, nonprofits, community organizations, and regional partners. One of my greatest strengths is being a connector and facilitator — bringing people to the table, identifying common goals, and finding ways for people and organizations to work together.',
       'City Council should actively look for opportunities to collaborate, share knowledge, learn from successful models, and build partnerships that benefit Bella Vista residents.',
     ],
     pull: 'Strong communities aren’t built in silos. They’re built through relationships.',
-    image: { ...IMAGES.heroArmsCrossed, focus: '30% 30%' },
+    image: IMAGES.campaignBooth,
   },
   {
     id: 'practical-solutions',
@@ -124,6 +144,7 @@ export const COMMITMENTS: readonly Commitment[] = [
     title: 'Focus on practical solutions',
     pill: 'Practical solutions',
     cardTitle: 'Focus on practical solutions',
+    cardAccent: 'solutions',
     lede: 'City government should work for the people it serves.',
     paragraphs: [
       'Complex problems rarely have simple answers. They require research, thoughtful questions, different perspectives, collaboration, and a willingness to find common ground.',
@@ -138,6 +159,7 @@ export const COMMITMENTS: readonly Commitment[] = [
     title: 'Lead with care and respect',
     pill: 'Care and respect',
     cardTitle: 'Lead with care and respect',
+    cardAccent: 'respect',
     lede: 'How we lead matters just as much as what we accomplish.',
     paragraphs: [
       'I believe people can disagree and still respect one another. We can have difficult conversations without becoming divided. We can listen to different perspectives without losing sight of our shared love for Bella Vista.',

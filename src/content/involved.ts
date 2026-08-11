@@ -89,7 +89,7 @@ export const PURPOSES: readonly Purpose[] = [
     id: 'purpose-join',
     value: 'Join the campaign',
     label: 'Join the campaign',
-    submitLabel: 'Count me in',
+    submitLabel: 'Count me in!',
   },
   {
     id: 'purpose-question',

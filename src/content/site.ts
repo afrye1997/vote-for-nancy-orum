@@ -33,6 +33,17 @@ export const SITE = {
    * three hardcoded spans in JSX (§2.4). Revising the tagline changes it here.
    */
   taglineSegments: ['Listening.', 'Serving.', 'Building Bella Vista Together.'],
+  /**
+   * The one word of the refrain set in the campaign green instead of white.
+   *
+   * Stored as the word rather than as an index or a fourth segment, and matched
+   * against the end of whichever clause contains it, so `taglineSegments` above
+   * stays the only place the headline's wording lives. Rewriting a clause can
+   * therefore never leave this pointing at a word that is no longer in it — the
+   * colour just stops applying, which is a far cheaper failure than a headline
+   * assembled out of two lists that disagree.
+   */
+  taglineAccent: 'Together.',
   /** Retained but unrendered — see the correction note above. */
   kicker: 'Transparent leadership. Responsible growth.',
   heroLede: 'I listen. I connect. I solve problems.',

@@ -180,12 +180,14 @@ export function PlatformRail({ base }: { readonly base: string }) {
   return (
     <>
       <section className="section container rail-head">
-        <p className="eyebrow">{PLATFORM_INTRO.eyebrow}</p>
-        <h1 className="section__title">
-          {PLATFORM_INTRO.headingLead}{' '}
-          <span className="rail-head__emphasis">{PLATFORM_INTRO.headingEmphasis}</span>
-        </h1>
-        <p className="section__lede rail-head__lede">{PLATFORM_INTRO.lede}</p>
+        <div className="reveal">
+          <p className="eyebrow">{PLATFORM_INTRO.eyebrow}</p>
+          <h1 className="section__title">
+            {PLATFORM_INTRO.headingLead}{' '}
+            <span className="rail-head__emphasis">{PLATFORM_INTRO.headingEmphasis}</span>
+          </h1>
+          <p className="section__lede rail-head__lede">{PLATFORM_INTRO.lede}</p>
+        </div>
         <nav aria-label="Commitments">
           <ul className="rail-index">
             {COMMITMENTS.map((commitment, index) => (
@@ -224,8 +226,18 @@ export function PlatformRail({ base }: { readonly base: string }) {
           ))}
         </div>
         <RailArrow direction="next" onClick={() => scrollToIndex(centre + 1)} />
-        <p className="rail-counter" aria-live="polite">
-          {active + 1} / {REAL}
+        {/*
+          The "5 / 6" readout was removed from the page at the campaign's
+          request, 2026-08-11. The live region itself stays, hidden: it is the
+          only thing that tells a screen-reader user where they have landed
+          after pressing next, and the rail offers no other feedback — the cards
+          scroll, which is silent.
+
+          The wording is a sentence rather than "5 / 6" because it is now only
+          ever heard, never read. "five slash six" is not what that meant.
+        */}
+        <p className="visually-hidden" aria-live="polite">
+          Commitment {active + 1} of {REAL}
         </p>
       </div>
     </>

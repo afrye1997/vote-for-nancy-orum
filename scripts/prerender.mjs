@@ -79,6 +79,26 @@ const FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">`
 
+/**
+ * The scroll-reveal gate. Inline and in the head deliberately — both halves of
+ * it have to run before anything paints or the whole feature is a liability.
+ *
+ * `js` is what src/styles/base.css requires before it will hide a `.reveal`
+ * block. Setting it here, synchronously, means the hidden state is in force
+ * from the first paint (no flash of text that then disappears) and is never in
+ * force for a visitor without JavaScript (nothing sets the class, so the
+ * prerendered HTML stays fully legible — which is the whole point of
+ * prerendering it).
+ *
+ * The `load` handler is the bail-out for the case in between: JavaScript is on,
+ * so the text is hidden, but the bundle 404s or throws before src/reveal.ts can
+ * un-hide it. Module scripts are deferred and execute before `load`, so a
+ * healthy bundle has always set the attribute by the time this runs; only a
+ * broken one reaches the `remove`, and it recovers the page rather than
+ * serving a blank column where the campaign's words should be.
+ */
+const REVEAL_GATE = `<script>document.documentElement.classList.add('js');addEventListener('load',function(){if(!document.documentElement.hasAttribute('data-reveals-ready'))document.documentElement.classList.remove('js')})</script>`
+
 /** Find an emitted asset by extension. At most one of each is expected. */
 async function findAsset(ext) {
   const assets = join(DIST, 'assets')
@@ -134,6 +154,7 @@ function document({ title, description, body, props, cssHref, jsHref, ogImage, c
      because the scrapers cache the failure long after the file arrives. -->`
   }
 ${FONT_LINKS}${HCAPTCHA_SCRIPT ? '\n' + HCAPTCHA_SCRIPT : ''}
+${REVEAL_GATE}
 ${cssHref ? `<link rel="stylesheet" href="${cssHref}">` : '<!-- no stylesheet emitted -->'}
 </head>
 <body>

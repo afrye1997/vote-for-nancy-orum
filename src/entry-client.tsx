@@ -1,5 +1,6 @@
 import { hydrateRoot } from 'react-dom/client'
 import { PAGE_COMPONENTS, type PageProps } from './pages/registry'
+import { startReveals } from './reveal'
 import './styles/index.css'
 
 /**
@@ -40,3 +41,16 @@ if (el && data?.textContent) {
   const Page = PAGE_COMPONENTS[props.page]
   if (Page) hydrateRoot(el, <Page {...props} />)
 }
+
+/*
+ * Reveals are wired up outside the `if` above, and outside React.
+ *
+ * Outside the `if`, because the scroll reveal is the only thing keeping the
+ * text visible once `html.js` is set — a page that somehow failed to hydrate
+ * must still un-hide itself, and returning early would leave it blank.
+ *
+ * Outside React, because the class is added to prerendered nodes React is
+ * merely adopting. It never appears in any component's props, so React has no
+ * reason to write over it on a later render.
+ */
+startReveals()

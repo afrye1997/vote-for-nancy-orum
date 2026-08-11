@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nancy Orum for Bella Vista City Council, Ward 2</title>
+    <!--
+      The scroll-reveal gate, mirroring REVEAL_GATE in scripts/prerender.mjs so
+      `npm run dev` behaves like the built site. Keep the two in step; the
+      built pages never use this file's head.
+    -->
+    <script>
+      document.documentElement.classList.add('js')
+      addEventListener('load', function () {
+        if (!document.documentElement.hasAttribute('data-reveals-ready'))
+          document.documentElement.classList.remove('js')
+      })
+    </script>
   </head>
   <body>
     <!--

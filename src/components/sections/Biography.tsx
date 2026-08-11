@@ -15,7 +15,7 @@ import { BIO_CREDO, BIO_SIGNOFF, FULL_BIO, PULLQUOTE_PROPOSAL } from '../../cont
 export function Biography() {
   return (
     <section className="section container">
-      <div className="bio">
+      <div className="bio reveal">
         <p className="eyebrow">{BIO_SECTION.eyebrow}</p>
         <h2 className="section__title">{BIO_SECTION.heading}</h2>
         {PULLQUOTE_PROPOSAL.approved ? (

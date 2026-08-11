@@ -13,7 +13,7 @@ export function RootedBand({ base }: { readonly base: string }) {
       />
       <div className="band__scrim" />
       <div className="band__inner container">
-        <div>
+        <div className="reveal">
           <p className="eyebrow eyebrow--light">{ROOTED_BAND.eyebrow}</p>
           <p className="band__line">{ROOTED_BAND.line}</p>
         </div>

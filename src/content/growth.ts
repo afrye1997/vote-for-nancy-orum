@@ -48,9 +48,18 @@ export type Stat = {
    * Where the count-up starts. Purely presentational — the number nobody reads,
    * because it is only on screen for a moment.
    *
-   * An alternative worth considering: start each one at its own previous value
-   * (30,104 for the population, 28 for the permits). The animation would then
-   * be the argument rather than decoration. Kept short and close for now.
+   * Set very close to `value` at the campaign's request (2026-08-11): these now
+   * travel 4, 8 and 7 respectively, so the effect is an odometer settling onto
+   * the figure rather than a number racing up to it. On the population stat
+   * that means only the last digit moves.
+   *
+   * ⚠ Keep them BELOW `value` and never above it. CountUp animates from here to
+   * there and the caption beside each one describes an increase; a start above
+   * the value would count downwards and read as the opposite claim.
+   *
+   * An alternative still worth considering: start each one at its own previous
+   * value (30,104 for the population, 28 for the permits). The animation would
+   * then be the argument rather than decoration.
    */
   readonly countFrom: number
   /** Appended verbatim after the formatted number. */
@@ -103,7 +112,7 @@ export const STATS: readonly Stat[] = [
      * stated exactly as the design states it.
      */
     value: 82,
-    countFrom: 62,
+    countFrom: 78,
     suffix: '%',
     caption: 'Population growth between the 2000 and 2020 censuses',
     source: 'U.S. Census Bureau',
@@ -114,7 +123,7 @@ export const STATS: readonly Stat[] = [
     id: 'population-now',
     /** Vintage 2025. The artifact's 33,274 is a superseded vintage. */
     value: CENSUS.populationLatest,
-    countFrom: 33_275,
+    countFrom: 34_510,
     suffix: '',
     /** 30,104, not the artifact's 30,102 — that number is in no Census product. */
     caption: `Estimated residents as of ${CENSUS.populationLatestAsOf}, up from ${CENSUS.population2020.toLocaleString('en-US')} counted in the 2020 census`,
@@ -126,7 +135,7 @@ export const STATS: readonly Stat[] = [
     id: 'permits',
     /** 637 is the federal figure. No city document publishes the artifact's 636. */
     value: CENSUS.permits2024,
-    countFrom: 620,
+    countFrom: 630,
     suffix: '',
     // Comparison uses 2012, which HAS data. The artifact compared to 2013,
     // which does not exist in the survey — Bella Vista reported zero months.

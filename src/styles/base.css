@@ -171,3 +171,33 @@ button {
     scroll-behavior: smooth;
   }
 }
+
+/*
+ * ── Scroll reveal ─────────────────────────────────────────────────────────────
+ *
+ * Blocks marked `.reveal` in the markup rise into place as they are scrolled to.
+ * src/reveal.ts adds `.is-revealed` and explains the fail-open reasoning; the
+ * two gates that matter are both on the selector below.
+ *
+ * `html.js` is set by an inline script in the document head, so this never
+ * applies to a visitor without JavaScript, and `no-preference` keeps it away
+ * from anyone who has asked for less motion. Both fail towards visible text.
+ *
+ * Only opacity and transform animate. Nothing here can move a neighbour, so
+ * revealing a block cannot reflow the page under someone mid-read, and a hidden
+ * block still holds its full height for an anchor to land against.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  html.js .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  html.js .reveal.is-revealed {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 1000ms var(--ease-organic),
+      transform 1000ms var(--ease-organic);
+  }
+}

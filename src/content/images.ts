@@ -60,6 +60,18 @@ export const IMAGES = {
     height: 1350,
     focus: '28% 35%',
   },
+  campaignBooth: {
+    file: 'campaign-booth.jpeg',
+    alt: 'Nancy Orum at her campaign booth, beside a Nancy Orum for City Council banner',
+    width: 1040,
+    height: 772,
+    /**
+     * The card crops this to a 520×220 letterbox, showing a little over half
+     * the frame's height. Held high enough to keep the banner's top edge and
+     * her face both inside it.
+     */
+    focus: '50% 38%',
+  },
   familySquare: {
     file: 'family-square.jpeg',
     alt: 'Nancy Orum with her family on the downtown square',

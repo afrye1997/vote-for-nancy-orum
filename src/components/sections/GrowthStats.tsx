@@ -47,12 +47,17 @@ export function GrowthStats() {
 
   return (
     <section className="section container" style={{ paddingTop: 0 }}>
-      <div className="section__head section__head--growth">
+      <div className="section__head section__head--growth reveal">
         <p className="eyebrow">{GROWTH_INTRO.eyebrow}</p>
         <h2 className="section__title">{GROWTH_INTRO.heading}</h2>
         <p className="section__lede">{GROWTH_INTRO.lede}</p>
       </div>
-      <div className="stats" ref={statsRef}>
+      {/*
+        Revealed as one block, not three. The counters are deliberately kept in
+        lockstep (see CountUp) and staggering their containers would undo on the
+        way in exactly what that arranges on the way up.
+      */}
+      <div className="stats reveal" ref={statsRef}>
         {STATS.map((stat) => (
           <div className="stat" key={stat.id}>
             <p className="stat__figure">
@@ -72,7 +77,7 @@ export function GrowthStats() {
           </div>
         ))}
       </div>
-      <p className="stats__note">{GROWTH_INTRO.note}</p>
+      <p className="stats__note reveal">{GROWTH_INTRO.note}</p>
     </section>
   )
 }

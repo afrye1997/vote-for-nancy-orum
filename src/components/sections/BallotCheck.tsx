@@ -2,7 +2,7 @@ import { LinkButton } from '../ui/Button'
 import { Photo } from '../ui/Photo'
 import { BALLOT } from '../../content/involved'
 import { IMAGES, imgSources } from '../../content/images'
-import { AT_LARGE_NOTICE, KEY_DATES, OFFICIAL_LINKS } from '../../content/election'
+import { AT_LARGE_NOTICE, OFFICIAL_LINKS } from '../../content/election'
 
 /**
  * "Can I vote for Nancy?" — the block that replaces the mockup's ward lookup.
@@ -20,7 +20,7 @@ import { AT_LARGE_NOTICE, KEY_DATES, OFFICIAL_LINKS } from '../../content/electi
 export function BallotCheck({ base }: { readonly base: string }) {
   return (
     <section className="section container" style={{ paddingBottom: 0 }}>
-      <div className="ballot">
+      <div className="ballot reveal">
         <p className="eyebrow">{BALLOT.eyebrow}</p>
         <h2 className="ballot__title">{BALLOT.heading}</h2>
         <p className="ballot__lede">{BALLOT.lookupLede}</p>
@@ -38,32 +38,18 @@ export function BallotCheck({ base }: { readonly base: string }) {
           </p>
         </details>
         <div className="ballot__actions">
+          {/*
+            No "Get involved" button here. It sent you to a form further down
+            the page you were already on, from a page called Get involved — and
+            the header carries a Volunteer button that does the same thing on
+            every page including this one. `BALLOT.involvedCta` is left in
+            involved.ts rather than deleted; the string is still the campaign's.
+          */}
           <LinkButton variant="secondary" href={OFFICIAL_LINKS.voterLookup} external>
             {BALLOT.lookupCta}
           </LinkButton>
-          <LinkButton variant="accent" href="#involved-form">
-            {BALLOT.involvedCta}
-          </LinkButton>
         </div>
       </div>
-      <div className="ballot">
-        <h3 className="eyebrow" style={{ marginTop: 48 }}>
-          {BALLOT.datesHeading}
-        </h3>
-      </div>
-      <ul className="dates">
-        {KEY_DATES.map((date) => (
-          <li className="dates__item" key={date.iso}>
-            <time className="dates__when" dateTime={date.iso}>
-              {date.display}
-            </time>
-            <p className="dates__what">
-              <span className="dates__label">{date.label}</span>
-              {date.detail ? <> — {date.detail}</> : null}
-            </p>
-          </li>
-        ))}
-      </ul>
     </section>
   )
 }

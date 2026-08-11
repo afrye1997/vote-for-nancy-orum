@@ -10,20 +10,27 @@ npm run images    # assets/ -> public/img/, AVIF + fallback for each
 
 ## Where the originals come from
 
-`assets/` holds the twelve files from the campaign's Claude Design project. It
-is gitignored: 45 MB of camera originals and 7200px print masters does not
-belong in a repository that deploys to GitHub Pages. The design project is their
-master copy — re-export from there if `assets/` is ever lost.
+`assets/` holds thirteen files. It is gitignored: 46 MB of camera originals and
+7200px print masters does not belong in a repository that deploys to GitHub
+Pages.
 
-They cannot be fetched programmatically. The design MCP caps file reads at
-256 KiB and every one of these exceeds it, returning a truncated file that still
-looks valid and decodes to a torn image.
+Twelve of them come from the campaign's Claude Design project, which is their
+master copy — re-export from there if `assets/` is ever lost. They cannot be
+fetched programmatically: the design MCP caps file reads at 256 KiB and every
+one of these exceeds it, returning a truncated file that still looks valid and
+decodes to a torn image.
+
+⚠ `campaign-booth.jpeg` is **not** in the design project. It came from the
+campaign directly, at 2048×1520 — already downscaled, so there is no larger
+master to go back to. Re-exporting the design project will not restore it. If
+`assets/` is lost, that one has to come from the campaign again.
 
 | File | Used by |
 |---|---|
 | `nav-logo.png` | Header, on the dark pages (home, get involved) |
-| `nav-logo-navy.png` | Header, on the light pages (about, platform) |
-| `hero-arms-crossed.jpeg` | Home hero; platform commitment 4 |
+| `nav-logo-navy.png` | Header, on the light pages, and on every page below 900px |
+| `hero-arms-crossed.jpeg` | Home hero |
+| `campaign-booth.jpeg` | Platform commitment 4 |
 | `nancy-orum-headshot.jpeg` | Platform commitment 5 |
 | `community-event.jpeg` | Get involved hero; platform commitment 1 |
 | `family-square.jpeg` | About "rooted here" band; platform commitment 2 |
@@ -40,7 +47,7 @@ Each original becomes two files at the same size: an **AVIF**, and a **PNG or
 JPEG fallback**. Components render both through a `<picture>`, so any given
 visitor downloads exactly one.
 
-45.5 MB of originals become **1.6 MB served to a modern browser**, or 5.8 MB to
+46.5 MB of originals become **1.8 MB served to a modern browser**, or 6.1 MB to
 a browser too old for AVIF (Safari before 16.4). Home is 0.30 MB all-in.
 
 Target sizes are twice each image's largest CSS display width, capped at 1800 for
