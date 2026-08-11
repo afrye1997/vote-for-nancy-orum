@@ -391,7 +391,41 @@ hCaptcha only. Set `HCAPTCHA_SITE_KEY` to Web3Forms' own published free-plan key
 `50b2fe65-b00b-4b9e-ad62-3ba471098be2`, and enable hCaptcha in their dashboard.
 On the free plan they hold the matching secret; supplying your own key/secret
 pair is a paid feature and a token minted against a different site key will not
-verify. There is no hCaptcha account of ours and no hostname list to manage.
+verify.
+
+⚠ **This paragraph was already correct and the mistake was made anyway, on
+2026-08-11.** `HCAPTCHA_SITE_KEY` was set to a sitekey minted in a new hCaptcha
+dashboard (`594ed3ba-…`), on the entirely reasonable reasoning that it was "our"
+key. It is ours, and that is exactly why it does not work: **this site never
+verifies the token — Web3Forms does**, on their servers, with the secret half of
+the pair. On the free plan the only pair they hold is their own, so a genuine
+token minted by any other sitekey has no secret to check it against and the
+submission is refused. Their docs: *"You can set your own site key and secret
+key on all paid plans."*
+
+Nothing in the hCaptcha dashboard can change that — not the account tier, not
+domain allowlisting. Those govern how our sitekey behaves, and our sitekey is
+not in the loop.
+
+So there now **is** an hCaptcha account (Pro Publisher, sitekey `594ed3ba-…`,
+with an unused domain allowlist). It is deliberately not wired to anything, and
+it must stay that way until either Web3Forms is on a paid plan or the Worker
+below exists — the Worker is the case where we hold the secret and do the
+verifying, and at that point `594ed3ba-…` becomes the correct key and the
+published one becomes wrong.
+
+The symptom to recognise: the form fails at submit with a message from
+Web3Forms, not a network error, and the captcha widget itself works fine. Check
+what is actually live before theorising:
+
+```bash
+curl -s https://vote-for-nancy-orum.votenancyorum.workers.dev/involved/ \
+  | grep -o '"hcaptchaSiteKey":"[^"]*"'
+```
+
+If the captcha ever becomes more trouble than it is worth, deleting
+`HCAPTCHA_SITE_KEY` entirely is a supported state: the form falls back to the
+honeypot and regains the no-JavaScript path this section costs.
 
 The Worker below is still worth building eventually, for the reason that has
 nothing to do with captchas:
