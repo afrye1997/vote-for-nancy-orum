@@ -14,7 +14,7 @@ import { href } from '../../content/site'
  * back into the campaign. Either way the visitor gets somewhere that answers
  * them, which is the whole point.
  *
- * This used to render a `DisabledButton` instead — present, dimmed, inert, with
+ * This used to render a dimmed, inert button instead — present but dead, with
  * the reason beside it. Two things were wrong with that. It disagreed with the
  * rest of the site, where the header and the home hero have always routed to
  * `donate/` under exactly the same condition, so the same control behaved

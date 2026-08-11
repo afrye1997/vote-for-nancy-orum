@@ -74,10 +74,17 @@ const HCAPTCHA_SCRIPT = HCAPTCHA_SITE_KEY
  *
  * Self-hosting these would remove the third party altogether and is the right
  * end state; it needs the font binaries, which we do not have.
+ *
+ * Three families, and the third is one weight of one style on purpose. Libre
+ * Caslon Display has no bold — it is a single-weight family — so the growth
+ * figures, which are the only thing on the site set in a bold serif, take their
+ * 700 from Libre Caslon Text instead. See --font-figure in tokens.css. Nothing
+ * else uses that family, so nothing else needs a weight from it, and asking for
+ * only 700 keeps it to one file.
  */
 const FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">`
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:wght@700&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">`
 
 /**
  * The scroll-reveal gate. Inline and in the head deliberately — both halves of
@@ -211,8 +218,13 @@ for (const page of PAGES) {
 }
 
 /**
- * GitHub Pages serves 404.html for unknown paths. Without it, visitors get
- * GitHub's generic 404, which looks nothing like the campaign.
+ * `404.html` is the not-found document for the Cloudflare static-assets Worker
+ * (`not_found_handling: "404-page"` in wrangler.jsonc). Without it a mistyped
+ * URL gets Cloudflare's generic error page, which looks nothing like the
+ * campaign — and, unlike this one, offers no way back into it.
+ *
+ * The filename is a convention several static hosts share, GitHub Pages among
+ * them, so it stays correct if the site is ever moved.
  */
 const notFoundRender = renderNotFound(renderOpts)
 const notFound = document({

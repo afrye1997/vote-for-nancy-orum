@@ -6,6 +6,13 @@
  * budget as the common thread.
  *
  * Note none of these are ward-scoped, so §2.6 has nothing to flag here.
+ *
+ * ⚠ Nothing imports this file. No page renders these profiles; the section was
+ * not carried across from the artifact. It is kept because the copy is the
+ * campaign's and reads well, not because it is wired to anything — so treat a
+ * change here as a change to a draft, and check `Home.tsx` before assuming an
+ * edit will appear anywhere. `priorities.ts` is in the same position and
+ * explains the reasoning at more length.
  */
 
 export type VoterProfile = {

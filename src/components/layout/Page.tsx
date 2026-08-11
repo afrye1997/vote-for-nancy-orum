@@ -11,10 +11,16 @@ import { Header } from './Header'
  * full-bleed photography and let the artwork run up behind it; the other pages
  * are light, so the header takes navy type and `main` starts below it.
  *
- * It is applied here rather than passed down. The nav links need it, and they
- * read it off `.site--dark` / `.site--light` in CSS; the campaign sign in the
- * header brings its own background and looks the same on either surface, so
- * Header itself no longer has anything to decide.
+ * It is both applied here AND passed down, and both are load-bearing. The
+ * `.site--dark` / `.site--light` class is what colours the nav links, in CSS.
+ * The prop is what lets `Header` pick between the two cuts of the lockup and
+ * decide whether the ≤900px `<source>` pair is needed at all — see the note
+ * there, and the per-page measurements in HANDOFF.md under "Decisions that
+ * must not be quietly reversed".
+ *
+ * ⚠ The prop is therefore not redundant with the class, however much it looks
+ * it. Dropping it puts the navy lockup on the two photographic heroes, where
+ * 99.7% of its ink measured below 4.5:1 over Get involved.
  */
 export function Page({
   base,

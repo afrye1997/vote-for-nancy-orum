@@ -80,8 +80,9 @@ export const SEO = {
  * becomes four prerendered documents here.
  *
  * `path` is relative to the site root and always ends in a slash (except home),
- * so links work identically under GitHub Pages' `/<repo>/` prefix and under a
- * bare custom domain later.
+ * so links work identically whether the site is served from the root — which is
+ * what the Cloudflare Worker does today, with `SITE_BASE` left at `/` — or from
+ * a `/<repo>/` style prefix if it is ever moved somewhere that needs one.
  *
  * Adding a page means adding an entry here and a case in entry-server.tsx.
  * That is the whole cost — no router, no route config, no prerender list to

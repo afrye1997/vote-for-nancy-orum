@@ -5,10 +5,11 @@ import { href } from '../content/site'
 /**
  * 404.
  *
- * GitHub Pages serves this file for any unknown path. Rendering it through the
- * same shell as everything else means a mistyped link still lands somewhere
- * that looks like the campaign and offers a way back, instead of on GitHub's
- * own error page.
+ * Prerendered to `404.html`, which the Cloudflare static-assets Worker serves
+ * for any unknown path (`not_found_handling` in wrangler.jsonc). Rendering it
+ * through the same shell as everything else means a mistyped link still lands
+ * somewhere that looks like the campaign and offers a way back, instead of on
+ * Cloudflare's own error page.
  */
 export function NotFound({ base }: { readonly base: string }) {
   return (

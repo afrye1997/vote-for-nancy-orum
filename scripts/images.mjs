@@ -9,8 +9,9 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * WHY THIS EXISTS
  * ─────────────────────────────────────────────────────────────────────────────
- * The originals are camera files and print masters — 48 MB across twelve
- * files, with two 7200px yard-sign renders displayed at 250 and 280 CSS pixels.
+ * The originals are camera files and print masters — 47 MB across the thirteen
+ * files in TARGETS, with two 7200px yard-sign renders displayed at 250 and 280
+ * CSS pixels.
  * Shipped as-is the home page weighed 15 MB and the platform page 35 MB, which
  * misses ENGINEERING.md §5's LCP budget by more than an order of magnitude.
  *
@@ -96,7 +97,7 @@ const AVIF_QUALITY = '60'
  * does not survive, so the derivative shipped upside down — and it looked fine
  * in `assets/`, in Preview, and in the design project the whole time.
  *
- * Only one of the twelve is affected today, but the next photo off someone's
+ * Only one of the thirteen is affected today, but the next photo off someone's
  * phone is a coin flip, so all eight orientations are handled rather than the
  * one case that bit us.
  */

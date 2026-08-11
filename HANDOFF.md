@@ -119,7 +119,7 @@ The harness lived in the session scratchpad and is gone; rebuild it:
 | About | Full bio removed to match | `<Biography />` still exists, one line to restore |
 | All | Header has no scrim, per the mockup | Nav fails 4.5:1 on the Get involved hero |
 | Home | Entrance animations compressed from 2300ms to 840ms | End state identical. Slowed from 520ms on 2026-08-11 at the campaign's request; held short of the mockup because an element at `opacity: 0` is not a painted LCP candidate |
-| Home | The six commitment cards are links, with an "Explore this commitment" prompt on hover/focus | **Requested by the campaign, 2026-08-11.** Each targets `platform/#commitment-NN`, ids the rail already renders. The prompt occupies its line at all times so hover cannot reflow the row |
+| Home | The six commitment cards are links that flip on hover/focus, showing the lede and an "Explore this commitment" prompt on the back face | **Requested by the campaign, 2026-08-11.** Each targets `platform/#commitment-NN`, ids the rail already renders and honours on arrival. Both faces are always in the DOM, so nothing reflows and the accessible name carries the whole card; where `hover: hover` or `no-preference` fails they simply stack |
 
 ---
 
@@ -351,11 +351,17 @@ Deployments; a failed build leaves the previous version serving.
 `npm run deploy` also exists for a manual push from this machine
 (`npm run build && wrangler deploy`), but the normal path is `git push`.
 
-Because **Cloudflare** runs the build, `WEB3FORMS_KEY`, `TURNSTILE_SITE_KEY` and
+Because **Cloudflare** runs the build, `WEB3FORMS_KEY`, `HCAPTCHA_SITE_KEY` and
 `SITE_ORIGIN` go in the dashboard as **build** variables — not runtime
 bindings, and not `vars` in wrangler.jsonc. They are read at build time and
 baked into the HTML; a runtime binding arrives after the build has finished and
 does nothing. Changing one needs a new build, not just a save.
+
+⚠ **`HCAPTCHA_SITE_KEY`, not `TURNSTILE_SITE_KEY`.** This paragraph and
+`wrangler.jsonc` both named the Turnstile variable until 2026-08-11. Nothing
+reads it — `scripts/prerender.mjs` reads `HCAPTCHA_SITE_KEY` — so following the
+old instruction gave a green build with the captcha switched off and no warning
+anywhere. Turnstile was abandoned; see the captcha note below for why.
 
 A cautionary note, because it cost a failed deploy: this session asserted there
 was no CI after checking the repo for workflow files and finding none. The
@@ -426,9 +432,13 @@ wrangler secret put WEB3FORMS_KEY      # was a build variable
 wrangler secret put TURNSTILE_SECRET   # never existed here before
 ```
 
-`TURNSTILE_SITE_KEY` stays a **build** variable — it is public and belongs in the
-HTML. `WEB3FORMS_KEY` must be **removed** from the build variables, or it keeps
-being baked into the page and the whole point is lost.
+`TURNSTILE_SITE_KEY` would be a new **build** variable — it is public and
+belongs in the HTML. (It does not exist today; the site is on hCaptcha, and
+`HCAPTCHA_SITE_KEY` is the build variable that is actually read. Turnstile
+becomes viable again here only because the Worker verifies it against
+Cloudflare itself rather than through Web3Forms, which is what made it a paid
+feature.) `WEB3FORMS_KEY` must be **removed** from the build variables, or it
+keeps being baked into the page and the whole point is lost.
 
 **Client change.** `InvolvedForm`'s `ContactForm` posts to
 `https://api.web3forms.com/submit`; point it at `/api/contact` and drop the

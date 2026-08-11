@@ -248,8 +248,11 @@
   }
 }
 
+/* --font-figure, not --font-display: this is the one place on the site that
+   asks a serif for a real 700, and the display stack has none. The token's own
+   note has the measurements. */
 .stat__figure {
-  font-family: var(--font-display);
+  font-family: var(--font-figure);
   font-weight: 700;
   font-size: clamp(34px, 4.4vw, 60px);
   line-height: 1.04;
@@ -1079,6 +1082,16 @@
   font-size: var(--text-base);
 }
 
+/*
+ * The alignment that actually applies, at every width.
+ *
+ * `.donate-row__actions` is only ever rendered inside this aside — Involved.tsx
+ * is DonateRow's single call site — and a descendant selector outranks the bare
+ * class, which media queries do not change. So the `flex-end` on the base rule
+ * below has never been seen, and a `flex-start` override that used to sit in the
+ * ≤1100px block could not fire either. It was deleted rather than left looking
+ * load-bearing; change this rule instead.
+ */
 .involved-split__aside .donate-row__actions {
   align-items: center;
   gap: var(--space-2);
@@ -1150,9 +1163,9 @@
 }
 
 /*
- * "Join the campaign" and BallotCheck both jump to #involved-form, which is on
- * the form itself. Without this the form's top edge lands flush against the top
- * of the window, with its heading touching the viewport edge and the header
+ * The home hero's "Join the campaign" jumps to #involved-form, which is on the
+ * form itself. Without this the form's top edge lands flush against the top of
+ * the window, with its heading touching the viewport edge and the header
  * overlapping it on the narrow layout where the header is in the flow.
  */
 #involved-form {
@@ -1423,6 +1436,21 @@
     gap: var(--space-6);
   }
 
+  /*
+   * Stacked, each figure is centred over its own caption.
+   *
+   * In three columns the figures are already spread across the row and ranging
+   * them left is what lines them up with each other. Stacked, that reading is
+   * gone: each stat is a full-width block under its own rule, and a large
+   * figure hard against the left edge of it looks like the start of a line
+   * rather than the point of the block. The caption and the source come with
+   * it — a centred number over ranged-left text is two alignments in one card,
+   * which is the thing that already had to be fixed on the commitment cards.
+   */
+  .stat {
+    text-align: center;
+  }
+
   .plank-grid,
   .strength-grid {
     grid-template-columns: 1fr;
@@ -1444,10 +1472,6 @@
 
   .form {
     padding: var(--space-5);
-  }
-
-  .donate-row__actions {
-    align-items: flex-start;
   }
 }
 

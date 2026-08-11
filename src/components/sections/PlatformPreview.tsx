@@ -63,12 +63,22 @@ export function PlatformPreview({ base }: { readonly base: string }) {
                 className="card plank-card"
                 href={href(base, `platform/#commitment-${commitment.num}`)}
               >
-                <span className="plank-card__face plank-card__face--front">
+                {/*
+                  `<div>`, not `<span>`. The front face holds an `<h3>`, and a
+                  heading is flow content — it cannot live inside a
+                  phrasing-content element. Every browser recovers from it, but
+                  the recovery is unspecified and need not agree across engines.
+
+                  The `<a>` above may wrap them either way: an anchor is
+                  transparent content, so it takes whatever its own context
+                  allows, and its context here is an `<li>`.
+                */}
+                <div className="plank-card__face plank-card__face--front">
                   <h3 className="plank-card__title">
                     {accentuate(commitment.cardTitle, commitment.cardAccent)}
                   </h3>
-                </span>
-                <span className="plank-card__face plank-card__face--back">
+                </div>
+                <div className="plank-card__face plank-card__face--back">
                   <span className="plank-card__body">{commitment.lede}</span>
                   <span className="plank-card__cta" aria-hidden="true">
                     {PLATFORM_PREVIEW.cardCta}
@@ -86,7 +96,7 @@ export function PlatformPreview({ base }: { readonly base: string }) {
                       <path d="m12 5 7 7-7 7" />
                     </svg>
                   </span>
-                </span>
+                </div>
               </a>
             </li>
           ))}

@@ -1,18 +1,9 @@
 # Handoff — outstanding fixes
 
-Written 2026-08-11, after the revision session that produced `bef7242` and
-`2ce4ac8`. Everything below was found by auditing that work afterwards.
-
-**Read this first:** the session changed the header several times and ended by
-reverting it to the mockup's original two-file tone swap. Most of what follows
-is debris from that revert — comments and docs describing an intermediate state
-that no longer exists. Two items are functional bugs. Four are pre-existing and
-predate the session; they are marked as such so you do not go looking for them
-in the diff.
-
-Verify before you fix. Every claim here was measured, and the measurement is
-quoted. One agent-reported finding turned out to be wrong on the details (see
-§1) — treat the numbers as the record, not the prose.
+Rewritten 2026-08-11. The previous version of this file listed the findings of
+an audit of `bef7242` / `2ce4ac8`. Every item on it has now been acted on, and
+this is the record of what changed, what was decided, and the two things that
+still need a real browser.
 
 ```bash
 npm run build     # with WEB3FORMS_KEY set, or the form does not render
@@ -24,215 +15,190 @@ npm run preview   # :4173
 ⚠ `npm run build` **without** `WEB3FORMS_KEY` renders the "not configured" card
 instead of the form, so `#help`, the purpose radios and the submit button are
 absent from `dist/`. Testing anything about the form against that build gives
-false negatives — this caught me once already.
+false negatives. All three commands were run green against a build with
+`WEB3FORMS_KEY` and `HCAPTCHA_SITE_KEY` set.
 
 ---
 
-## Working tree state
+## Still needs a real browser
 
-Clean. What this section described as uncommitted went in as `a656147`, after
-this document was written: the mobile swipe-hint pill in
-`src/components/sections/PlatformRail.tsx` and `src/styles/sections.css`, the
-narrow-rail centring beside it, and the stacked flip-card spacing on the home
-preview. Reviewed and sound: the pill is hidden on desktop, shows once per load
-when the rail scrolls into view on touch, auto-dismisses after 3600ms or on
-`pointerdown`, is `pointer-events: none` throughout, and its hand animation is
-gated behind `prefers-reduced-motion`. It is also gated on a real touch screen
-rather than on window width, so a narrowed desktop window will not show it —
-that is deliberate, not a bug to chase.
+No browser automation is available on this machine — no Playwright, no
+Puppeteer, no devtools MCP — so the two functional fixes were reasoned from the
+code and verified only as far as the built HTML. Both are worth ten minutes
+against `npm run preview`.
 
-`a656147` changed only CSS on the flip cards. §4 below, on the invalid `<h3>`
-inside a `<span>`, is untouched by it and still stands.
+**1. Commitment deep links.** Load `/platform/#commitment-03` and
+`#commitment-06`. Check which card is nearest the rail's horizontal centre, and
+what the hidden live region (`[aria-live]`) reads — it should say "Commitment 3
+of 6" and "Commitment 6 of 6". Then load `/platform/` bare and confirm it still
+opens on Commitment 01.
 
-Everything described below is committed and deployed. Cloudflare builds on
-every push to `main`.
+The reasoning behind the fix is written out at the effect in
+`PlatformRail.tsx`. The part that was NOT verifiable here is the claim that a
+fragment scroll arriving *after* hydration is harmless because a centred card is
+already fully in view and the spec's inline alignment for fragment navigation is
+`nearest`. That is what the spec says; whether every engine agrees is what the
+manual pass is for. If one does not, the effect will need to re-assert on
+`load` as well.
 
----
+**2. Volunteer with another purpose selected.** On `/involved/`, switch to "Ask
+a question", then press Volunteer in the header. The join radio should select
+itself, the branch should open, and the page should scroll to "How would you
+like to help?" with focus in it. Then press Volunteer a second time without
+moving — the select should re-open rather than do nothing.
 
-## 1. Commitment deep links land on the wrong card — FUNCTIONAL
-
-**`src/components/sections/PlatformRail.tsx`**
-
-Every flip card on the home page links to `platform/#commitment-NN`. Measured
-against the built site, they are off by one:
-
-```
-#commitment-01 -> centres Commitment 01   correct
-#commitment-03 -> centres Commitment 02   WRONG
-#commitment-06 -> centres Commitment 05   WRONG
-```
-
-An agent reported this as "every link lands on commitment 01". That is not what
-happens — it is a consistent off-by-one. Measure again before theorising.
-
-The suspect is the interaction between the browser's native anchor scroll and
-the rail's own centring: `ready` flips true in an effect after hydration, the
-clones are inserted, and the effect at `PlatformRail.tsx` (the one commented
-"Once the clones exist, jump to the first real card") sets `rail.scrollLeft`
-directly. Whatever the browser did for the anchor is overwritten, and the
-"nearest to centre" logic then resolves to a neighbour.
-
-A fix needs to honour an incoming `#commitment-NN` hash instead of
-unconditionally jumping to `CLONES`. Note the ids are two-digit strings
-(`'01'`…`'06'`), and only the real (non-clone) planks carry them.
-
-**Test:** load `/platform/#commitment-03` and `#commitment-06` and check which
-card is nearest the rail's horizontal centre, and what the hidden live region
-(`[aria-live]`) reads.
-
-## 2. Header "Volunteer" is dead once the purpose is switched — FUNCTIONAL
-
-**`src/components/sections/InvolvedForm.tsx`**, the `#help` effect
-
-Volunteer points at `involved/#help`, the "How would you like to help?" select.
-That select lives inside `.form__branch--join`, which CSS hides whenever another
-purpose is checked:
-
-```
-purpose-join      branch display flex   reachable
-purpose-question  branch display none   NO — anchor and focus both fail
-purpose-sign      branch display none   NO
-```
-
-A fresh arrival is fine, because join is the default. It breaks for anyone who
-has already switched to "Ask a question" or "Request a yard sign" and then
-presses Volunteer — the anchor scrolls nowhere and `focus()` silently no-ops on
-a `display: none` element.
-
-Options, roughly in order of preference: have the effect check the join radio
-before focusing (it is the branch Volunteer means, so selecting it is honest);
-or fall back to `#involved-form` when `#help` is not rendered; or move the
-select out of the branch. Do not "fix" it by making the field always visible —
-read the note at the top of `InvolvedForm.tsx` about why branch fields must
-never be `disabled` and why exclusion is measured at submit.
-
-**Related, smaller:** pressing Volunteer a second time while already on the page
-does nothing, because `hashchange` does not fire when the hash is unchanged. A
-`click` handler on same-page anchors, or clearing the hash on dismiss, would
-cover it.
-
-## 3. `reveal.ts` disarms its own safety net before doing the work
-
-**`src/reveal.ts:72`**
-
-`startReveals()` sets `data-reveals-ready` as its first statement, before
-querying targets or constructing the observer. The inline head script (see
-`REVEAL_GATE` in `scripts/prerender.mjs`) treats that attribute as proof the
-bundle is healthy and skips its bail-out. So if anything after line 72 throws,
-the attribute is already set, the bail-out never runs, and every `.reveal` block
-stays at `opacity: 0` permanently — the exact fail-closed outcome the
-three-gate design exists to prevent.
-
-The comment above it claims a throw is safe because "those are handled by
-revealing everything on the error path". There is no error path. Either add one
-(wrap the body in `try/catch` and reveal everything in the `catch`), or move the
-`setAttribute` to the end of the successful path. Then correct the comment.
-
-## 4. Invalid HTML in the flip cards
-
-**`src/components/sections/PlatformPreview.tsx:66-69`**
-
-`.plank-card__face--front` is a `<span>` containing an `<h3>`. A heading is flow
-content and cannot live inside a phrasing-content element. Browsers recover, but
-it is invalid and the parser's repair is not guaranteed to match across engines.
-
-Both faces are `<span>` because they sit inside an `<a>`; that part is fine —
-`<a>` is transparent content and may wrap flow content. Making the faces `<div>`
-is the smallest correct change. Check nothing in `sections.css` depends on them
-being inline-level first (they are `display: flex` already, so it should be
-inert).
-
-## 5. Comments and docs left describing the reverted header — ALL FROM THE REVERT
-
-These contradict the code as shipped. Grouped because they share one cause.
-
-**`src/components/layout/Page.tsx:14-17`** — the worst of them. Says `tone` "is
-applied here rather than passed down" and that "Header itself no longer has
-anything to decide". Both false: line 35 passes `tone={tone}`, and `Header.tsx`
-uses it to pick the lockup and to decide whether to emit the ≤900px `<source>`
-pair. The operative message is that the prop is inert and removable — which is
-precisely the reversal `HANDOFF.md` now forbids under "Decisions that must not
-be quietly reversed", with the measurements showing the navy cut puts 99.7% of
-its ink below 4.5:1 over the Get involved hero.
-
-**`src/styles/layout.css:278`** — "The header now renders the campaign sign,
-which brings its own background and would sit on either bar." It renders the
-transparent knockouts, which is the only reason the ≤900px bar has to be light.
-This sentence undercuts the rule it sits above.
-
-**`src/styles/layout.css:300`** — "Smaller than the desktop bar's 108px." The
-desktop rule is `height: 140px` (`layout.css:87`). 108px exists nowhere in the
-project.
-
-**`src/components/sections/Hero.tsx:69`** and **`src/styles/sections.css:1153`**
-— both say BallotCheck also jumps to `#involved-form`. That button was deleted
-in the same commit. The `scroll-margin-top` rule is still wanted (the hero
-button and the anchor both need it); only the justification is stale.
-
-**`HANDOFF.md`**, "Known remaining gaps to 1:1" — the commitment-cards row
-describes the pre-flip design ("the prompt occupies its line at all times so
-hover cannot reflow the row"). That mechanism was replaced by the flip.
-
-**`src/content/involved.ts:209`** — `DONATE_ROW.unavailable` is documented as
-"shown beside the disabled Donate button". The button is a real link to
-`donate/` now; nothing on the site is disabled.
-
-## 6. `DisabledButton` is an unused export
-
-**`src/components/ui/Button.tsx:80`**
-
-`DonateRow` was its only caller and now renders a `LinkButton`. Its doc comment
-carries real reasoning about `aria-disabled` vs `disabled` keeping a control in
-the tab order, which is why it was not deleted on the spot. Decide: keep it as a
-design-system primitive, or delete it and let git hold the reasoning.
-
-Same call for **`BALLOT.involvedCta`** in `src/content/involved.ts` — the string
-for the removed button, deliberately kept, now referenced only by a comment.
-
-## 7. Minor, in files this session touched
-
-- **`scripts/images.mjs:12` and `:99`** — both say "twelve" originals.
-  `campaign-booth.jpeg` made it thirteen.
-- **`src/styles/sections.css`** — there is a `.donate-row__actions` rule inside a
-  responsive block that can no longer take effect, now that the aside scopes its
-  own alignment. Confirm with devtools before deleting.
-- **`index.html`** — the reveal-gate comment claims parity with the built pages.
-  The dev server has no prerendered HTML to hydrate, so `npm run dev` renders
-  nothing at all; the gate there is inert rather than equivalent.
+Everything else below is comment, doc or dead-code work and is verified by the
+fact that it builds and reads correctly.
 
 ---
 
-## Pre-existing — NOT from this session
+## Corrections to the previous version of this file
 
-Found while auditing. Older than the diff, and worth fixing, but do not go
-looking for them in `bef7242`.
+**The swipe hint was already committed.** The old "Working tree state" section
+described the mobile swipe-hint pill and the narrow-rail centring as uncommitted
+work belonging to someone else. They are in `a656147`. The working tree was
+clean at the start of this session apart from this file.
 
-1. **The deploy docs name the wrong env var.** `wrangler.jsonc:23` and
-   `HANDOFF.md:354` tell the next deployer to set `TURNSTILE_SITE_KEY`. The
-   build reads **`HCAPTCHA_SITE_KEY`** (`scripts/prerender.mjs:43`). Turnstile
-   was abandoned; following the instructions as written silently leaves the
-   captcha off. This is the highest-value item on this list, because it is
-   instructions to a human that do not work.
-2. **`ENGINEERING.md:18`** says the styling layer is "Tailwind 4 via
-   `@tailwindcss/vite`". There is no Tailwind in the project — no dependency, no
-   `@theme` block, and `src/styles/` is hand-written CSS.
-3. **`scripts/contrast.mjs`** measures `nav link over header scrim` and
-   `nav current over header scrim` against a scrim the site does not render —
-   the header has no scrim, per the mockup, and that is listed as a known gap.
-   Two of the 50 pairs pass for a surface nobody sees, while the real failure
-   (nav links over the Get involved hero) is not measured at all.
-4. **`src/content/priorities.ts` and `src/content/voters.ts` have no importers.**
-   6 KB of typed copy the build never sees. `priorities.ts` is the more
-   dangerous of the two: it advertises an approval gate that nothing reads, so
-   the gate cannot fire.
-5. **Four places say the host is GitHub Pages** — `scripts/prerender.mjs`,
-   `src/pages/NotFound.tsx`, `src/content/site.ts`. It is a Cloudflare
-   static-assets Worker. The `404.html` justification in particular is written
-   about the wrong platform.
+**The header scrim finding was understated.** The old pre-existing item 3 said
+`scripts/contrast.mjs` measured a scrim the site does not render. True, and
+worse than described: `.site-header::before` was never defined in any
+stylesheet. The only rule that mentioned it was a `display: none` for the narrow
+bar — an override of nothing, itself dead since whenever the scrim was dropped.
+Both the rule and the two fictional contrast pairs are gone.
+
+**The §1 off-by-one theory held up.** The old file was right to insist the
+"every link lands on commitment 01" report was wrong. The mechanism now written
+into `PlatformRail.tsx` predicts an off-by-one, not a jump to the start, and
+matches the measurements that were quoted.
 
 ---
 
-## Already fixed, do not redo
+## What changed
+
+### Functional
+
+**`src/components/sections/PlatformRail.tsx`** — the effect that jumps to the
+first real card once the clones exist now reads an incoming `#commitment-NN`
+first, via a new `hashedCommitment()`, and centres that card instead. `setCentre`
+follows it, so the live region and the focused-card styling agree.
+
+**`src/components/sections/InvolvedForm.tsx`** — the `#help` effect now checks
+the `purpose-join` radio when another purpose is selected, then scrolls the
+select into view itself, because the browser's anchor scroll already ran against
+an element with no box. The write is a direct DOM write, which is the same
+contract as the rest of the file: CSS owns which branch is live and React holds
+no opinion about it. A document-level `click` listener covers the second press,
+which `hashchange` cannot see.
+
+**`src/reveal.ts`** — `startReveals()` now wraps its work in `try`/`catch`,
+reveals everything in the `catch`, and sets `data-reveals-ready` only after
+that. The body moved into `observeReveals()`. A throw now costs the animation
+instead of the page. The comment claiming an error path already existed has been
+replaced with one describing the error path that now does.
+
+**`src/components/sections/PlatformPreview.tsx`** — both flip-card faces are
+`<div>`. The front one held an `<h3>` inside a `<span>`, which is invalid.
+Nothing in `sections.css` depended on them being inline-level; the built HTML
+was checked.
+
+### Comments and docs left over from the header revert
+
+- `src/components/layout/Page.tsx` — said `tone` was not passed down and that
+  Header had nothing to decide. Both false. Now says why the prop and the class
+  are both load-bearing, and what dropping the prop would cost.
+- `src/styles/layout.css` — the "renders the campaign sign, which brings its own
+  background" sentence undercut the rule it sat above; rewritten around the
+  transparent knockouts, which is why the bar has to be light. The dead
+  `.site--dark .site-header::before` rule beside it is deleted. "the desktop
+  bar's 108px" is now "the desktop lockup's 140px", which is the real value.
+- `src/components/sections/Hero.tsx` and `src/styles/sections.css` — both
+  claimed BallotCheck also jumps to `#involved-form`. That button was deleted;
+  the `scroll-margin-top` rule stays, its justification no longer names it.
+- `HANDOFF.md` — the commitment-cards row under "Known remaining gaps to 1:1"
+  described the pre-flip design. Rewritten around the flip.
+- `src/content/involved.ts` — `DONATE_ROW.unavailable` no longer describes a
+  disabled button.
+
+### Decisions
+
+**`DisabledButton` deleted.** `DonateRow` was its only caller and now argues in
+its own note why a dimmed control was the wrong answer. Its `aria-disabled`
+reasoning is folded into `SubmitButton`, which is the one place still relying on
+it, and `Button.tsx`'s header records where the third component went. Git holds
+the rest.
+
+**`BALLOT.involvedCta` kept.** Different case: it is a content string the
+campaign owns, and `BallotCheck.tsx` already documents why it was left in place
+rather than deleted. Content files legitimately hold copy nothing renders yet.
+
+**`priorities.ts` and `voters.ts` kept, and the approval gate made real.** These
+are unapproved policy copy and drafted profiles; deleting a candidate's
+unapproved policy text is not a developer's call, and git is a worse home for it
+than a file with the warning attached. But the flagged problem was real —
+`PRIORITIES_APPROVED_BY_CANDIDATE` "blocks launch" and nothing read it. `PLANKS`
+is no longer exported; `approvedPlanks()` is the only way to reach it and throws
+while the flag is false. Prerendering runs the SSR bundle in Node, so the first
+page that renders these now fails the build. Both files say plainly at the top
+that nothing imports them.
+
+### `npm run contrast` output changed
+
+The two `nav ... over header scrim` pairs measured a surface that does not
+exist, and both passed. They are replaced by the real one: nav links over the
+hero photograph, no scrim, worst case a white pixel. Both fail, at 1.13 and
+1.00, and both are shipped — so pairs can now carry a `GAP` marker, which prints
+the number but does not set the exit code. A `GAP` pair that starts passing
+reports `FIXED?` and *does* fail, so a marker cannot outlive the problem it
+describes.
+
+Every `GAP` needs a matching row in `HANDOFF.md` under "Known remaining gaps to
+1:1". The header one has had a row there all along.
+
+Reads `48 of 50 pairs pass; 2 accepted gap(s).`
+
+### Pre-existing, now fixed
+
+1. **The deploy docs named the wrong env var** — `wrangler.jsonc` and
+   `HANDOFF.md` both said `TURNSTILE_SITE_KEY`; the build reads
+   `HCAPTCHA_SITE_KEY`. Both corrected, both with a note saying what the old
+   instruction did (a green build with the captcha silently off) so nobody
+   re-derives it. The Worker proposal further down `HANDOFF.md` still discusses
+   Turnstile, which is correct there — that design verifies it against
+   Cloudflare directly rather than through Web3Forms, which is what made it a
+   paid feature. The "stays a build variable" wording is now "would be".
+2. **`ENGINEERING.md` claimed Tailwind 4.** There is none. The row now describes
+   hand-written CSS with custom-property tokens.
+3. **The contrast scrim pairs** — above.
+4. **`priorities.ts` / `voters.ts`** — above.
+5. **GitHub Pages references** — `scripts/prerender.mjs`, `src/pages/NotFound.tsx`
+   and `src/content/site.ts` now name the Cloudflare static-assets Worker and its
+   `not_found_handling` setting. The `ENGINEERING.md` host row now names the real
+   host too. `HANDOFF.md:324` was left alone: it says a prefix is only needed for
+   a GitHub Pages project site "which is not the plan", and that is accurate.
+
+### Minor
+
+- `scripts/images.mjs` — "twelve" originals is thirteen, and the size is 47 MB
+  measured over exactly the files in `TARGETS`, not the whole of `assets/`.
+- `src/styles/sections.css` — the `.donate-row__actions` rule in the ≤1100px
+  block could never fire. `DonateRow` has one call site and it is inside
+  `.involved-split__aside`, whose descendant selector outranks the bare class at
+  every width. Deleted, with a note on the rule that does win.
+- `index.html` — the reveal-gate comment claimed parity with the built pages.
+  It now says the gate is present but inert under `npm run dev`, and points at
+  `build && preview` for testing it.
+
+---
+
+## Not touched
+
+- The mobile swipe hint in `PlatformRail.tsx` and `sections.css` (`a656147`).
+  Reviewed again in passing and still sound.
+- `HANDOFF.md`'s Worker proposal, beyond the two wording fixes above.
+- `WEB3FORMS_KEY` is still the tester's key, not the campaign's. That swap has
+  to be undone before launch and is tracked separately.
+
+## Already fixed before this session, do not redo
 
 - The Facebook link (footer pointed at a profile that publishes no title).
 - The hover oscillator on the commitment cards — hover is triggered from the
@@ -249,5 +215,6 @@ looking for them in `bef7242`.
 `assets/nav-sign.png` and `assets/nav-sign-glow.png` are the header artwork from
 the reverted treatment. `assets/` is gitignored, and unlike the rest of that
 folder these did not come from the Claude Design project — they were generated
-images downloaded to `~/Downloads`. Nothing references them. If that treatment
-is ever wanted back, the originals need a real home first.
+images downloaded to `~/Downloads`. Nothing references them, and they are
+excluded from the thirteen counted in `images.mjs`. If that treatment is ever
+wanted back, the originals need a real home first.

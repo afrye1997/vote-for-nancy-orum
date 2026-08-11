@@ -65,6 +65,23 @@ const TOUCH = '(any-pointer: coarse)'
 
 type Slide = { commitment: Commitment; key: string; clone: boolean }
 
+/**
+ * Which of the six an incoming `platform/#commitment-NN` is asking for.
+ *
+ * The home page's flip cards and this page's own index links both use these
+ * ids, and only the real (non-clone) planks carry them — `num` is a two-digit
+ * string, `'01'`…`'06'`, so it is compared as written rather than parsed.
+ *
+ * Returns null for no hash, an unrecognised one, or an id belonging to
+ * something else on the page, and the caller then centres the first card.
+ */
+function hashedCommitment(): number | null {
+  const match = /^#commitment-(\d{2})$/.exec(window.location.hash)
+  if (match === null) return null
+  const index = COMMITMENTS.findIndex((commitment) => commitment.num === match[1])
+  return index < 0 ? null : index
+}
+
 const REAL_SLIDES: Slide[] = COMMITMENTS.map((commitment, i) => ({
   commitment,
   key: `real-${i}`,
@@ -123,13 +140,34 @@ export function PlatformRail({ base }: { readonly base: string }) {
     return rail.scrollLeft + cardBox.left + cardBox.width / 2 - (railBox.left + rail.clientWidth / 2)
   }
 
-  /** Once the clones exist, jump to the first real card without animating. */
+  /**
+   * Once the clones exist, jump to the card the URL asked for — the first real
+   * one when it asked for nothing. No animation either way.
+   *
+   * ───────────────────────────────────────────────────────────────────────────
+   * THE HASH HAS TO BE READ HERE, BECAUSE THIS EFFECT OVERWRITES THE BROWSER
+   * ───────────────────────────────────────────────────────────────────────────
+   * This used to set `scrollLeft` to CLONES unconditionally, and every
+   * `platform/#commitment-NN` deep link from the home page landed on the wrong
+   * card because of it. The browser's own fragment scroll happens on the
+   * six-card server render, before the clones are inserted; this then moves
+   * `scrollLeft` out from under it, and `nearest()` resolves to whichever card
+   * that leaves closest to the centre. Measured before the fix: `#commitment-03`
+   * centred Commitment 02 and `#commitment-06` centred Commitment 05 — a
+   * consistent off-by-one rather than a jump to the top of the rail.
+   *
+   * Centring the requested card here is also stable against a fragment scroll
+   * that arrives afterwards: a browser scrolls a fragment into view with inline
+   * alignment `nearest`, and a card sitting in the middle of the rail is
+   * already fully in view, so there is nothing left for it to do.
+   */
   useEffect(() => {
     if (!ready) return
     const rail = railRef.current
-    const left = offsetTo(CLONES)
+    const index = CLONES + (hashedCommitment() ?? 0)
+    const left = offsetTo(index)
     if (rail && left !== null) rail.scrollLeft = left
-    setCentre(CLONES)
+    setCentre(index)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready])
 

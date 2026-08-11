@@ -15,10 +15,10 @@ rule is violated, justify it in the commit message rather than deleting it.
 | Framework | React 19.2 | `ref` as a prop, native document metadata, Suspense |
 | Build | Vite 8 | Rolldown, fast HMR |
 | Language | TypeScript 6, `strict` | Non-negotiable on anything that ships publicly |
-| Styling | Tailwind 4 via `@tailwindcss/vite` | CSS-first config through `@theme`, no JS config file |
+| Styling | Hand-written CSS in `src/styles/`, custom properties for tokens | No CSS dependency at all; `tokens.css` is vendored verbatim from the design system, so a re-sync is a file copy |
 | Rendering | React prerendered with `renderToString`, then hydrated | Every URL is a complete document that renders without JavaScript; the bundle only upgrades it |
 | Lint | oxlint, react rules **explicitly enabled** | They are off by default. Assuming otherwise is silently false |
-| Host | Static files — GitHub Pages, Cloudflare, anywhere | Output is plain HTML; the host is not a dependency |
+| Host | A Cloudflare static-assets Worker, built from `main` by Workers Builds | Output is plain HTML, so the host stays swappable — but it is Cloudflare today, and `wrangler.jsonc` is the config that matters |
 | Forms | Web3Forms — native HTML `POST`, with `fetch` layered over it | The POST works with JavaScript disabled; the fetch only removes the need for an absolute redirect URL |
 
 **Dependency rule:** every new dependency is justified in writing, once, at the

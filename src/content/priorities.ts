@@ -5,6 +5,20 @@
  * ⚠ NOT YET APPROVED BY THE CANDIDATE — see APPROVAL note below
  * ─────────────────────────────────────────────────────────────────────────────
  *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * NOTHING IMPORTS THIS FILE, AND THAT IS THE CURRENT STATE, NOT AN OVERSIGHT
+ * ─────────────────────────────────────────────────────────────────────────────
+ * The site ships the six commitments in `platform.ts` instead; these three
+ * planks were the earlier framing and no page renders them. The file is kept
+ * because the copy is still a live question for the campaign, not because it is
+ * wired to anything.
+ *
+ * Which means the gate below was decorative for as long as it was a bare
+ * boolean: a flag nobody reads cannot block a launch. `approvedPlanks()` is the
+ * fix — the planks are reachable only through it, and it throws while the flag
+ * is false. Prerendering runs the SSR bundle in Node, so the first page that
+ * renders these fails the build rather than publishing them.
+ *
  * Unlike `bio.ts`, this text did NOT come from Nancy. It came from the original
  * Claude artifact, i.e. a drafting tool. And unlike a tagline, these are
  * SPECIFIC POLICY COMMITMENTS written in the first person — "I will do X."
@@ -60,7 +74,29 @@ export const PRIORITIES_INTRO = {
     'check. So here is the problem, and here is what I will do.',
 } as const
 
-export const PLANKS: readonly Plank[] = [
+/**
+ * The only way to reach the planks, and the whole of the gate.
+ *
+ * A component that wants to render them calls this. While the flag above is
+ * false it throws, the prerender step fails, and nothing ships — which is what
+ * "blocks launch" has to mean to be worth writing down.
+ *
+ * ⚠ Do not export `PLANKS` to route around this, and do not soften the throw
+ * into a warning or an empty array. A silent empty section looks like a layout
+ * bug and gets "fixed" by whoever meets it next; a failed build gets read.
+ */
+export function approvedPlanks(): readonly Plank[] {
+  if (!PRIORITIES_APPROVED_BY_CANDIDATE) {
+    throw new Error(
+      'priorities.ts: these planks are specific policy commitments the candidate ' +
+        'has not approved. Set PRIORITIES_APPROVED_BY_CANDIDATE only after she has ' +
+        'read them word for word. See the note at the top of that file.',
+    )
+  }
+  return PLANKS
+}
+
+const PLANKS: readonly Plank[] = [
   {
     id: 'transparency',
     label: 'Transparency',

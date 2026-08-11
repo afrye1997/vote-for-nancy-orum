@@ -63,6 +63,27 @@
   /* typography */
   --font-display: 'Big Caslon', 'Libre Caslon Display', Didot, serif;
   --font-body: 'Figtree', system-ui, sans-serif;
+
+  /*
+   * The display stack has no bold in it, on any platform.
+   *
+   * Libre Caslon Display ships one weight — Google serves `font-weight: 400`
+   * and nothing else — so `font-weight: 700` on --font-display asks for a face
+   * that does not exist. What each device does with that is its own business:
+   * macOS synthesises a passable bold out of Big Caslon, and iOS, which has no
+   * Big Caslon, falls to Didot, whose bold is barely distinguishable from its
+   * regular at any size. The campaign's growth figures came out looking unbold
+   * on a phone and only half-bold on a desktop, which is exactly this.
+   *
+   * So the figures get a face that really is bold. Libre Caslon Text is the
+   * text companion to the Display cut and has a genuine 700; the webfont is
+   * FIRST here, ahead of the system Caslons, so that every visitor sees the
+   * same weight rather than whichever approximation their OS improvises.
+   *
+   * Requested in scripts/prerender.mjs. Adding a weight to that URL is what
+   * makes this token real — the fallbacks are only insurance.
+   */
+  --font-figure: 'Libre Caslon Text', 'Big Caslon', Didot, serif;
   --text-xs: 12px;
   --text-sm: 14px;
   --text-base: 16px;

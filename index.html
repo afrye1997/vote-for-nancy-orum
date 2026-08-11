@@ -5,9 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nancy Orum for Bella Vista City Council, Ward 2</title>
     <!--
-      The scroll-reveal gate, mirroring REVEAL_GATE in scripts/prerender.mjs so
-      `npm run dev` behaves like the built site. Keep the two in step; the
-      built pages never use this file's head.
+      The scroll-reveal gate, copied from REVEAL_GATE in scripts/prerender.mjs.
+      The built pages never use this file's head, so keep the two in step by
+      hand.
+
+      It is not equivalent here, only present. This shell has no prerendered
+      markup to hydrate, so under `npm run dev` there is nothing on the page for
+      the gate to un-hide and nothing for a bail-out to rescue — the bundle
+      renders everything or the page is blank either way. Test the gate itself
+      against `npm run build && npm run preview`.
     -->
     <script>
       document.documentElement.classList.add('js')

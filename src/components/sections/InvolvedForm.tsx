@@ -390,15 +390,55 @@ function ContactForm({
    * the visitor came from — and the opening is the part that happens when the
    * browser allows it.
    *
-   * `hashchange` covers the same-page press, where nothing remounts.
+   * ─────────────────────────────────────────────────────────────────────────
+   * VOLUNTEER HAS TO SELECT THE JOIN BRANCH, NOT JUST AIM AT IT
+   * ─────────────────────────────────────────────────────────────────────────
+   * `#help` lives inside `.form__branch--join`, which the stylesheet hides
+   * whenever another purpose is checked. A fresh arrival is fine, because join
+   * is the default — but a visitor who has already switched to "Ask a question"
+   * or "Request a yard sign" and then presses Volunteer gets nothing at all: a
+   * `display: none` element has no box for the anchor to scroll to, and
+   * `focus()` on it silently no-ops. Measured on the built site; both branches
+   * fail, and the button reads as dead.
+   *
+   * So the radio is checked first. That is not a workaround — join is the
+   * branch Volunteer means, and selecting it is the honest reading of the
+   * press. The write goes straight to the DOM rather than through state,
+   * which is the same contract as everything else here: CSS owns which branch
+   * is live, `:has(#purpose-join:checked)` re-evaluates on the spot, and React
+   * holds no opinion to fall out of sync. See the note at the top of this file.
+   *
+   * ⚠ Not "make the field always visible". The branch rules are what keep an
+   * unrelated field out of the campaign's inbox, and the same note explains why
+   * `disabled` is not available as an alternative.
+   *
+   * Scrolling is ours to do in that case, and only in that case: the browser
+   * already ran its anchor scroll against a field that had no box, so there is
+   * nothing in flight to fight. `block: 'start'` reproduces what the anchor
+   * would have done, `#help`'s own `scroll-margin-top` included.
+   *
+   * `hashchange` covers pressing Volunteer from elsewhere on this page, where
+   * nothing remounts. It does NOT cover pressing it twice — navigating to the
+   * hash you are already on fires no event — which is what the click listener
+   * below is for.
    */
   useEffect(() => {
     const openHelp = () => {
       if (window.location.hash !== '#help') return
       const field = document.getElementById('help')
       if (!(field instanceof HTMLSelectElement)) return
-      /* preventScroll: the browser has already scrolled the anchor into view,
-         and focusing again would fight the smooth scroll still in flight. */
+
+      const join = document.getElementById('purpose-join')
+      if (join instanceof HTMLInputElement && !join.checked) {
+        join.checked = true
+        /* Reads back the layout the line above just changed, so the field is
+           measured with a box rather than without one. */
+        field.scrollIntoView({ block: 'start' })
+      }
+
+      /* preventScroll either way: one of the two scrolls above has already
+         happened and is probably still smooth-scrolling, and focus would fight
+         whichever it was. */
       field.focus({ preventScroll: true })
       const picker = (field as HTMLSelectElement & { showPicker?: () => void }).showPicker
       if (typeof picker !== 'function') return
@@ -408,9 +448,35 @@ function ContactForm({
         /* No activation, or no support. Focus above is the whole fallback. */
       }
     }
+
+    /*
+     * The second press. A click handler runs before the browser applies the
+     * hash, so the check is deferred by a task — well inside the five seconds
+     * of transient activation `showPicker()` needs, and `openHelp` is
+     * idempotent, so the ordinary case running it twice costs nothing.
+     *
+     * `instanceof HTMLAnchorElement` rather than a selector match: an SVG `<a>`
+     * also has an `href` attribute, and its `.href` is not a string.
+     */
+    const onClick = (event: MouseEvent) => {
+      const from = event.target
+      if (!(from instanceof Element)) return
+      const link = from.closest('a[href]')
+      if (!(link instanceof HTMLAnchorElement)) return
+      const url = new URL(link.href, window.location.href)
+      if (url.hash !== '#help') return
+      if (url.origin !== window.location.origin) return
+      if (url.pathname !== window.location.pathname) return
+      setTimeout(openHelp, 0)
+    }
+
     openHelp()
     window.addEventListener('hashchange', openHelp)
-    return () => window.removeEventListener('hashchange', openHelp)
+    document.addEventListener('click', onClick)
+    return () => {
+      window.removeEventListener('hashchange', openHelp)
+      document.removeEventListener('click', onClick)
+    }
   }, [])
 
   /*

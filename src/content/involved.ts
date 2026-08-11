@@ -206,8 +206,11 @@ export const DONATE_ROW = {
   body: 'Every dollar stays right here in Bella Vista.',
   cta: 'Donate',
   /**
-   * Shown beside the disabled Donate button while `DONATE_URL` is null. Wording
-   * from the mockup's "coming soon" modal, which a static page cannot open.
+   * Shown under the Donate button while `DONATE_URL` is null. The button is a
+   * live link to `donate/` in that state, not a disabled control — this sets
+   * the expectation before the click rather than after it. See DonateRow.tsx.
+   * Wording from the mockup's "coming soon" modal, which a static page cannot
+   * open.
    */
   unavailable: 'Online donations aren’t open quite yet.',
 } as const

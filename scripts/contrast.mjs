@@ -79,14 +79,37 @@ function ratio(fg, bg) {
 /**
  * Lightest alpha each scrim reaches under its own text, over the brightest
  * possible photograph. See the correction note above.
+ *
+ * ⚠ THERE IS NO HEADER SCRIM. Two pairs here used to measure `nav link` and
+ * `nav current` against a `scrimHeader` at 0.7 alpha, and both passed
+ * comfortably — for a surface the site does not render. `.site-header::before`
+ * was never defined in any stylesheet; the only rule mentioning it was a
+ * `display: none` for the narrow bar, which has now gone too. The header sits
+ * directly on the photograph, per the mockup, and that is the pair below.
  */
 const scrimHero = blend(T.navy900, T.white, 0.88)
 const scrimHeroNarrow = blend(T.navy900, T.white, 0.78)
-const scrimHeader = blend(T.navy900, T.white, 0.7)
 const scrimBand = blend(T.navy900, T.white, 0.78)
 const scrimPageHero = blend(T.navy900, T.white, 0.82)
 
-/** [what, foreground, background, required] — 4.5 body, 3.0 large text and UI. */
+/**
+ * Pairs the site is KNOWN to fail, and has decided to ship anyway.
+ *
+ * They are measured and printed like everything else — the number is the point
+ * — but they do not set the exit code, because a gate that is red on purpose
+ * stops being read. Each one needs a matching row in HANDOFF.md under "Known
+ * remaining gaps to 1:1"; if it is not written down there, it is not a known
+ * gap, it is a bug.
+ *
+ * Do NOT clear one of these by inventing a background. That is exactly how the
+ * header ended up being audited against a scrim it does not have.
+ */
+const GAP = 'known gap'
+
+/**
+ * [what, foreground, background, required, gap?] — 4.5 body, 3.0 large text
+ * and UI. A fifth element marks the pair as an accepted failure, per GAP above.
+ */
 const PAIRS = [
   ['body text', T.navy900, T.frost50, 4.5],
   ['lede on page', T.slate700, T.frost50, 4.5],
@@ -126,8 +149,13 @@ const PAIRS = [
   ['hero headline, narrow scrim', T.white, scrimHeroNarrow, 4.5],
   ['hero lede, narrow scrim', T.frost100, scrimHeroNarrow, 4.5],
   ['hero eyebrow, narrow scrim', T.lime300, scrimHeroNarrow, 4.5],
-  ['nav link over header scrim', T.frost100, scrimHeader, 4.5],
-  ['nav current over header scrim', T.white, scrimHeader, 4.5],
+  /* The real surface: no scrim, so the worst case is the brightest pixel the
+     photograph can reach. Both fail, and both are shipped — see GAP above and
+     the "Header has no scrim, per the mockup" row in HANDOFF.md. The text
+     shadow on `.site--dark .site-nav__link` is what makes this survivable in
+     practice, and a shadow is not something this file can measure. */
+  ['nav link over hero photo, no scrim', T.frost100, T.white, 4.5, GAP],
+  ['nav current over hero photo, no scrim', T.white, T.white, 4.5, GAP],
   ['about band line over scrim', T.white, scrimBand, 4.5],
   ['about band eyebrow over scrim', T.lime300, scrimBand, 4.5],
   ['involved hero title over scrim', T.white, scrimPageHero, 4.5],
@@ -141,20 +169,37 @@ const PAIRS = [
 ]
 
 let failed = 0
+let gaps = 0
 console.log('\n  ratio  need  result  pair')
 console.log('  ─────  ────  ──────  ' + '─'.repeat(36))
-for (const [name, fg, bg, need] of PAIRS) {
+for (const [name, fg, bg, need, gap] of PAIRS) {
   const r = ratio(fg, bg)
   const ok = r >= need
-  if (!ok) failed += 1
+  let verdict = 'pass'
+  if (!ok && gap === GAP) {
+    verdict = 'GAP'
+    gaps += 1
+  } else if (!ok) {
+    verdict = 'FAIL'
+    failed += 1
+  } else if (gap === GAP) {
+    /* A gap that now passes is not good news to be quietly swallowed — either
+       the design was fixed and the marker should go, or the wrong thing is
+       being measured again. */
+    verdict = 'FIXED?'
+    failed += 1
+  }
   console.log(
-    `  ${r.toFixed(2).padStart(5)}  ${need.toFixed(1).padStart(4)}  ${(ok ? 'pass' : 'FAIL').padStart(6)}  ${name}`,
+    `  ${r.toFixed(2).padStart(5)}  ${need.toFixed(1).padStart(4)}  ${verdict.padStart(6)}  ${name}`,
   )
 }
 
 console.log(`\n  worst-case scrims: hero ${scrimHero}, band ${scrimBand}, page hero ${scrimPageHero}`)
+if (gaps > 0) {
+  console.log(`  ${gaps} pair(s) marked GAP: failing on purpose, recorded in HANDOFF.md.`)
+}
 if (failed > 0) {
-  console.error(`\n  ${failed} pair(s) below threshold.\n`)
+  console.error(`\n  ${failed} pair(s) below threshold, or marked GAP and no longer failing.\n`)
   process.exit(1)
 }
-console.log(`\n  all ${PAIRS.length} pairs pass.\n`)
+console.log(`\n  ${PAIRS.length - gaps} of ${PAIRS.length} pairs pass; ${gaps} accepted gap(s).\n`)

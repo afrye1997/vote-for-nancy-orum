@@ -20,10 +20,15 @@
   // start failing right after a config change, check which product the project
   // actually is before changing anything else.
   //
-  // Because Cloudflare runs the build, WEB3FORMS_KEY, TURNSTILE_SITE_KEY and
+  // Because Cloudflare runs the build, WEB3FORMS_KEY, HCAPTCHA_SITE_KEY and
   // SITE_ORIGIN belong in the dashboard as BUILD variables — they are read by
   // the build and baked into the HTML, not read at request time. Runtime
   // bindings would arrive after the build had already finished and do nothing.
+  //
+  // HCAPTCHA_SITE_KEY, not TURNSTILE_SITE_KEY, which is what this comment used
+  // to say. Turnstile was tried and abandoned — Web3Forms verifies it only on
+  // the paid plan — and scripts/prerender.mjs reads HCAPTCHA_SITE_KEY. Setting
+  // the old name leaves the captcha silently switched off with a green build.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "vote-for-nancy-orum",
 

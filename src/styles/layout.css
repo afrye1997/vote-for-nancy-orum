@@ -275,19 +275,15 @@
    * photography because of its white outline, not its colour. Neither had
    * anywhere to go on a navy bar, so the bar went light.
    *
-   * The header now renders the campaign sign, which brings its own background
-   * and would sit on either bar. The light bar stays: the nav links below it
-   * are navy at this width, and they are what needs the pale surface.
+   * That reasoning still holds, because those are still the two files the
+   * header renders — both are transparent knockouts with no background of their
+   * own, which is exactly why the bar underneath has to be the light one.
+   * Header.tsx swaps the navy cut in at this width for the same reason.
    */
   .site-header {
     position: static;
     background: var(--surface-card);
     border-bottom: 1px solid var(--border-soft);
-  }
-
-  /* An opaque surface now, so the masked scrim has nothing left to do. */
-  .site--dark .site-header::before {
-    display: none;
   }
 
   .site-header__inner {
@@ -297,9 +293,10 @@
   }
 
   /*
-   * Smaller than the desktop bar's 108px. The sign has a row to itself here,
-   * but that row is on a phone, and 92px is what keeps the ward banner legible
-   * without the masthead eating the screen before the hero.
+   * Smaller than the desktop lockup's 140px (see the rule above). The lockup
+   * has a row to itself here, but that row is on a phone, and 92px is what
+   * keeps the ward banner legible without the masthead eating the screen
+   * before the hero.
    */
   .site-header__logo img {
     height: 92px;

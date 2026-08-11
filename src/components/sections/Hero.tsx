@@ -66,8 +66,7 @@ export function Hero({ base }: { readonly base: string }) {
                 Straight to the form, not to the top of the page that holds it.
                 `#involved-form` is the id InvolvedForm puts on both of its
                 branches — the real form and the "not configured" card — so this
-                lands somewhere real whether or not the key is set. BallotCheck
-                already links to the same anchor.
+                lands somewhere real whether or not the key is set.
               */}
               <LinkButton variant="accent" size="lg" href={href(base, 'involved/#involved-form')}>
                 {HERO_ACTIONS.join}

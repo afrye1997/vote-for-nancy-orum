@@ -63,14 +63,39 @@ const ABOVE = '200000px'
 
 const READY_ATTR = 'data-reveals-ready'
 
+/**
+ * The whole of gate 2, and the reason this function is wrapped rather than
+ * written straight into `startReveals`.
+ *
+ * `data-reveals-ready` is a promise to the inline head script that the hiding
+ * will be undone, and setting it retires that script's bail-out for good. So it
+ * may only be set once the promise has actually been kept — which means after
+ * every target either carries `is-revealed` or is being watched by a live
+ * observer, not before.
+ *
+ * An earlier version set it as its first statement, on the reasoning that a
+ * throw still counted as "the bundle arrived". It did not: a throw anywhere
+ * below disarmed the bail-out and left every `.reveal` block at `opacity: 0`
+ * permanently — precisely the blank page the three gates exist to prevent.
+ *
+ * The `catch` is the error path that comment assumed and this file did not
+ * have. It reveals everything outright, so a fault in the observer setup costs
+ * the animation rather than the text, and only then is the attribute set.
+ */
 export function startReveals(): void {
   const root = document.documentElement
-  /* Tells the inline head script its bail-out is not needed. Set before any of
-     the work below, so a throw in here still counts as "the bundle arrived" —
-     the CSS is only load-bearing for elements this function never reaches, and
-     those are handled by revealing everything on the error path. */
+  try {
+    observeReveals()
+  } catch (error) {
+    /* Worth a line in the console: this path means the page is legible but the
+       reveals are not working, which is invisible from the outside. */
+    console.error('[reveals] falling back to revealing everything', error)
+    for (const el of document.querySelectorAll('.reveal')) el.classList.add('is-revealed')
+  }
   root.setAttribute(READY_ATTR, '')
+}
 
+function observeReveals(): void {
   const targets = Array.from(document.querySelectorAll<HTMLElement>('.reveal'))
   if (targets.length === 0) return
 
