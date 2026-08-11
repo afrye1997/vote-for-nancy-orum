@@ -23,12 +23,12 @@ It implements the campaign's Claude Design mockup — project
 `49f5002f-9282-454f-a97e-ba6f8a7737c3`, file `Nancy Orum Campaign Site.dc.html`
 — as a prerendered React site that hydrates in the browser.
 
-Repo: https://github.com/afrye1997/vote-for-nancy-orum (public, one commit).
+Repo: https://github.com/afrye1997/vote-for-nancy-orum (public).
 
 ```bash
 npm run build      # typecheck, bundle, prerender, run the output gates
 npm run preview    # serve dist/ at :4173
-npm run contrast   # 44 measured colour pairs
+npm run contrast   # 50 measured colour pairs
 npm run images     # assets/ -> public/img/ derivatives (macOS only)
 npm run lint
 ```
@@ -67,7 +67,7 @@ scripts/
   images.mjs           image pipeline
   contrast.mjs         colour audit
 assets/                design-project originals, GITIGNORED (48 MB)
-public/img/            generated derivatives, committed (7.5 MB)
+public/img/            generated derivatives, committed (7.9 MB)
 ```
 
 **Two rules hydration imposes.** Both have already caused bugs:
@@ -118,14 +118,33 @@ The harness lived in the session scratchpad and is gone; rebuild it:
 | Get involved | Donate dialog still CSS, not React state | `DonateRow.tsx` argues it should stay a page |
 | About | Full bio removed to match | `<Biography />` still exists, one line to restore |
 | All | Header has no scrim, per the mockup | Nav fails 4.5:1 on the Get involved hero |
-| Home | Entrance animations compressed from 2300ms to 520ms | End state identical |
-| All | Header logo is the `footer-sign` yard-sign lockup, not the mockup's two knockouts | **Requested by the campaign, 2026-08-10.** Not a fix — both knockouts were legible on the tone each was chosen for |
-| All | Header logo is 146px, was 140px | Consequence of the above. The sign's glow fades to transparent, so only ~64% of the box is type; the box runs larger to keep the lettering its old size |
+| Home | Entrance animations compressed from 2300ms to 840ms | End state identical. Slowed from 520ms on 2026-08-11 at the campaign's request; held short of the mockup because an element at `opacity: 0` is not a painted LCP candidate |
 | Home | The six commitment cards are links, with an "Explore this commitment" prompt on hover/focus | **Requested by the campaign, 2026-08-11.** Each targets `platform/#commitment-NN`, ids the rail already renders. The prompt occupies its line at all times so hover cannot reflow the row |
 
 ---
 
 ## Decisions that must not be quietly reversed
+
+**Which header lockup goes on which page.** The header ships two cuts of the
+same mark and picks by page tone. That is the mockup's behaviour, and it is not
+cosmetic — each file is legible on exactly one kind of surface. Measured per ink
+pixel against the real hero photographs, compositing each PNG over what actually
+sits behind it:
+
+| Page | File | Worst | Median | Ink below 4.5:1 |
+|---|---|---|---|---|
+| About Nancy (pale) | `nav-logo-navy.png` | 14.33 | 15.29 | 0% |
+| Home (hero photo) | `nav-logo-navy.png` | 1.00 | 2.04 | 84% |
+| Get involved (hero photo) | `nav-logo-navy.png` | 1.00 | 1.27 | **99.7%** |
+| Home (hero photo) | `nav-logo.png` white lines | 1.10 | 6.27 | 30% |
+| Get involved | `nav-logo.png` white lines | 3.05 | 14.32 | 8% |
+
+The navy cut on a photograph is close to invisible; that is what the swap
+prevents. `nav-logo.png`'s navy "ORUM" also measures poorly and is fine — it
+carries a white outline and survives on that, not on its colour. Below 900px the
+header becomes a light bar in the flow, so the navy cut is swapped back in there
+on every page. If a hero photograph is ever replaced, re-measure rather than
+assume.
 
 **Growth figures.** Three of the mockup's four stats failed fact-checking
 against primary Census files. `30,102` appears in no Census product, `33,274` is

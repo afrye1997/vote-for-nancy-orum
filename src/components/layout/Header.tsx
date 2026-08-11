@@ -21,9 +21,10 @@ import { NAV_PAGES, href } from '../../content/site'
  *                      over the two hero photographs it is close to invisible —
  *                      99.7% of its ink fell below 4.5:1 on Get involved.
  *
- * Those numbers are in HANDOFF.md. If a hero photograph is ever swapped,
- * re-measure rather than assume; which file wins is a property of the picture
- * behind it, not of anything in this file.
+ * The full per-page table is in HANDOFF.md under "Decisions that must not be
+ * quietly reversed". If a hero photograph is ever swapped, re-measure rather
+ * than assume; which file wins is a property of the picture behind it, not of
+ * anything in this file.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * THE THIRD CASE THE MOCKUP NEVER HAD
