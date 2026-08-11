@@ -28,6 +28,31 @@ deploys it on every push to `main`:
 
     https://vote-for-nancy-orum.votenancyorum.workers.dev
 
+### ⚠ There is also an abandoned Pages project, and the domain was pointed at it
+
+Discovered 2026-08-11. `votefornancyorum.com` served a **different, older
+build** from `vote-for-nancy-orum.pages.dev` — same bundle hash as the Pages
+project, a different one from the Worker — and because that project has no build
+variables, every visitor to the real domain got the form's "not configured"
+card instead of the form. Everything deployed to the Worker was invisible there.
+
+The tell is the bundle hash. Two hosts serving the same site must serve the same
+one:
+
+```bash
+for h in https://votefornancyorum.com \
+         https://vote-for-nancy-orum.votenancyorum.workers.dev; do
+  echo "$h -> $(curl -sL "$h/involved/" \
+    | grep -o '/assets/index-[A-Za-z0-9_-]*\.js' | head -1)"
+done
+```
+
+Fix, in order — a custom domain can only be attached to one project at a time:
+release it from Pages, add it to the Worker under its **Domains** tab, update
+`SITE_ORIGIN` and rebuild, then **delete the Pages project**. Adding the missing
+variables to Pages instead would leave two live copies of the campaign site
+drifting apart, which is how this happened.
+
 `nancyorum.com` is not bought yet (HANDOFF.md §2). `npx wrangler deployments
 list` shows the history; wrangler is already authenticated as
 votenancyorum@gmail.com.
