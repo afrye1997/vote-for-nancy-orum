@@ -23,7 +23,15 @@ export function Involved({
       <div className="container" style={{ paddingTop: 48 }}>
         <p className="involved__intro reveal">{INVOLVED_INTRO}</p>
         {/*
-          A real <hr>, not a styled div. The subject changes here — why to help,
+          The chip-in band leads the page, right under the intro — the campaign
+          wants donating to be the first ask, not a card tucked under the
+          calendar where it used to sit. It stays outside the form element for
+          the same reason as ever: the form's whole job is one call to action,
+          and this is a different one.
+        */}
+        <DonateRow base={base} />
+        {/*
+          A real <hr>, not a styled div. The subject changes here — how to help,
           then whether you can vote in this race — and a thematic break is what
           the element means. It is announced as a separator to anyone not
           looking at the page, which a decorative border would not be.
@@ -38,17 +46,7 @@ export function Involved({
         unequal on purpose — the form has far more in it than the calendar.
       */}
       <div className="involved-split container">
-        {/*
-          The left column is the "things to know" side: when to vote, and the
-          other way to help. Donating stays out of the form element itself —
-          it was a second call to action inside the thing whose whole job is
-          one call to action, and once DONATE_URL is set that becomes a real
-          control sitting inside a <form> it has nothing to do with.
-        */}
-        <div className="involved-split__aside">
-          <KeyDates />
-          <DonateRow base={base} />
-        </div>
+        <KeyDates />
         <InvolvedForm
           base={base}
           web3formsKey={web3formsKey}

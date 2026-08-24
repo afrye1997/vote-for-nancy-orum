@@ -886,19 +886,19 @@
 }
 
 /*
- * Centred in the gap it divides, rather than hung off the paragraph above it.
+ * Centred in the gap it divides, rather than hung off the band above it.
  *
  * --section-y, matching the ballot section's own top padding below the line, so
  * the clearance is identical on both sides and stays that way if the section
  * rhythm is ever retuned.
  *
- * ⚠ This does NOT add to `.involved__intro`'s 40px bottom margin — adjacent
- * vertical margins collapse to the larger of the two, so the gap above the line
- * is 72px, not 112px. An earlier attempt set 16px here expecting 40 + 16 and
- * got 40, because 40 already won. If you need a value below 40px to have any
- * effect at all, the paragraph's margin is what has to change.
+ * The sibling selector is the load-bearing part: when the donate band was
+ * added above the line, the old `.involved__intro + .rule` stopped matching
+ * and the rule fell back to `margin: 0` — flush against the band's border.
+ * If anything else is ever inserted before the line, this selector has to
+ * follow it.
  */
-.involved__intro + .rule {
+.donate-row + .rule {
   margin-top: var(--section-y);
 }
 
@@ -1032,69 +1032,6 @@
 .involved-split .form-wrap,
 .involved-split .form {
   height: 100%;
-}
-
-/*
- * The left column: the calendar, then the donate prompt beneath it. One grid
- * item holding two, because the grid has exactly two columns and a third child
- * would wrap onto a new row rather than stack.
- */
-.involved-split__aside {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-}
-
-/* Pinned to the bottom of the column, so it meets the form card's lower edge
-   whichever of the two happens to be setting the row height. */
-.involved-split__aside .donate-row {
-  margin-top: auto;
-}
-
-/*
- * In this column the prompt is a card, not a strip, and it is centred.
- *
- * `.donate-row` is built to spread across a wide band with `space-between`; at
- * ~425px that leaves the button hard against the right edge with a ragged
- * sentence beside it. Here it reads top to bottom and down the middle —
- * question, reason, button, caveat — which sets it apart from the left-aligned
- * calendar above rather than half-matching it.
- *
- * `text-align` centres the copy, `align-items` centres the flex children. Both
- * are needed: the first does nothing to the button's box, the second does
- * nothing to a wrapped line of text.
- */
-.involved-split__aside .donate-row {
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-lg);
-}
-
-/* The question earns its own line at this width; run in, it reads as one long
-   sentence with a bold clause rather than a prompt and its answer. */
-.involved-split__aside .donate-row__lead {
-  display: block;
-  margin-bottom: 2px;
-  font-size: var(--text-base);
-}
-
-/*
- * The alignment that actually applies, at every width.
- *
- * `.donate-row__actions` is only ever rendered inside this aside — Involved.tsx
- * is DonateRow's single call site — and a descendant selector outranks the bare
- * class, which media queries do not change. So the `flex-end` on the base rule
- * below has never been seen, and a `flex-start` override that used to sit in the
- * ≤1100px block could not fire either. It was deleted rather than left looking
- * load-bearing; change this rule instead.
- */
-.involved-split__aside .donate-row__actions {
-  align-items: center;
-  gap: var(--space-2);
 }
 
 .involved-split .container,
@@ -1332,25 +1269,43 @@
   color: var(--navy-900);
 }
 
+/*
+ * The chip-in card. This leads Get Involved, right after the intro, and it is
+ * meant to be the loudest thing between the hero and the form — the campaign
+ * asked for donating to be the first ask, not a sidebar card.
+ *
+ * Green, when everything else on the page tints frost-blue: the accent from
+ * the logo's own palette, so the card reads as a highlight rather than a
+ * different site. Everything stacks down the middle — question, reason,
+ * button — at the intro paragraph's own 640px measure, so the card continues
+ * the centred column above it instead of breaking into a full-width stripe.
+ */
 .donate-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  text-align: center;
   gap: var(--space-4);
-  margin-top: var(--space-1);
-  padding: var(--space-4) 18px;
-  border-radius: var(--radius-md);
-  background: var(--surface-tint);
+  max-width: 640px;
+  margin: var(--space-8) auto 0;
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--green-300);
+  border-radius: var(--radius-lg);
+  background: var(--green-100);
+  box-shadow: var(--shadow-card);
 }
 
 .donate-row__text {
-  font-size: 14.5px;
+  font-size: var(--text-lg);
   line-height: 1.55;
   color: var(--slate-700);
 }
 
+/* The question gets its own line and the biggest type in the band. */
 .donate-row__lead {
+  display: block;
+  margin-bottom: 2px;
+  font-size: var(--text-xl);
   font-weight: var(--weight-semibold);
   color: var(--navy-900);
 }
@@ -1358,7 +1313,7 @@
 .donate-row__actions {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 6px;
 }
 

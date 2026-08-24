@@ -202,7 +202,12 @@ export const FORM = {
 } as const
 
 export const DONATE_ROW = {
-  lead: 'Prefer to chip in?',
+  /**
+   * "Want", not the old "Prefer" — the band now leads the page, before the
+   * volunteer form, so there is nothing yet for "prefer" to be an
+   * alternative to.
+   */
+  lead: 'Want to chip in?',
   body: 'Every dollar stays right here in Bella Vista.',
   cta: 'Donate',
   /**

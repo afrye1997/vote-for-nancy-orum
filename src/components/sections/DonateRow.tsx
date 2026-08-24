@@ -4,7 +4,9 @@ import { DONATE_URL } from '../../content/election'
 import { href } from '../../content/site'
 
 /**
- * The donate prompt.
+ * The donate prompt — a full-width band at the top of Get Involved, right
+ * after the intro. It used to be a small card under the calendar in the
+ * split's aside column; the campaign asked for donating to lead the page.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * THE BUTTON ALWAYS WORKS. WHERE IT GOES IS WHAT CHANGES.
@@ -39,13 +41,13 @@ export function DonateRow({ base }: { readonly base: string }) {
       <div className="donate-row__actions">
         {DONATE_URL === null ? (
           <>
-            <LinkButton variant="primary" href={href(base, 'donate/')}>
+            <LinkButton variant="primary" size="lg" href={href(base, 'donate/')}>
               {DONATE_ROW.cta}
             </LinkButton>
             <span className="note">{DONATE_ROW.unavailable}</span>
           </>
         ) : (
-          <LinkButton variant="primary" href={DONATE_URL} external>
+          <LinkButton variant="primary" size="lg" href={DONATE_URL} external>
             {DONATE_ROW.cta}
           </LinkButton>
         )}
