@@ -225,8 +225,11 @@ export const CONTACT = {
  *
  * We are not lawyers and this is not advice — it is a pointer to the checklist
  * so nobody switches on fundraising without knowing it has consequences.
+ *
+ * The processor is GoodChange. The campaign sent this link on 2026-08-24;
+ * it answers 200 at exactly this URL, no redirect hop.
  */
-export const DONATE_URL: string | null = null
+export const DONATE_URL: string | null = 'https://goodchange.app/donate/nancyorum'
 
 /**
  * Every string that must be replaced before launch, so one check covers them
