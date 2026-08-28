@@ -34,32 +34,68 @@
  *               a refrain rather than a repetition. Her words beat the design's,
  *               per the voice decision at the top of this file.
  *
- * Two lines of hers were considered and rejected for this slot. "Protect. Plan.
- * Prosper." is a three-beat, full-stopped refrain, and it would sit immediately
- * under `tagline`, which is also a three-beat, full-stopped refrain animated in
- * one clause at a time — two of those stacked compete instead of reinforcing, so
- * it stays at the foot of the statement card where it has the room to land. And
- * "I believe Bella Vista can move forward…" is the sentence the same email
- * assigns to the statement's own standfirst, which renders directly below this
- * one; the identical sentence twice in one scroll is the sharpest duplication
- * this change could have introduced.
+ * "I believe Bella Vista can move forward…" was considered for this slot and
+ * rejected: the same email assigns that sentence to the statement's standfirst,
+ * which renders directly below this one, and the identical sentence twice in one
+ * scroll is the sharpest duplication this change could have introduced.
  *
  *   ⚠ CONFIRM she meant this line and not the whole statement. See the
  *     "still to confirm" list at the top of statement.ts.
+ *
+ * CORRECTION (2026-08-28): the tagline follows the artwork, and this supersedes
+ * the 2026-08-04 voice decision above on one point only.
+ *
+ *   tagline     was `BIO_SIGNOFF.refrain`, "Listening. Serving. Building Bella
+ *   segments    Vista Together." Now "Protect. Plan. Prosper.", the line on the
+ *   accent      red banner of her walk card and, in its longer form, the yellow
+ *               banner on the front of it and the foot of her statement.
+ *
+ * The 2026-08-04 reasoning still holds for what it decided — her line beat the
+ * drafting tool's, and it should have. What it could not know is that she would
+ * later print a different line on every sign, card and banner she ordered. The
+ * site was showing a slogan that appears on none of her campaign material, which
+ * is a worse outcome than either line on its own.
+ *
+ * Note this DOES place the refrain immediately above the hero lede, which an
+ * earlier draft of the note above argued against. The objection was to stacking
+ * two competing three-beat refrains. There is only one now: the H1 is the
+ * refrain, and the lede under it is a sentence. The clash the objection guarded
+ * against cannot occur.
+ *
+ * `bio.ts` is untouched. "Listening. Serving. Building Bella Vista Together." is
+ * still how she closes her own bio and `Biography.tsx` still renders it there.
  */
-
-import { BIO_SIGNOFF } from './bio'
 
 export const SITE = {
   candidate: 'Nancy Orum',
-  /** Her signature line — hero headline and the site's primary tagline. */
-  tagline: BIO_SIGNOFF.refrain,
+  /**
+   * The campaign slogan, and the hero headline.
+   *
+   * ⚠ NO LONGER `BIO_SIGNOFF.refrain`, and the decoupling is the point.
+   *
+   * Until 2026-08-27 this read through to bio.ts, because "Listening. Serving.
+   * Building Bella Vista Together." is how Nancy opens and closes her own bio
+   * and a line a candidate repeats unprompted is the line she believes. That
+   * reasoning has not changed and neither has bio.ts — her signoff is still her
+   * signoff, and `Biography.tsx` still closes the bio with it.
+   *
+   * What changed is that she now has a printed campaign slogan, and it is a
+   * different line. "Protect. Plan. Prosper." is on the red banner of her walk
+   * card, and "Protect what we love / Plan for what's next / Prosper together"
+   * is the yellow banner on its front. The site was showing a slogan that
+   * appears on none of her printed material.
+   *
+   * So the two are separate fields now rather than one field doing both jobs:
+   * the bio keeps the sentence she wrote about herself, and the hero carries the
+   * sentence her signs carry. Do not re-point this at bio.ts to save a string.
+   */
+  tagline: 'Protect. Plan. Prosper.',
   /**
    * The same line, split at its three sentence boundaries. The hero animates
    * each clause in on its own beat, so the split has to be data rather than
    * three hardcoded spans in JSX (§2.4). Revising the tagline changes it here.
    */
-  taglineSegments: ['Listening.', 'Serving.', 'Building Bella Vista Together.'],
+  taglineSegments: ['Protect.', 'Plan.', 'Prosper.'],
   /**
    * The one word of the refrain set in the campaign green instead of white.
    *
@@ -69,8 +105,11 @@ export const SITE = {
    * therefore never leave this pointing at a word that is no longer in it — the
    * colour just stops applying, which is a far cheaper failure than a headline
    * assembled out of two lists that disagree.
+   *
+   * "Prosper." rather than the old "Together.": it is the clause the other two
+   * build to, and it is the last one to animate in.
    */
-  taglineAccent: 'Together.',
+  taglineAccent: 'Prosper.',
   /** Retained but unrendered — see the correction note above. */
   kicker: 'Transparent leadership. Responsible growth.',
   /** Hers, from the 2026-08-27 statement. See the correction note above. */
@@ -93,9 +132,9 @@ export const SITE = {
 export const SEO = {
   title: 'Nancy Orum for Bella Vista City Council, Ward 2',
   description:
-    'Listening. Serving. Building Bella Vista Together. Nancy Orum is running for ' +
-    'Bella Vista City Council, Ward 2, Position 2 — and every Bella Vista voter ' +
-    'votes in this race. General election November 3, 2026.',
+    'Protect. Plan. Prosper. Nancy Orum is running for Bella Vista City Council, ' +
+    'Ward 2, Position 2 — and every Bella Vista voter votes in this race. ' +
+    'General election November 3, 2026.',
   /** Absolute URL, set once the domain is purchased. Required for OG tags. */
   canonicalOrigin: null as string | null,
 } as const
@@ -134,10 +173,11 @@ export const PAGES_NAV: readonly NavPage[] = [
     path: '',
     label: 'Home',
     title: 'Nancy Orum for Bella Vista City Council, Ward 2',
+    /** Leads with the slogan, which changed with the artwork on 2026-08-27. */
     description:
-      'Listening. Serving. Building Bella Vista Together. Nancy Orum is running for ' +
-      'Bella Vista City Council, Ward 2, Position 2 — and every Bella Vista voter ' +
-      'votes in this race. General election November 3, 2026.',
+      'Protect. Plan. Prosper. Nancy Orum is running for Bella Vista City Council, ' +
+      'Ward 2, Position 2 — and every Bella Vista voter votes in this race. ' +
+      'General election November 3, 2026.',
     inNav: true,
   },
   {
