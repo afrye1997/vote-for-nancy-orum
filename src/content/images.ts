@@ -92,23 +92,40 @@ export const IMAGES = {
     width: 1200,
     height: 800,
   },
-  logoLockup: {
-    file: 'logo-lockup.png',
-    alt: 'Nancy Orum for City Council logo',
-    width: 479,
+  /**
+   * The 2026 circular logo. Replaced the square green→blue lockup when the
+   * campaign sent its new artwork on 2026-08-27.
+   *
+   * Cropped here from the supplied file, which set the circle on a white page
+   * with a decorative dotted rule beneath it. The rule is not part of the mark,
+   * and a white square would show as a box on every tinted surface this sits
+   * on, so the crop is tight to the circle and the surround is transparent.
+   */
+  logoCircle: {
+    file: 'logo-circle-2026.png',
+    alt: 'Nancy Orum for Bella Vista City Council, Ward 2 — vote November 3rd',
+    width: 480,
     height: 480,
   },
+  /**
+   * The 2026 yard sign, and the footer mark, are the same painting.
+   *
+   * Two records rather than one because the alt text is not the same job: in
+   * the footer the sign IS the campaign's identifying mark, and on the involved
+   * form it is a picture of the physical object being offered. Both point at
+   * one derivative, so the artwork is downloaded once and cached for the other.
+   */
   footerSign: {
-    file: 'footer-sign.jpeg',
+    file: 'yard-sign-2026.jpeg',
     alt: 'Nancy Orum — City Council, Ward 2 — Bella Vista, Arkansas',
-    width: 560,
-    height: 280,
+    width: 640,
+    height: 426,
   },
   yardSign: {
-    file: 'yard-sign-3x6.jpeg',
+    file: 'yard-sign-2026.jpeg',
     alt: 'A Nancy Orum for City Council yard sign',
     width: 640,
-    height: 320,
+    height: 426,
   },
   wardMap: {
     file: 'ward-map-2022.png',

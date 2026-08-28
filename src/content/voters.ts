@@ -13,6 +13,14 @@
  * change here as a change to a draft, and check `Home.tsx` before assuming an
  * edit will appear anywhere. `priorities.ts` is in the same position and
  * explains the reasoning at more length.
+ *
+ * ⚠ 2026-08-27: this copy is now second-hand. Nancy's own statement in
+ * `statement.ts` covers the same ground — roads keeping pace with rooftops, what
+ * the city costs to live in — in her words rather than a drafting tool's
+ * folksier ones ("the roads ought to keep pace with the rooftops going up next
+ * to them"). If this section is ever rendered, rewrite these bodies from her
+ * text first. Publishing the paraphrase beside the original would put a voice in
+ * her mouth that is close enough to hers to be mistaken for it.
  */
 
 export type VoterProfile = {

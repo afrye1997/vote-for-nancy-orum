@@ -63,17 +63,29 @@ const OUT = 'public/img'
  * file → { px: longest edge in the output, jpeg: convert to JPEG }
  *
  * JPEG only where the original has no alpha channel. about-arkansas, the two
- * nav lockups, logo-lockup and the ward map are all transparent and stay PNG;
+ * nav lockups, logo-circle-2026 and the ward map are all transparent and stay PNG;
  * flattening them would put a white box around the artwork.
  */
 const TARGETS = {
   'nav-logo.png': { px: 420 },
   'nav-logo-navy.png': { px: 420 },
   'about-arkansas.png': { px: 1200 },
-  'logo-lockup.png': { px: 480 },
+  /**
+   * The 2026 circular logo, supplied by the campaign on 2026-08-27. Stays PNG:
+   * it is cropped to the circle with a transparent surround, and flattening it
+   * would put a white square behind the artwork on every tinted background it
+   * sits on. Replaced the green→blue `logo-lockup.png`.
+   */
+  'logo-circle-2026.png': { px: 480 },
   'ward-map-2022.png': { px: 1280 },
-  'footer-sign.png': { px: 560, jpeg: true },
-  'yard-sign-3x6.png': { px: 640, jpeg: true },
+  /**
+   * The 2026 watercolour yard sign, same supply date. One source feeds both the
+   * footer mark and the yard-sign illustration on the involved form — they are
+   * the same artwork at two sizes, so one 640px derivative serves both rather
+   * than shipping the painting twice. Replaced `footer-sign.png` and
+   * `yard-sign-3x6.png`, whose gradient artwork is no longer the brand.
+   */
+  'yard-sign-2026.png': { px: 640, jpeg: true },
   'tanyard-creek-falls.png': { px: 1040, jpeg: true },
   'hero-arms-crossed.jpeg': { px: 1800 },
   'community-event.jpeg': { px: 1800 },

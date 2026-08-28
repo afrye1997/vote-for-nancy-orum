@@ -174,8 +174,16 @@ export const GROWTH_INTRO = {
     'Residents only voted to incorporate in 2006, and Bella Vista only became a ' +
     'city in 2007. We have been catching up ever since. These are the numbers the ' +
     'next council has to plan around.',
+  /**
+   * The enumeration here — "streets, drainage, police, fire, and EMS" — was
+   * dropped on 2026-08-27. Nancy's statement now names the same departments a
+   * section above this one, on the same page, and capitalises them: "roads,
+   * sewer, utilities, Police, Fire, and EMS". Her copy is verbatim and does not
+   * move, so this one gave way instead. Two lists of the same services one
+   * scroll apart, disagreeing about capitals, reads as an editing mistake rather
+   * than as two voices.
+   */
   note:
     'Growth is not the problem. Unplanned growth is. Every new rooftop adds demand ' +
-    'on streets, drainage, police, fire, and EMS, while what funds the city has ' +
-    'stayed narrow.',
+    'on the services a city provides, while what funds the city has stayed narrow.',
 } as const

@@ -23,7 +23,7 @@ export function Donate({ base }: { readonly base: string }) {
     <Page base={base} current="donate" tone="light">
       <section className="section container" style={{ textAlign: 'center' }}>
         <div className="reveal" style={{ maxWidth: 460, marginInline: 'auto' }}>
-          <Photo {...imgSources(base, IMAGES.logoLockup)} image={IMAGES.logoLockup} eager />
+          <Photo {...imgSources(base, IMAGES.logoCircle)} image={IMAGES.logoCircle} eager />
           <h1 className="section__title" style={{ marginTop: 18 }}>
             Coming soon
           </h1>

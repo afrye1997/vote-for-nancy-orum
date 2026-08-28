@@ -119,6 +119,8 @@ const PAIRS = [
   ['eyebrow on tint', T.eyebrow, T.frost100, 4.5],
   ['muted note on page', T.slate600, T.frost50, 4.5],
   ['muted note on card', T.slate600, T.white, 4.5],
+  /* Her added sentences inside the statement's tinted advocacy card. */
+  ['advocacy aside on tint', T.slate600, T.frost100, 4.5],
   ['stat source link', T.slate600, T.frost50, 4.5],
   ['rail index label', T.slate600, T.white, 4.5],
   ['rail index number', T.slate500, T.white, 4.5],

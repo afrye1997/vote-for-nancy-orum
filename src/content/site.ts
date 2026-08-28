@@ -14,11 +14,38 @@
  * tool, so they are adopted rather than argued with:
  *
  *   heroLede    was the artifact's "Bella Vista is growing fast…" paragraph.
- *               The design sets a four-word line instead. Kept.
+ *               The design sets a short line instead. Kept.
  *   kicker      "Transparent leadership. Responsible growth." no longer appears
  *               anywhere in the design. It survives here, unused, because
  *               deleting a line the campaign may still want costs nothing to
  *               keep and cannot be recovered from a repository with no history.
+ *
+ * CORRECTION (2026-08-27): heroLede changes again, and this time it is Nancy's
+ * own doing. Her email that day sent a full growth statement and said it goes
+ * "in place of the 'I listen' text". The statement runs about four hundred
+ * words; this slot is one line under the H1, above three buttons, over a
+ * photograph. The literal instruction is not physically possible, so the
+ * statement went to `statement.ts` and renders in the section directly below the
+ * hero, and this slot took the one sentence of hers that fits it.
+ *
+ *   heroLede    was "I listen. I connect. I solve problems." — the design
+ *               project's skills triad. Now the second half of her own closing
+ *               line, which the statement below repeats in full, so it reads as
+ *               a refrain rather than a repetition. Her words beat the design's,
+ *               per the voice decision at the top of this file.
+ *
+ * Two lines of hers were considered and rejected for this slot. "Protect. Plan.
+ * Prosper." is a three-beat, full-stopped refrain, and it would sit immediately
+ * under `tagline`, which is also a three-beat, full-stopped refrain animated in
+ * one clause at a time — two of those stacked compete instead of reinforcing, so
+ * it stays at the foot of the statement card where it has the room to land. And
+ * "I believe Bella Vista can move forward…" is the sentence the same email
+ * assigns to the statement's own standfirst, which renders directly below this
+ * one; the identical sentence twice in one scroll is the sharpest duplication
+ * this change could have introduced.
+ *
+ *   ⚠ CONFIRM she meant this line and not the whole statement. See the
+ *     "still to confirm" list at the top of statement.ts.
  */
 
 import { BIO_SIGNOFF } from './bio'
@@ -46,7 +73,8 @@ export const SITE = {
   taglineAccent: 'Together.',
   /** Retained but unrendered — see the correction note above. */
   kicker: 'Transparent leadership. Responsible growth.',
-  heroLede: 'I listen. I connect. I solve problems.',
+  /** Hers, from the 2026-08-27 statement. See the correction note above. */
+  heroLede: 'I want us to become an even better Bella Vista.',
   heroEyebrow: 'Ward 2 · Position 2',
   office: 'Bella Vista City Council',
   seat: 'Ward 2, Position 2',

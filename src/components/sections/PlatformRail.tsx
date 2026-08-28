@@ -470,7 +470,7 @@ function Plank({
     >
       {commitment.image === null ? (
         <div className="plank__logo-frame">
-          <Photo {...imgSources(base, IMAGES.logoLockup)} image={IMAGES.logoLockup} />
+          <Photo {...imgSources(base, IMAGES.logoCircle)} image={IMAGES.logoCircle} />
         </div>
       ) : (
         <Photo

@@ -40,6 +40,30 @@
  *
  * The gap between that and "new development pays its own way" is exactly the
  * gap she needs to close herself.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 2026-08-27: SHE CLOSED A DIFFERENT GAP. THIS FILE STAYS SHUT.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Nancy sent a growth statement in her own words that day — it is in
+ * `statement.ts` and it renders on the home page. Read quickly it looks like the
+ * approval this file has been waiting for. It is not, and this is the most
+ * expensive misreading available here.
+ *
+ * Her infrastructure position is about SEQUENCING: "make sure roads, sewer,
+ * utilities, Police, Fire, and EMS can support significant growth before we
+ * encourage it." The plank below is about COST ALLOCATION: "New development pays
+ * its own way for the infrastructure it requires." One says check first. The
+ * other says who pays. They have different opponents, and she has stated only
+ * the first.
+ *
+ * The tax-base plank is half-endorsed and no more. She has independently written
+ * "growth that strengthens our tax base" and "let's make sure they spend their
+ * dollars here and not in our neighboring cities". She has NOT said "Homes use
+ * more in city services than they return in revenue," which is the claim that
+ * plank rests on and the one a homeowner would argue with.
+ *
+ * So: PRIORITIES_APPROVED_BY_CANDIDATE stays false, and no plank text moves
+ * anywhere on the strength of that email.
  */
 
 export type Plank = {

@@ -190,6 +190,19 @@
   padding-block: var(--space-6) 56px;
 }
 
+/*
+ * The statement's advocacy card is now the taller column, not the shorter one.
+ *
+ * At the base 1.1fr / 0.9fr it gets roughly 411px of text — about 50 characters,
+ * narrower than every measure this file sets for prose. Flipping the tracks
+ * gives it about 62ch and brings the two columns to roughly the same height,
+ * which is also why this section does not carry `.split--centered`: with the
+ * heights close, centring the shorter column only floats it off the baseline.
+ */
+.split--statement {
+  grid-template-columns: 0.9fr 1.1fr;
+}
+
 .split__emphasis {
   margin-top: var(--space-3);
   font-size: 17px;
@@ -198,19 +211,65 @@
   color: var(--navy-900);
 }
 
-.vision__list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-  padding-left: var(--space-5);
+/*
+ * The advocacy card, which replaced the six one-line vision items on
+ * 2026-08-27. Her six run 20–40 words each, and every rule below exists because
+ * the old ones were written for a list of aphorisms.
+ */
+.advocacy__list {
+  margin-top: var(--space-4);
+  /*
+   * Only does anything in the band between the 900px collapse and about 700px,
+   * where this card runs the full container and the lines would otherwise reach
+   * ~92 characters. Inert on desktop, where the track ratio in
+   * `.split--statement` already lands near 62ch, and inert on a phone, where the
+   * card is narrower than the cap.
+   *
+   * 68ch, matching `.bio` — the site's widest prose measure — rather than the
+   * 62ch the desktop column happens to produce. At 62ch the cap bites hard
+   * enough in that band to leave a third of the card empty on the right, which
+   * reads as a layout fault rather than as a measure.
+   */
+  max-width: 68ch;
+  padding: 0;
+  list-style: none;
   font-size: var(--text-base);
   line-height: 1.6;
   color: var(--slate-700);
 }
 
-.vision__closer {
-  margin-top: 14px;
+/*
+ * Six multi-clause items need a separator; `--space-2` was enough between
+ * one-line items and is not between three-line ones. Same hairline-and-padding
+ * idiom as `.dates__item`, this site's other label-plus-clause list.
+ *
+ * The disc markers went with the aphorisms. A wrapped body line hanging under a
+ * bullet is the tell that a list style was chosen for single clauses.
+ */
+.advocacy__item {
+  padding-block: var(--space-4);
+  border-top: 1px solid var(--border-soft);
+}
+
+.advocacy__label {
+  font-weight: var(--weight-semibold);
+  color: var(--navy-900);
+}
+
+/*
+ * Her own added sentences. A step quieter than the item they belong to, and
+ * deliberately not `--brand-primary`: the one accent colour in this card belongs
+ * to the closer. `--slate-600` on `--frost-100` measures 4.98:1.
+ */
+.advocacy__aside {
+  margin-top: var(--space-2);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--slate-600);
+}
+
+.advocacy__closer {
+  margin-top: var(--space-5);
   font-size: var(--text-base);
   font-weight: var(--weight-semibold);
   color: var(--brand-primary);
