@@ -1339,11 +1339,17 @@
  * meant to be the loudest thing between the hero and the form — the campaign
  * asked for donating to be the first ask, not a sidebar card.
  *
- * Green, when everything else on the page tints frost-blue: the accent from
- * the logo's own palette, so the card reads as a highlight rather than a
- * different site. Everything stacks down the middle — question, reason,
- * button — at the intro paragraph's own 640px measure, so the card continues
- * the centred column above it instead of breaking into a full-width stripe.
+ * Rose, when everything else on the page tints frost-blue: the pink in her sky,
+ * so the card reads as a highlight rather than as a different site. Everything
+ * stacks down the middle — question, reason, button — at the intro paragraph's
+ * own 640px measure, so the card continues the centred column above it instead
+ * of breaking into a full-width stripe.
+ *
+ * It was gold until 2026-08-29, and gold is what the ballot card two sections
+ * below it uses. Two cream cards that close together on one page read as the
+ * same component saying two different things. Rose separates them, and it earns
+ * the difference: this card asks for money and that one answers a question
+ * about the ballot.
  */
 .donate-row {
   display: flex;
@@ -1354,9 +1360,9 @@
   max-width: 640px;
   margin: var(--space-8) auto 0;
   padding: var(--space-6) var(--space-8);
-  border: 1px solid var(--gold-300);
+  border: 1px solid var(--border-rose);
   border-radius: var(--radius-lg);
-  background: var(--gold-100);
+  background: var(--surface-rose);
   box-shadow: var(--shadow-card);
 }
 
@@ -1366,13 +1372,19 @@
   color: var(--slate-700);
 }
 
-/* The question gets its own line and the biggest type in the band. */
+/*
+ * The question gets its own line and the biggest type in the card.
+ *
+ * Rose rather than navy: it is the one place on the site where the pink is the
+ * TYPE and not the surface behind it, which is what keeps the colour from
+ * reading as decoration. 5.44:1 on the card it sits on.
+ */
 .donate-row__lead {
   display: block;
   margin-bottom: 2px;
   font-size: var(--text-xl);
   font-weight: var(--weight-semibold);
-  color: var(--navy-900);
+  color: var(--rose-600);
 }
 
 .donate-row__actions {

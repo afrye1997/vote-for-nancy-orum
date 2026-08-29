@@ -105,6 +105,25 @@ button {
   outline-color: #ffffff;
 }
 
+/*
+ * Selected text carries the rose.
+ *
+ * The browser default is a blue that belongs to the operating system rather
+ * than to this site, and it lands on top of a page whose own blue means "this
+ * is a link". Rose has no other job in the type, so a selection cannot be
+ * mistaken for one.
+ *
+ * The pair is stated in full — both the background AND the colour — because a
+ * background alone leaves the text at whatever it already was, and this
+ * highlight has to work under navy body copy, white type on the dark bands, and
+ * the blue of a link the visitor has dragged across. Navy on rose-100 measures
+ * 13.4:1, which covers all three.
+ */
+::selection {
+  background: var(--rose-100);
+  color: var(--navy-900);
+}
+
 /* Screen-reader-only, but still focusable — used by the skip link and by the
    real radio inputs beneath the styled purpose chips. */
 .visually-hidden {

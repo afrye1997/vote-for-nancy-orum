@@ -76,9 +76,24 @@
   --gold-300: #f7ce85;
   --gold-100: #fceed4;
 
-  /* Her coral. A warm note held in reserve, and the error state. */
-  --coral-500: #ee7a82;
-  --coral-600: #c4443c;
+  /*
+   * Rose. The pink in her sky, and the third colour of the sunset.
+   *
+   * Centred on hue 352, which is where the paint actually sits — sampling the
+   * two files for saturated pixels between hue 335 and 8 returns #f87888 more
+   * than any other value, so --rose-500 IS that pixel rather than a guess at it.
+   *
+   * Same split as gold, for the same reason: --rose-500 is a block colour and
+   * carries navy type at 5.85:1, --rose-600 is the value dark enough to BE type.
+   * Gold and rose are deliberately not interchangeable in use — gold is the
+   * accent that acts (buttons, the accented word), rose is the accent that warms
+   * (the chip-in card, selected text). Keeping those jobs apart is what stops
+   * the page turning into a fruit salad.
+   */
+  --rose-600: #ae3448;
+  --rose-500: #f87888;
+  --rose-300: #f7afba;
+  --rose-100: #fdecef;
 
   /* Blue-greys, pulled toward the shadows in the sign's painting. */
   --slate-700: #3b4b75;
@@ -101,7 +116,7 @@
    * sits on it throughout — so it is navy to blue, and it is not her sunset. A
    * gold field there would flash bright behind white text.
    */
-  --grad-brand: linear-gradient(115deg, #f0b63c, #ee7a82);
+  --grad-brand: linear-gradient(115deg, #f0b63c, #f87888);
   --grad-hero: linear-gradient(115deg, #0c1f5e, #2456a6);
 
   /* semantic aliases */
@@ -114,6 +129,7 @@
   --surface-card: #ffffff;
   --surface-tint: var(--frost-100);
   --surface-warm: var(--gold-100);
+  --surface-rose: var(--rose-100);
   --surface-inverse: var(--navy-900);
   --text-body: var(--navy-900);
   --text-muted: var(--slate-600);
@@ -123,6 +139,7 @@
   --border-soft: var(--frost-200);
   --border-strong: var(--slate-400);
   --border-warm: var(--gold-300);
+  --border-rose: var(--rose-300);
   --link: var(--blue-600);
   --link-hover: var(--blue-700);
   --success: var(--gold-700);
