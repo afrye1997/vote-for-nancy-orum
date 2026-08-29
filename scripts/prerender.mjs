@@ -143,7 +143,7 @@ function document({ title, description, body, props, cssHref, jsHref, ogImage, c
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(description)}">
-<meta name="theme-color" content="#12235B">${noindex ? '\n<meta name="robots" content="noindex">' : ''}${
+<meta name="theme-color" content="#0C1F5E">${noindex ? '\n<meta name="robots" content="noindex">' : ''}${
     canonical ? `\n<link rel="canonical" href="${canonical}">` : ''
   }
 <meta property="og:type" content="website">

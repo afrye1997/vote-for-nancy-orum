@@ -106,14 +106,21 @@ Can be the same as #5.
 ## 🖼️ Images
 
 ### 8. A logo with a transparent background
-Everything sent so far has the green-to-blue gradient baked into the picture, so
-it can only sit on top of that gradient. For the site header we need the **"N"
-mark and/or the wordmark on a transparent background** — a PNG with transparency
-or, better, a real SVG.
+**Mostly answered on 2026-08-27.** Nancy sent the new circular logo, and we
+cropped it to the circle and cut the surround out, so it now has real
+transparency and sits on any background. It is on the donate page and the last
+platform card, and the site's whole colour palette was rebuilt from it on
+2026-08-29.
 
-If the designer who made the signs has the original file, ask them for it. If it
-doesn't exist, tell us and we'll build the header mark in code instead — that's
-a fine outcome, we just shouldn't guess.
+Still outstanding, and smaller than it was: the **header** mark. The two nav
+lockups are still the old artwork with a background baked in, which is why the
+header ships two files and swaps between them. A **horizontal** lockup in the new
+watercolour brand — wordmark on transparency, PNG or better an SVG — would
+finish this and retire the last of the old logo from the site.
+
+If the designer who made the new signs has the original file, ask them for it. If
+it doesn't exist, tell us and we'll build the header mark in code instead —
+that's a fine outcome, we just shouldn't guess.
 
 ### 9. Confirm the photo
 The headshot in `asset/nancy-orum.jpg` is the one we'll use unless you'd rather

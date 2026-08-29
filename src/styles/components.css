@@ -59,9 +59,14 @@
 }
 
 /*
- * Accent sits at navy-900 on green-600 (8.2:1). The design system's hover state
- * swaps to white on green-700, which measures 5.1:1 — both pass, so the hover
- * is kept as authored.
+ * Navy type on gold, the way the yellow banner on her walk card carries navy
+ * type. 8.6:1 filled, 5.19:1 on the deeper gold it hovers to.
+ *
+ * The hover used to swap the LABEL to white as well, because it darkened to
+ * green-700 and white was the only thing that would read on it. Gold has no
+ * equivalent: a gold dark enough to carry white type is a brown, and there is
+ * no brown in her artwork. So the hover deepens the gold and the type stays
+ * navy, which is also the quieter transition of the two.
  */
 .btn--accent {
   background: var(--brand-accent);
@@ -70,9 +75,9 @@
 }
 
 .btn--accent:hover {
-  background: var(--green-700);
-  border-color: var(--green-700);
-  color: var(--text-on-primary);
+  background: var(--brand-accent-hover);
+  border-color: var(--brand-accent-hover);
+  color: var(--text-on-accent);
 }
 
 .btn--secondary {
@@ -136,7 +141,7 @@
 
 .btn-lift:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 22px rgba(18, 35, 91, 0.35);
+  box-shadow: 0 10px 22px rgba(12, 31, 94, 0.35);
 }
 
 .btn-row {
@@ -171,7 +176,7 @@
 }
 
 .eyebrow--light {
-  color: var(--lime-300);
+  color: var(--gold-300);
 }
 
 .display {
@@ -259,7 +264,10 @@ select.field__control {
 
 .field__control:focus-visible {
   border-color: var(--focus-ring);
-  box-shadow: 0 0 0 3px rgba(82, 181, 46, 0.35);
+  /* --focus-ring at 0.32. Kept literal because a box-shadow cannot take a
+     colour token and an alpha in one value without color-mix(), which this
+     stylesheet does not otherwise rely on. Update both together. */
+  box-shadow: 0 0 0 3px rgba(36, 86, 166, 0.32);
 }
 
 .field__hint {

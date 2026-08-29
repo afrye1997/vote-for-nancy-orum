@@ -109,18 +109,18 @@
 }
 
 .site-nav__link:hover {
-  border-bottom-color: var(--green-600);
+  border-bottom-color: var(--brand-accent);
 }
 
 /* Over photography the nav is light; over the tinted pages it is navy. */
 .site--dark .site-nav__link {
   color: var(--frost-100);
-  text-shadow: 0 1px 3px rgba(18, 35, 91, 0.55);
+  text-shadow: 0 1px 3px rgba(12, 31, 94, 0.55);
 }
 
 .site--dark .site-nav__link[aria-current='page'] {
   color: #ffffff;
-  border-bottom-color: var(--lime-300);
+  border-bottom-color: var(--gold-300);
 }
 
 .site--light .site-nav__link {
@@ -212,7 +212,7 @@
 
 .site-footer__notice {
   margin-top: var(--space-2);
-  color: var(--green-300);
+  color: var(--gold-300);
   font-weight: var(--weight-semibold);
 }
 

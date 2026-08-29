@@ -59,7 +59,8 @@
   align-items: stretch;
   min-height: 560px;
   overflow: hidden;
-  background: var(--grad-brand);
+  /* The dark one. White type sits on this until the photograph decodes. */
+  background: var(--grad-hero);
 }
 
 .hero__media,
@@ -118,8 +119,8 @@
  * the effect still reads as a stagger and the last clause lands under a second.
  */
 /*
- * Direct children only. The last clause now contains a nested span for the word
- * set in green, and a descendant selector caught that too — giving the accent
+ * Direct children only. The last clause contains a nested span for the word set
+ * in the accent colour, and a descendant selector caught that too — giving it
  * its own opacity:0 and its own 600ms animation running on a different clock to
  * the clause around it, and making it an inline-block inside a line of type
  * that wants to stay one flow.
@@ -129,12 +130,16 @@
 }
 
 /*
- * The one green word in a white headline. --lime-300 rather than the brand
- * green: this sits over the hero scrim, where the darker greens do not clear
- * 4.5:1. scripts/contrast.mjs measures it against the scrim's worst case.
+ * The one gold word in a white headline — "Prosper." as of 2026-08-27.
+ *
+ * --gold-300 rather than --brand-accent: this sits over the hero scrim, and the
+ * block gold is too dark against it. Gold runs the opposite way to the green it
+ * replaced — green got darker to gain contrast on light, gold has to get
+ * LIGHTER to gain contrast on dark. scripts/contrast.mjs measures it against
+ * the scrim's worst case, at both scrim weights.
  */
 .hero__title-accent {
-  color: var(--lime-300);
+  color: var(--gold-300);
 }
 
 /*
@@ -584,11 +589,12 @@
 }
 
 /*
- * The one word of each title in the campaign green.
+ * The one word of each title in the campaign accent.
  *
- * --eyebrow, not --brand-accent. tokens.css records that green-700 measured
- * 4.27:1 on the tinted surface and was darkened to this for exactly this kind
- * of use; the brighter brand green does not clear 4.5:1 against a white card.
+ * --eyebrow, not --brand-accent, and the reason survived the 2026-08-29 repaint
+ * intact: the block accent has never been dark enough to be a text colour on a
+ * white card. It was a green that missed 4.5:1; it is now a gold that misses it
+ * by far more. --eyebrow is the accent hue taken down until it reads as text.
  */
 .plank-card__accent {
   color: var(--eyebrow);
@@ -748,7 +754,7 @@
 /* ── About ───────────────────────────────────────────────────────────────── */
 
 .about-portrait {
-  filter: drop-shadow(0 10px 24px rgba(18, 35, 91, 0.28));
+  filter: drop-shadow(0 10px 24px rgba(12, 31, 94, 0.28));
 }
 
 /*
@@ -981,9 +987,9 @@
 .ballot__answer {
   margin-top: 18px;
   padding: 20px 22px;
-  border: 1px solid var(--green-300);
+  border: 1px solid var(--gold-300);
   border-radius: var(--radius-lg);
-  background: var(--green-100);
+  background: var(--gold-100);
 }
 
 .ballot__answer-title {
@@ -1348,9 +1354,9 @@
   max-width: 640px;
   margin: var(--space-8) auto 0;
   padding: var(--space-6) var(--space-8);
-  border: 1px solid var(--green-300);
+  border: 1px solid var(--gold-300);
   border-radius: var(--radius-lg);
-  background: var(--green-100);
+  background: var(--gold-100);
   box-shadow: var(--shadow-card);
 }
 
@@ -1595,7 +1601,7 @@
   padding: 9px 15px;
   transform: translate(-50%, -50%);
   border-radius: var(--radius-pill);
-  background: rgba(18, 35, 91, 0.88);
+  background: rgba(12, 31, 94, 0.88);
   box-shadow: var(--shadow-raised);
   font-size: 13px;
   font-weight: var(--weight-semibold);
