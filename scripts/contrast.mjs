@@ -46,7 +46,7 @@ const T = {
   frost200: '#DCE5F2',
   white: '#FFFFFF',
   ctaBand: '#2F4C9B',
-  eyebrow: '#9A4A15',
+  eyebrow: '#AE3448', /* = --rose-600 */
   slate500: '#67728A',
   borderControl: '#8391AA',
   formError: '#A3341C',

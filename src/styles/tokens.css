@@ -293,13 +293,24 @@
    *              This reaches 3.18.
    */
   /*
-   * Burnt sienna, 2026-08-29. Was a mid green, for the same reason everything
-   * else was: the old logo. It is her orange taken down until it reads as text
-   * on a light surface — her gold at painted lightness is about 1.9:1 on the
-   * page and cannot be a text colour at all. Reaches 5.7 on the page, 5.4 on
-   * tint, 6.0 on card, and 5.45 on the warm ballot card it also has to sit on.
+   * Rose, and no longer a colour of its own.
+   *
+   * This was a mid green until 2026-08-29 (the old logo), then briefly a burnt
+   * sienna — her orange taken down far enough to be text, because gold at its
+   * painted lightness is 1.9:1 on the page and cannot be type at all.
+   *
+   * The sienna was right about the problem and wrong about the answer. Eyebrows
+   * are the most repeated accent on the site — every section has one — so they
+   * are what sets its temperature, and a dark orange reads as brown rather than
+   * as anything in her sky. --rose-600 is the same idea done with the pink that
+   * is actually in the painting, and it costs nothing to switch: it measures
+   * 5.89 on the page against the sienna's 5.92, 5.47 on tint against 5.51, 6.20
+   * on a card against 6.24, and 5.41 on the ballot card against 5.45.
+   *
+   * The sienna is gone rather than kept unused. It was only ever standing in for
+   * a warm text colour, and there is one now.
    */
-  --eyebrow: #9a4a15;
+  --eyebrow: var(--rose-600);
   --slate-500: #687386;
   --border-control: #8391aa;
 
