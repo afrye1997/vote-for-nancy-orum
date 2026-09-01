@@ -63,7 +63,23 @@
  * against cannot occur.
  *
  * `bio.ts` is untouched. "Listening. Serving. Building Bella Vista Together." is
- * still how she closes her own bio and `Biography.tsx` still renders it there.
+ * still how she closes her own bio, and her bio is not on the site: nothing
+ * imports `Biography.tsx`, so the line reaches no page and is not even in the
+ * JS bundle. (An earlier version of this note said that component "still renders
+ * it there." It does not, and correcting that is the whole of what 2026-09-01
+ * changed here.)
+ *
+ * CONFIRMED (2026-09-01): the candidate chose PPP over the old refrain in her
+ * own words — "I think I like the new plan, protect, and prosper over the
+ * original jargon. My walk card matches the PPP too. So I think remove the
+ * other unless there's a place you think it needs to go."
+ *
+ * There was no place it needed to go, and nothing to remove from any page,
+ * because it had already reached zero. The only candidate slot was the foot of
+ * her full biography, which is not published — and even there it would have sat
+ * one screen above the CTA band's "Let's build them together.", which is the
+ * duplication the note above exists to prevent. Her bio keeps her sentence; the
+ * site carries her slogan.
  */
 
 export const SITE = {
@@ -77,7 +93,7 @@ export const SITE = {
    * Building Bella Vista Together." is how Nancy opens and closes her own bio
    * and a line a candidate repeats unprompted is the line she believes. That
    * reasoning has not changed and neither has bio.ts — her signoff is still her
-   * signoff, and `Biography.tsx` still closes the bio with it.
+   * signoff, sitting in her bio, which no page renders.
    *
    * What changed is that she now has a printed campaign slogan, and it is a
    * different line. "Protect. Plan. Prosper." is on the red banner of her walk
@@ -110,8 +126,18 @@ export const SITE = {
    * build to, and it is the last one to animate in.
    */
   taglineAccent: 'Prosper.',
-  /** Retained but unrendered — see the correction note above. */
-  kicker: 'Transparent leadership. Responsible growth.',
+  /*
+   * `kicker` was here: "Transparent leadership. Responsible growth."
+   *
+   * Deleted 2026-09-01, on the candidate's instruction to retire the old
+   * framing. It was a drafting tool's line, never hers, and no component had
+   * read it since 2026-08-09 — but it was NOT tree-shaken, because it rode
+   * inside this object, so every visitor was still downloading it.
+   *
+   * It was kept in 2026-08-09 for one stated reason: that a line the campaign
+   * might still want "cannot be recovered from a repository with no history."
+   * The repository has history now, and this comment is the pointer to it.
+   */
   /** Hers, from the 2026-08-27 statement. See the correction note above. */
   heroLede: 'I want us to become an even better Bella Vista.',
   heroEyebrow: 'Ward 2 · Position 2',

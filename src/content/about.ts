@@ -4,14 +4,21 @@
  * Source: the campaign's design project, 2026-08-09.
  *
  * This module holds the page's framing only. Nancy's biography itself is in
- * `bio.ts`, verbatim and untouchable, and the About page renders it in full.
+ * `bio.ts`, verbatim and untouchable.
  *
- * The mockup's About page has no bio on it — it runs an intro, four cards, and
- * a photograph. Leaving seven hundred words of the candidate's own words
- * unpublished on the page called "About Nancy" is not a design decision anyone
- * actually made; it is what happens when a layout is drawn before the copy
- * arrives. The bio is rendered in the design's own type styles, below the four
- * cards, where the mockup already had a section break.
+ * ⚠ CORRECTED 2026-09-01. This note used to say the About page "renders it in
+ * full", and then argued at length for why it should. It does not, and by the
+ * look of it never did: `Nancy.tsx` mounts AboutIntro, Strengths and RootedBand
+ * and nothing else, `Biography.tsx` is imported by no page, and Vite tree-shakes
+ * `bio.ts` out of the bundle entirely. `Nancy.tsx:12-17` is the accurate account
+ * — the bio was added once and deliberately removed again, "because the design
+ * does not have it and the design is the specification."
+ *
+ * The argument that was here is still worth having, and it is preserved in that
+ * file rather than restated here. What could not stay is a comment that told
+ * anyone reading it the opposite of what the code does — which is how a question
+ * about where the candidate's retired refrain still appeared got answered wrong
+ * three times before it was answered against the build.
  */
 
 export const ABOUT_INTRO = {

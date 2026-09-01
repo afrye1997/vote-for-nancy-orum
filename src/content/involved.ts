@@ -220,8 +220,19 @@ export const DONATE_ROW = {
   unavailable: 'Online donations aren’t open quite yet.',
 } as const
 
+/**
+ * Reworded 2026-09-01. The old second sentence ended "...willing to help build
+ * Bella Vista together", which is the payload of the retired refrain — same
+ * verb, same object, same adverb — and it was the last place a visitor could
+ * still read those words in sequence. Everyone who submits the form lands here,
+ * so it was also the most-read copy carrying it.
+ *
+ * Design-project copy rather than hers, so it could be reworded freely. The
+ * warmth is doing real work on this page and is kept; only the retired phrasing
+ * went.
+ */
 export const THANKS = {
   title: 'Thank you, neighbor.',
-  body: 'We’ll be in touch soon. It means a lot that you’re willing to help build Bella Vista together.',
+  body: 'We’ll be in touch soon. It means a lot to have you with us.',
   cta: 'Back to the campaign',
 } as const
