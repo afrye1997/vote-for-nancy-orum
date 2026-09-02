@@ -117,31 +117,38 @@ real alpha — white type for the pages that open on a photograph, navy for the
 pale ones — and the header picks by page. That retired the last of the old logo
 from the site. Nothing outstanding here.
 
-### 9. Photographs — now the biggest gap on the site
-Two things happened on 2026-09-02 that make this the most useful thing you can
-send us.
+### 9. Photographs
+Five of her six platform cards now carry one. Two still do not, and there is a
+rights question on three — §9a.
 
-**Five of the platform's six cards have no picture.** They used to carry
-photographs illustrating the old commitments. Nancy's six replaced them, and only
-one of the pictures we have honestly illustrates one of hers — the waterfall, on
-"Protect natural areas". There is no photograph in the project of a road, an
-intersection, a residential street, a utility, a storefront, or a Police, Fire or
-EMS crew, and rather than put a misleading picture over a policy position those
-five cards ship without one.
+**Cards 02 "Protect neighborhoods" and 04 "Verify infrastructure" have no
+picture.** Nothing in the project honestly shows a residential street, a utility,
+or a Police, Fire or EMS crew, and rather than put a misleading picture over a
+policy position those two ship without one.
 
-**Her headshot is now on no page of the site.** Same cause.
+**Her headshot is on no page of the site**, since the commitment it used to
+illustrate is gone.
 
 What would fix it, roughly in order of value:
 
 1. **Little Sugar Creek** — she names the project on her first commitment, and
    the waterfall currently on that card is Tanyard Creek, a different one.
-2. **A road or intersection** in Bella Vista, for "Address traffic before
-   development."
+2. **A residential street**, for "Protect neighborhoods."
+3. **Police, Fire or EMS** — only with the crews' own consent, which is theirs to
+   give and not ours or hers.
+4. **A Bella Vista road or intersection**, to replace the borrowed one on card 03
+   (see §9a).
+5. **The creek photograph from the back of her walk card**, at full resolution,
+   from whoever designed the card. Nancy asked for it on the site; the only copy
+   we have is the printed card, with her name set across the picture, which
+   leaves 515 usable pixels where the page needs about 1200. The card was laid
+   out from the original, so that file exists.
+6. **A new headshot**, or confirmation that the one we have is still the one.
 
-### ⚠ 9a. Three photographs on the platform page need their rights cleared
+### ⚠ 9a. Three photographs need their rights cleared before launch
 
-This is now the one thing on the site that could cost the campaign money, so it
-is worth doing before launch rather than after.
+This is the one thing on the site that could cost the campaign money, so it is
+worth doing before launch rather than after.
 
 | Card | Arrived as | What the filename says |
 |---|---|---|
@@ -158,19 +165,7 @@ jersey carries a legible bike-shop name. A named local business on a candidate's
 platform page reads as that business endorsing her — a claim nobody has made, and
 one the business is entitled to decide for itself. The picture is cropped so the
 branding falls outside the visible band, but the full file still contains it, and
-anyone re-cropping this needs to know why it sits where it does.
-3. **A residential street**, for "Protect neighborhoods."
-4. **Police, Fire or EMS** — only with the crews' own consent, which is theirs to
-   give and not ours or hers.
-5. **The creek photograph from the back of her walk card**, at full resolution,
-   from whoever designed the card. Nancy asked for it on the site; the only copy
-   we have is the printed card, with her name set across the picture, which
-   leaves 515 usable pixels where the page needs about 1200. The card was laid
-   out from the original, so that file exists.
-
-### 10. Confirm the headshot
-The headshot we have is the one we'll use unless you'd rather send another —
-though right now it is not on the site at all, per §9.
+anyone re-cropping it needs to know why the crop sits where it does.
 
 ---
 
