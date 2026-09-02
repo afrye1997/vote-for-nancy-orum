@@ -36,6 +36,8 @@ const T = {
   gold800: '#B8790E',
   gold100: '#FCEED4',
   pine700: '#276847',
+  pine300: '#BBDDCC',
+  pine100: '#EFF8F4',
   rose600: '#AE3448',
   rose500: '#F87888',
   rose300: '#F7AFBA',
@@ -133,14 +135,14 @@ const PAIRS = [
   ['pull quote on tint', T.blue600, T.frost100, 4.5],
   ['stat figure (large)', T.blue600, T.frost50, 3.0],
   ['ballot answer title', T.eyebrow, T.gold100, 4.5],
-  /* The chip-in card, which is rose where the ballot card is gold. */
-  ['chip-in lead on rose', T.pine700, T.rose100, 4.5],
-  ['chip-in body on rose', T.slate700, T.rose100, 4.5],
-  ['chip-in note on rose', T.slate600, T.rose100, 4.5],
+  /* The chip-in card, which is pine where the ballot card is gold. */
+  ['chip-in lead on pine', T.pine700, T.pine100, 4.5],
+  ['chip-in body on pine', T.slate700, T.pine100, 4.5],
+  ['chip-in note on pine', T.slate600, T.pine100, 4.5],
   ['selected text', T.navy900, T.rose100, 4.5],
   /* Her pink as a block colour, for anything that later sits on it. */
   ['navy on rose block', T.navy900, T.rose500, 4.5],
-  ['chip-in card border', T.rose300, T.rose100, 1.0],
+  ['chip-in card border', T.pine300, T.pine100, 1.0],
   ['accent button', T.navy900, T.gold600, 4.5],
   /* Navy stays on the hover too — see .btn--accent:hover in components.css. */
   ['accent button hover', T.navy900, T.gold700, 4.5],

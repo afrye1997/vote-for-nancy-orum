@@ -1404,17 +1404,21 @@
  * meant to be the loudest thing between the hero and the form — the campaign
  * asked for donating to be the first ask, not a sidebar card.
  *
- * Rose, when everything else on the page tints frost-blue: the pink in her sky,
- * so the card reads as a highlight rather than as a different site. Everything
- * stacks down the middle — question, reason, button — at the intro paragraph's
- * own 640px measure, so the card continues the centred column above it instead
- * of breaking into a full-width stripe.
+ * Pine, when everything else on the page tints frost-blue: the trees in her
+ * painting, so the card reads as a highlight rather than as a different site.
+ * Everything stacks down the middle — question, reason, button — at the intro
+ * paragraph's own 640px measure, so the card continues the centred column above
+ * it instead of breaking into a full-width stripe.
  *
- * It was gold until 2026-08-29, and gold is what the ballot card two sections
- * below it uses. Two cream cards that close together on one page read as the
- * same component saying two different things. Rose separates them, and it earns
- * the difference: this card asks for money and that one answers a question
- * about the ballot.
+ * Third colour in a week, and the reason each one moved is worth keeping. It was
+ * gold, which collided with the ballot card two sections below: two cream cards
+ * that close together read as one component saying two different things. Then
+ * rose, which separated them. Then the campaign asked for green rather than red
+ * — first the heading, then the surface behind it — so the whole card is pine
+ * now and the separation from the gold ballot card survives the change.
+ *
+ * Every pair re-measured rather than assumed: heading 6.15, body 7.92, note
+ * 5.25, and the card still reads as a card against the page at 1.03.
  */
 .donate-row {
   display: flex;
@@ -1425,9 +1429,9 @@
   max-width: 640px;
   margin: var(--space-8) auto 0;
   padding: var(--space-6) var(--space-8);
-  border: 1px solid var(--border-rose);
+  border: 1px solid var(--border-pine);
   border-radius: var(--radius-lg);
-  background: var(--surface-rose);
+  background: var(--surface-pine);
   box-shadow: var(--shadow-card);
 }
 

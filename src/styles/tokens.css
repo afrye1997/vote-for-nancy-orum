@@ -36,10 +36,17 @@
  * her banner blue cannot either, so both are darkened for the roles that need
  * it and kept light for the roles that do not.
  *
- * ⚠ THERE IS NO GREEN IN HER ARTWORK. Green was the old logo's colour and it
- * ran through the whole system — the accent button, every eyebrow, the ballot
- * card, the hero's accented word. Gold took all of those. If you find a green
- * anywhere in this codebase, it is a leftover, not a decision.
+ * ⚠ THE OLD GREEN IS GONE, AND THE GREEN THAT IS HERE IS NOT IT.
+ *
+ * #3da21c — a bright civic green — was the retired logo's colour, and it ran
+ * through the whole system: the accent button, every eyebrow, the ballot card,
+ * the hero's accented word. Gold took all of those jobs on 2026-08-29. If you
+ * find that green anywhere in this codebase it is a leftover, not a decision.
+ *
+ * `--pine-*` is a different thing, added 2026-09-02 at the campaign's request
+ * and sampled from the trees in her painting: hue 150, low saturation, and light
+ * where the old green was hue 100 and loud. It has exactly one job, the chip-in
+ * card. Do not let it creep back into the jobs gold took.
  *
  * Values under "site additions" are NOT from the design system. They exist
  * because the mockup hardcoded them inline; they are named here so a colour
@@ -93,12 +100,20 @@
    * two files for saturated pixels between hue 335 and 8 returns #f87888 more
    * than any other value, so --rose-500 IS that pixel rather than a guess at it.
    *
-   * Same split as gold, for the same reason: --rose-500 is a block colour and
-   * carries navy type at 5.85:1, --rose-600 is the value dark enough to BE type.
-   * Gold and rose are deliberately not interchangeable in use — gold is the
-   * accent that acts (buttons, the accented word), rose is the accent that warms
-   * (the chip-in card, selected text). Keeping those jobs apart is what stops
-   * the page turning into a fruit salad.
+   * Same split as gold: --rose-500 is a block colour that carries navy type at
+   * 5.85:1, --rose-600 is the value dark enough to BE type.
+   *
+   * WHERE THE THREE ACCENTS STAND after 2026-09-02, because the jobs moved and a
+   * palette with overlapping roles is how a page turns into a fruit salad:
+   *
+   *   gold   the accent that ACTS — buttons, the accented word in a title
+   *   rose   the accent that LABELS — every eyebrow (via --eyebrow), selected
+   *          text, and the far end of the logo's gradient
+   *   pine   the chip-in card, and only that — the one warm surface on the site
+   *
+   * --rose-300 has no call site now that the chip-in card is pine. It is kept
+   * because rose is a real family here rather than a one-off, and the 300 step is
+   * the border weight any future rose surface would want.
    */
   --rose-600: #ae3448;
   --rose-500: #f87888;
@@ -119,6 +134,8 @@
    * light. 5.83:1 on the chip-in card, and above 5.6 on every other surface.
    */
   --pine-700: #276847;
+  --pine-300: #bbddcc;
+  --pine-100: #eff8f4;
 
   /* Blue-greys, pulled toward the shadows in the sign's painting. */
   --slate-700: #3b4b75;
@@ -154,7 +171,7 @@
   --surface-card: #ffffff;
   --surface-tint: var(--frost-100);
   --surface-warm: var(--gold-100);
-  --surface-rose: var(--rose-100);
+  --surface-pine: var(--pine-100);
   --surface-inverse: var(--navy-900);
   --text-body: var(--navy-900);
   --text-muted: var(--slate-600);
@@ -164,7 +181,7 @@
   --border-soft: var(--frost-200);
   --border-strong: var(--slate-400);
   --border-warm: var(--gold-300);
-  --border-rose: var(--rose-300);
+  --border-pine: var(--pine-300);
   /*
    * The one word set apart in a page title. Two values, because a title accent
    * has to survive both surfaces this site uses and no single gold does:
