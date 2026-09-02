@@ -97,6 +97,17 @@ const TARGETS = {
    */
   'yard-sign-2026.png': { px: 640, jpeg: true },
   'tanyard-creek-falls.png': { px: 1040, jpeg: true },
+  /*
+   * Commitment 03's photograph, supplied 2026-09-02. Already web-sized at
+   * 1500×999 when it arrived — see the rights note in images.ts — so 1040 is a
+   * downscale rather than a derivative of a master.
+   */
+  'arkansas-highway-sign.jpeg': { px: 1040 },
+  /*
+   * Commitment 05's photograph, supplied 2026-09-02. Portrait, and cropped hard
+   * to the card's 520×220 band — see the focus point in images.ts.
+   */
+  'residents-meeting.jpeg': { px: 1040 },
   'hero-arms-crossed.jpeg': { px: 1800 },
   'community-event.jpeg': { px: 1800 },
   'campaign-booth.jpeg': { px: 1040 },

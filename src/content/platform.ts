@@ -101,6 +101,9 @@ const PILLS: Record<string, string> = {
  */
 const ART: Record<string, Img> = {
   'natural-areas': IMAGES.tanyardCreek,
+  /* ⚠ Rights unconfirmed — see the note on this image in images.ts. */
+  'traffic-first': IMAGES.arkansasHighwaySign,
+  'residents-voice': IMAGES.residentsMeeting,
 }
 
 export const COMMITMENTS: readonly Commitment[] = approvedStatement().advocacy.map(

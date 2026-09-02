@@ -112,6 +112,58 @@ export const IMAGES = {
     height: 1350,
     focus: '50% 38%',
   },
+  /**
+   * Commitment 03, "Address traffic before development". Supplied 2026-09-02.
+   *
+   * ⚠ PROVENANCE UNCONFIRMED — DO NOT LAUNCH ON THIS WITHOUT CLEARING IT.
+   *
+   * Every other photograph on this site came from the campaign or its design
+   * project. This one arrived as `Arkansas_Sign_t1684.JPG`: 1500×999, 371 kB,
+   * every EXIF tag stripped, no camera make or model, and a `_t1684` suffix of
+   * the kind news CMSes append to a resized web copy. That is the signature of a
+   * picture saved off a page, not one taken by or for the campaign.
+   *
+   * It may well be licensed, or a press-release image, or a state agency's. But
+   * nobody has said so, and a campaign publishing a newspaper's photograph is the
+   * kind of mistake that arrives as a letter. Confirm the source and the licence
+   * before this site goes live, or replace it with a photograph the campaign
+   * owns — a Bella Vista road is on the list in NEEDED-FROM-CAMPAIGN.md §9.
+   *
+   * The alt text describes only what is visible. It does not place the road in
+   * Bella Vista, because nothing here establishes that it is.
+   */
+  arkansasHighwaySign: {
+    file: 'arkansas-highway-sign.jpeg',
+    alt: 'A “Welcome to Arkansas” sign beside a newly opened stretch of highway',
+    width: 1040,
+    height: 692,
+    /* The sign is upper-right; a centre crop to 520×220 would cut it in half. */
+    focus: '62% 38%',
+  },
+  /**
+   * Commitment 05, "Give residents a voice". Supplied 2026-09-02.
+   *
+   * Residents and officials around a table in a meeting room, with county
+   * district maps on the wall behind them. It is the one photograph on the site
+   * that shows the thing its card is about — people being heard in a room where
+   * decisions get made — rather than a place the decision is about.
+   *
+   * Provenance is better than commitment 03's but not confirmed: the filename it
+   * arrived under is a Facebook CDN name, so it was most likely saved from the
+   * campaign's own page, which the campaign would own. Worth one line of
+   * confirmation before launch, not a blocker.
+   *
+   * ⚠ Portrait, 762×1040, shown in a 520×220 band — the crop keeps about a fifth
+   * of the frame's height. `focus` holds it on the faces around the table; a
+   * centre crop lands on the tabletop.
+   */
+  residentsMeeting: {
+    file: 'residents-meeting.jpeg',
+    alt: 'Residents and officials talking around a table at a public meeting',
+    width: 762,
+    height: 1040,
+    focus: '50% 40%',
+  },
   /** Commitment 01, "Protect natural areas" — see ART in platform.ts. */
   tanyardCreek: {
     file: 'tanyard-creek-falls.jpeg',

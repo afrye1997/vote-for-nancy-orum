@@ -136,7 +136,13 @@ What would fix it, roughly in order of value:
 1. **Little Sugar Creek** — she names the project on her first commitment, and
    the waterfall currently on that card is Tanyard Creek, a different one.
 2. **A road or intersection** in Bella Vista, for "Address traffic before
-   development."
+   development." ⚠ **There is a placeholder on that card now and it needs
+   clearing before launch.** It arrived as `Arkansas_Sign_t1684.JPG` — 1500×999,
+   EXIF stripped, with the filename pattern a news site gives a resized web copy.
+   It may be perfectly licensed, but nobody has said where it came from, and a
+   campaign publishing a newspaper's photograph is the kind of mistake that
+   arrives as a letter. Either confirm the source and licence, or send a picture
+   of a Bella Vista road that the campaign owns.
 3. **A residential street**, for "Protect neighborhoods."
 4. **Police, Fire or EMS** — only with the crews' own consent, which is theirs to
    give and not ours or hers.
