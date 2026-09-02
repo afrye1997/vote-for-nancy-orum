@@ -1,7 +1,6 @@
 import { renderToString } from 'react-dom/server'
 import { PAGE_COMPONENTS, type PageProps } from './pages/registry'
 import { PAGES_NAV } from './content/site'
-import { PLATFORM_APPROVED_BY_CANDIDATE } from './content/platform'
 
 /**
  * Build-time rendering entry point.
@@ -50,18 +49,18 @@ function pageProps(opts: RenderOpts): PageProps {
 }
 
 export function renderPage(id: string, opts: RenderOpts): { html: string; props: object } {
-  /**
-   * Approval gate (ENGINEERING.md §6). The six commitments are first-person
-   * promises; if the flag in platform.ts is ever turned off, the build stops
-   * rather than quietly publishing them.
+  /*
+   * The approval gate that stood here is not gone, it moved.
+   *
+   * `PLATFORM_APPROVED_BY_CANDIDATE` was deleted on 2026-09-02 with the copy it
+   * guarded. The six commitments are now Nancy's own advocacy points, and
+   * `platform.ts` derives them by calling `approvedStatement()` at module scope —
+   * so importing that file at all runs `STATEMENT_APPROVED_BY_CANDIDATE`, and a
+   * false flag fails the build here exactly as this check used to.
+   *
+   * One flag, not two. Two flags over one body of text is a trap: flip one and
+   * the other page keeps publishing.
    */
-  if (!PLATFORM_APPROVED_BY_CANDIDATE) {
-    throw new Error(
-      'PLATFORM_APPROVED_BY_CANDIDATE is false — the six commitments are not cleared to publish. ' +
-        'See src/content/platform.ts.',
-    )
-  }
-
   const Page = PAGE_COMPONENTS[id]
   if (!Page) throw new Error(`No renderer for page id "${id}" — add it to pages/registry.tsx.`)
 

@@ -410,253 +410,6 @@
   color: var(--navy-900);
 }
 
-/* ── Commitment cards (home preview) ─────────────────────────────────────── */
-
-/* These are <ul>s, so the markers have to go — a card grid is a list
-   semantically, not visually. Same for .strength-grid below. */
-.plank-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
-  margin-top: 28px;
-  padding: 0;
-  list-style: none;
-}
-
-/* The li is now only a grid cell; the card is the <a> inside it. Flex here so
-   that anchor stretches to the row height instead of shrink-wrapping its text,
-   which would leave short cards floating above a gap. */
-.plank-grid > li {
-  display: flex;
-}
-
-/*
- * ── The commitment cards ──────────────────────────────────────────────────────
- *
- * THE BASE STATE IS NOT THE FLIP. Everything below the media query is a plain
- * stacked card — centred title, then the line, then the prompt — and that is
- * what a phone, a reduced-motion visitor and anything that cannot do 3D
- * transforms all get. It reads perfectly well; it just does not spin.
- *
- * The flip is layered on afterwards, and only where both of the things it needs
- * are true: a pointer that can actually hover, and a visitor who has not asked
- * for less motion. A hover-only reveal on a touch screen hides the sentence
- * that explains the commitment behind a gesture that does not exist there.
- */
-.plank-card {
-  display: flex;
-  flex-direction: column;
-  /* The whole distance between the title and the sentence under it, now that
-     the faces' facing paddings are gone. The flip sets this to 0 — there the
-     faces are stacked in depth, not in the column. */
-  gap: var(--space-3);
-  /*
-   * `width: 100%` is load-bearing, not defensive. The cell is a flex container,
-   * so on the main axis this anchor sizes to its content unless told otherwise
-   * — and "Listen first" is the shortest title of the six, so its card came out
-   * visibly narrower than its neighbours while the grid column stayed the same
-   * width. The card must fill the column, not the text.
-   */
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  text-decoration: none;
-  color: inherit;
-  transition:
-    box-shadow 220ms var(--ease-organic),
-    border-color 220ms var(--ease-organic);
-}
-
-/*
- * ⚠ HOVER IS TRIGGERED FROM THE GRID CELL, NEVER FROM THE CARD.
- *
- * The card rotates. Hanging `:hover` on a rotating element builds an
- * oscillator: as the card turns, its projected geometry sweeps out from under
- * any pointer that is not on the rotation axis, `:hover` stops matching, the
- * transition reverses, the card swings back under the pointer, `:hover` matches
- * again. Measured before this was fixed — a pointer held still 12px inside the
- * card's left edge produced 39 direction reversals in 3 seconds and never
- * reached the flipped state. Dead centre looked fine, because that is the one
- * column the axis runs through, which is exactly what makes this easy to miss.
- *
- * `.plank-grid > li` does not transform, so its box is wherever it was at rest
- * and hit-testing against it is stable for the whole rotation.
- *
- * `:focus-visible` stays on the card itself: focus does not depend on geometry,
- * and the anchor is the focusable thing.
- */
-.plank-grid > li:hover .plank-card {
-  border-color: var(--blue-300);
-  box-shadow: var(--shadow-raised);
-}
-
-/* Padding lives on the faces, not the card: once they are stacked for the flip
-   each face has to fill the card on its own. */
-.plank-card__face {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 22px;
-}
-
-/*
- * Where there is no flip the two faces sit one above the other, and they have
- * to read as one card rather than as two cards touching.
- *
- * Two things were making them look like two. The faces each carry their own
- * 22px, so the title and the sentence below it were separated by 22 + 22 + the
- * card's gap — 52px of nothing on a phone, which is more space than the title
- * itself occupies. And the front face was centred while the back was ranged
- * left, so a centred heading sat over left-aligned text.
- *
- * So: the inner paddings collapse and the gap alone spaces them, and centring
- * is left to the flip, where the front face IS the whole card and centring is
- * right. Both are restored inside that media query — which must stay BELOW
- * these rules, since it wins on source order, not on specificity.
- */
-.plank-card__face--front {
-  padding-bottom: 0;
-}
-
-.plank-card__face--back {
-  padding-top: 0;
-}
-
-/*
- * No `--tracking-wide` here. That token is 0.08em and every other thing wearing
- * it — the eyebrow, the stat source — is uppercase, which is what tracking that
- * wide is for. On this sentence-case line it just pulled the words apart, and
- * on a phone, where the line sits directly under the title, that was the first
- * thing you saw.
- */
-.plank-card__cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: var(--space-3);
-  font-size: 13px;
-  font-weight: var(--weight-semibold);
-  color: var(--brand-primary);
-}
-
-.plank-card__cta svg {
-  transition: transform 220ms var(--ease-organic);
-}
-
-.plank-grid > li:hover .plank-card__cta svg {
-  transform: translateX(3px);
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  /*
-   * Perspective on the cell rather than the card, because an element cannot
-   * supply the perspective it is itself rotating in.
-   *
-   * Set far back on purpose. The rotation has always been exactly a half turn,
-   * but at a close perspective the near edge of a 350px card swings a long way
-   * toward the viewer on the way round, and the exaggerated foreshortening
-   * reads as more travel than 180°. Pushing the vanishing point out flattens
-   * that swing, so what you see matches what the transform actually does.
-   */
-  .plank-grid > li {
-    perspective: 2400px;
-  }
-
-  .plank-card {
-    display: grid;
-    gap: 0;
-    transform-style: preserve-3d;
-    transition:
-      transform 620ms var(--ease-organic),
-      box-shadow 220ms var(--ease-organic),
-      border-color 220ms var(--ease-organic);
-  }
-
-  /*
-   * Both faces in the same grid cell. This is what makes the card exactly as
-   * tall as its taller face with no measured min-height to go stale — the back
-   * carries a sentence and a prompt, the front carries a title, and the cell
-   * resolves to whichever wins. A fixed height here would clip the back the
-   * first time someone edited a lede.
-   */
-  .plank-card__face {
-    grid-area: 1 / 1;
-    backface-visibility: hidden;
-    border-radius: var(--radius-lg);
-  }
-
-  /* Alone on the card, and centred in it — the collapsed inner padding and the
-     ranged-left title above are for the stacked card, which this is not. */
-  .plank-card__face--front {
-    align-items: center;
-    padding-bottom: 22px;
-    text-align: center;
-  }
-
-  /*
-   * The hovered card is blue.
-   *
-   * The colour is on the BACK FACE, not on the card, which is what makes it
-   * arrive with the turn rather than before it: the white front is still the
-   * side facing you for the first half of the rotation, and the blue is what
-   * comes round. Colouring `.plank-card:hover` itself would flash the whole
-   * card blue at the moment the pointer lands, while you were still looking at
-   * the title.
-   *
-   * It is scoped inside this query with the flip. Where there is no flip the
-   * two faces stack, and a blue lower half under a white upper half is not a
-   * card, it is a bug.
-   */
-  .plank-card__face--back {
-    padding-top: 22px;
-    transform: rotateY(180deg);
-    background: var(--brand-primary);
-  }
-
-  .plank-card__face--back .plank-card__body {
-    color: var(--frost-100);
-  }
-
-  .plank-card__face--back .plank-card__cta {
-    color: #ffffff;
-  }
-
-  /* Cell, not card — see the oscillator note above. */
-  .plank-grid > li:hover .plank-card,
-  .plank-card:focus-visible {
-    transform: rotateY(180deg);
-    border-color: var(--brand-primary);
-  }
-}
-
-/* The front face carries the whole card on its own, so it is set larger and
-   heavier than it was when it sat above a paragraph. */
-.plank-card__title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 21px;
-  line-height: 1.25;
-  color: var(--navy-900);
-}
-
-/*
- * The one word of each title in the campaign accent.
- *
- * --eyebrow, not --brand-accent, and the reason survived the 2026-08-29 repaint
- * intact: the block accent has never been dark enough to be a text colour on a
- * white card. It was a green that missed 4.5:1; it is now a gold that misses it
- * by far more. --eyebrow is the accent hue taken down until it reads as text.
- */
-.plank-card__accent {
-  color: var(--eyebrow);
-}
-
-.plank-card__body {
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--slate-700);
-}
-
 /* ── Platform rail ───────────────────────────────────────────────────────── */
 
 .rail-index {
@@ -701,8 +454,18 @@
   color: var(--slate-600);
 }
 
+/*
+ * `align-items: center` since 2026-09-02.
+ *
+ * A flex row defaults to `stretch`, so every card took the tallest card's
+ * height. That was invisible while each commitment carried 450–690 characters of
+ * body copy. Her six carry 67–252, and at that spread stretching padded the
+ * short cards with blank space under their last line. Centring lets each card be
+ * its own height on a common axis.
+ */
 .rail {
   display: flex;
+  align-items: center;
   gap: var(--space-6);
   padding: var(--space-4) calc(50% - 260px) var(--space-6);
   overflow-x: auto;
@@ -741,30 +504,8 @@
   transform: none;
 }
 
-.plank__media {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-}
 
-.plank__logo-frame {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 220px;
-  overflow: hidden;
-  background: var(--grad-brand);
-}
 
-.plank__logo-frame img {
-  width: auto;
-  height: auto;
-  max-width: 60%;
-  max-height: 170px;
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-card);
-}
 
 .plank__body {
   display: flex;
@@ -1496,10 +1237,6 @@
   .strength-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .plank-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (max-width: 900px) {
@@ -1553,7 +1290,6 @@
     text-align: center;
   }
 
-  .plank-grid,
   .strength-grid {
     grid-template-columns: 1fr;
   }
@@ -1663,10 +1399,10 @@
  * Shown only where the arrows are not, and only for a few seconds — see the
  * effect in PlatformRail.tsx for when it comes and goes.
  *
- * It sits over the photograph rather than over the body copy: the pill is
- * opaque, and a photograph is the one part of the card nobody is mid-sentence
- * in. `top` is the middle of that band — the rail's top padding plus half the
- * height of .plank__media.
+ * It used to sit over the card's photograph — the one part of a card nobody is
+ * mid-sentence in. The cards lost their photographs on 2026-09-02, so this now
+ * sits over the top of the body copy instead, and the offset below is a measured
+ * position rather than a derived one. It is opaque and it is brief.
  */
 .rail-hint {
   position: absolute;

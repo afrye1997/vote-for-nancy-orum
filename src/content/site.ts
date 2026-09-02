@@ -82,6 +82,8 @@
  * site carries her slogan.
  */
 
+import { PLATFORM_META_DESCRIPTION } from './platform'
+
 export const SITE = {
   candidate: 'Nancy Orum',
   /**
@@ -221,9 +223,14 @@ export const PAGES_NAV: readonly NavPage[] = [
     path: 'platform/',
     label: 'Platform',
     title: 'Six commitments — Nancy Orum for Bella Vista City Council',
-    description:
-      'Listen first, plan for thoughtful growth, protect our character, build ' +
-      'partnerships, focus on practical solutions, and lead with care and respect.',
+    /**
+     * Derived, not written. This was a hand-copy of the old six, and nothing in
+     * the build compares a description against the page it describes — so when
+     * the commitments changed on 2026-09-02 this string would have gone on
+     * serving the retired platform to search results and every shared link,
+     * silently and indefinitely. Deriving removes the failure mode.
+     */
+    description: PLATFORM_META_DESCRIPTION,
     inNav: true,
   },
   {

@@ -64,6 +64,22 @@ export const IMAGES = {
     height: 1200,
     focus: '22% 21%',
   },
+  /**
+   * ⚠ UNUSED since 2026-09-02, along with `campaignBooth` and `tanyardCreek`.
+   *
+   * They illustrated three of the six commitments the platform page carried. Her
+   * six replaced those, and none of the three could honestly illustrate one of
+   * hers — there is no photograph in this repo of a road, an intersection, a
+   * residential street, a utility, a storefront, or a Police, Fire or EMS crew,
+   * and putting the wrong picture over a policy position misrepresents it. So
+   * the platform cards ship with no imagery at all.
+   *
+   * Her HEADSHOT is now on no page of the site, which is worth fixing.
+   *
+   * Kept, with their derivatives, because the honest fix is more photographs
+   * rather than fewer — see NEEDED-FROM-CAMPAIGN.md §9. `prerender.mjs` only
+   * checks that REFERENCED images exist, so nothing fails while they wait.
+   */
   headshot: {
     file: 'nancy-orum-headshot.jpeg',
     alt: 'Nancy Orum at the arboretum',

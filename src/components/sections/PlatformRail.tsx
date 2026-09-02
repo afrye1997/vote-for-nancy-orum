@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Photo } from '../ui/Photo'
 import { StaggerTitle } from '../ui/StaggerTitle'
 import { COMMITMENTS, PLATFORM_INTRO, type Commitment } from '../../content/platform'
-import { IMAGES, imgSources } from '../../content/images'
 
 /**
  * The platform rail: a continuous loop, as the mockup has it.
@@ -103,7 +101,12 @@ const LOOPED_SLIDES: Slide[] = [
   })),
 ]
 
-export function PlatformRail({ base }: { readonly base: string }) {
+/**
+ * `base` was a prop here too, and for the same one reason: resolving the card
+ * photographs' URLs. The cards have no photographs since 2026-09-02, so neither
+ * this component nor `Plank` has anything left to resolve.
+ */
+export function PlatformRail() {
   const railRef = useRef<HTMLDivElement>(null)
   const [ready, setReady] = useState(false)
   /** Index into the rendered slides, not into COMMITMENTS. */
@@ -335,7 +338,6 @@ export function PlatformRail({ base }: { readonly base: string }) {
         <div className="rail" ref={railRef} tabIndex={0} role="group" aria-label="The six commitments">
           {slides.map((slide, index) => (
             <Plank
-              base={base}
               slide={slide}
               key={slide.key}
               /* The mockup dims and shrinks everything but the centred card. */
@@ -453,12 +455,14 @@ function RailArrow({
   )
 }
 
+/**
+ * `base` was a prop here until 2026-09-02. It resolved the card's photograph;
+ * the cards have no photograph now, so it has nothing left to resolve.
+ */
 function Plank({
-  base,
   slide,
   focused,
 }: {
-  readonly base: string
   readonly slide: Slide
   readonly focused: boolean
 }) {
@@ -470,27 +474,22 @@ function Plank({
       aria-hidden={clone ? true : undefined}
       data-focused={focused ? '' : undefined}
     >
-      {commitment.image === null ? (
-        <div className="plank__logo-frame">
-          <Photo {...imgSources(base, IMAGES.logoCircle)} image={IMAGES.logoCircle} />
-        </div>
-      ) : (
-        <Photo
-          className="plank__media"
-          {...imgSources(base, commitment.image)}
-          image={commitment.image}
-        />
-      )}
+      {/*
+        No photograph, deliberately — see the note above the component. The media
+        band and the `image === null` logo fallback both went with the old six.
+      */}
       <div className="plank__body">
         <p className="eyebrow plank__eyebrow">Commitment {commitment.num}</p>
         <h2 className="plank__title">{commitment.title}</h2>
         <p className="plank__lede">{commitment.lede}</p>
-        {commitment.paragraphs.map((text) => (
-          <p className="plank__text" key={text.slice(0, 32)}>
-            {text}
-          </p>
-        ))}
-        <p className="plank__pull">{commitment.pull}</p>
+        {/*
+          Guarded. `pull` is her aside and only three of six have one; rendered
+          unconditionally this paints an empty tinted bar with padding and a
+          radius on the other three. Statement.tsx already learned this.
+        */}
+        {commitment.pull === undefined ? null : (
+          <p className="plank__pull">{commitment.pull}</p>
+        )}
       </div>
     </article>
   )

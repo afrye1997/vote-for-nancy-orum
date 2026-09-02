@@ -7,7 +7,7 @@
   and are replaced with primary-sourced Census figures. The design mockup still
   carries the old ones; the build fails if any of them reach the output
 - **Filing** — confirmed
-- **Platform** — the six commitments, from the campaign's design project
+- **Platform** — Nancy's six commitments, in her own words (supplied 2026-09-02)
 - **Email** — `votenancyorum@gmail.com`, live in the footer
 - **Facebook** — linked in the footer
 - **Phone** — decided: none published, which is normal for a local race. Send
@@ -112,19 +112,41 @@ transparency and sits on any background. It is on the donate page and the last
 platform card, and the site's whole colour palette was rebuilt from it on
 2026-08-29.
 
-Still outstanding, and smaller than it was: the **header** mark. The two nav
-lockups are still the old artwork with a background baked in, which is why the
-header ships two files and swaps between them. A **horizontal** lockup in the new
-watercolour brand — wordmark on transparency, PNG or better an SVG — would
-finish this and retire the last of the old logo from the site.
+**Fully answered on 2026-09-02.** The header lockup arrived as two knockouts with
+real alpha — white type for the pages that open on a photograph, navy for the
+pale ones — and the header picks by page. That retired the last of the old logo
+from the site. Nothing outstanding here.
 
-If the designer who made the new signs has the original file, ask them for it. If
-it doesn't exist, tell us and we'll build the header mark in code instead —
-that's a fine outcome, we just shouldn't guess.
+### 9. Photographs — now the biggest gap on the site
+Two things happened on 2026-09-02 that make this the most useful thing you can
+send us.
 
-### 9. Confirm the photo
-The headshot in `asset/nancy-orum.jpg` is the one we'll use unless you'd rather
-send another.
+**The platform page has no pictures at all.** Its six cards used to carry
+photographs that illustrated the old commitments. Nancy's six replaced them, and
+none of the pictures we have can honestly illustrate one of hers — there is no
+photograph in the project of a road, an intersection, a residential street, a
+utility, a storefront, or a Police, Fire or EMS crew. Rather than put a
+misleading picture over a policy position, the cards ship without any.
+
+**Her headshot is now on no page of the site.** Same cause.
+
+What would fix it, roughly in order of value:
+
+1. **Little Sugar Creek** — she names the project on her first commitment.
+2. **A road or intersection** in Bella Vista, for "Address traffic before
+   development."
+3. **A residential street**, for "Protect neighborhoods."
+4. **Police, Fire or EMS** — only with the crews' own consent, which is theirs to
+   give and not ours or hers.
+5. **The creek photograph from the back of her walk card**, at full resolution,
+   from whoever designed the card. Nancy asked for it on the site; the only copy
+   we have is the printed card, with her name set across the picture, which
+   leaves 515 usable pixels where the page needs about 1200. The card was laid
+   out from the original, so that file exists.
+
+### 10. Confirm the headshot
+The headshot we have is the one we'll use unless you'd rather send another —
+though right now it is not on the site at all, per §9.
 
 ---
 

@@ -1,6 +1,7 @@
 import { LinkButton } from '../ui/Button'
 import { Photo } from '../ui/Photo'
 import { IMAGES, imgSources } from '../../content/images'
+import { PLATFORM_PREVIEW_CTA } from '../../content/platform'
 import { approvedStatement } from '../../content/statement'
 import { href } from '../../content/site'
 
@@ -12,11 +13,15 @@ import { href } from '../../content/site'
  * capital letters above a paragraph written for voters.
  *
  * The advocacy list stays inside the tinted card rather than spreading into a
- * full-width band of its own. Six items in a band would sit one scroll above
- * `PlatformPreview`'s six commitment cards with only the statistics between
- * them, and a reader meeting two six-item groups that close together will try to
- * map one onto the other. Framed by her own eyebrow, the relationship stays
- * legible: this is what she would push for, those are how she would govern.
+ * full-width band of its own.
+ *
+ * The reasoning changed shape on 2026-09-02 and the conclusion held. It used to
+ * be that six items in a band would sit one scroll above PlatformPreview's six
+ * commitment cards with only the statistics between them. Then her six BECAME
+ * the commitments, which made the preview a verbatim second printing of this
+ * card — so the preview was deleted and this is the only place her six appear on
+ * the home page. The card keeps them contained, and the button below carries the
+ * onward push the preview used to.
  */
 export function Statement({ base }: { readonly base: string }) {
   const statement = approvedStatement()
@@ -86,6 +91,18 @@ export function Statement({ base }: { readonly base: string }) {
           ))}
         </ul>
         <p className="advocacy__closer">{statement.closer}</p>
+        {/*
+          The route to the platform page, and since 2026-09-02 the main one from
+          this page. The six flip cards that used to carry people there were
+          removed because they restated these exact sentences one section below
+          this card. Primary rather than secondary: this is now the principal
+          onward link on the home page, not a secondary option beside it.
+        */}
+        <div style={{ marginTop: 20 }}>
+          <LinkButton variant="primary" href={href(base, 'platform/')}>
+            {PLATFORM_PREVIEW_CTA}
+          </LinkButton>
+        </div>
       </div>
     </section>
   )
