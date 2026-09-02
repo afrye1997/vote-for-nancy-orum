@@ -129,40 +129,52 @@
 }
 
 /*
- * Doubled on 2026-09-02 at the campaign's request — 900ms became 1800, and the
- * 420/840 delays became 840/1680. The last clause now settles at 3.48s where it
- * used to settle at 1.74s.
+ * THREE SECONDS, END TO END. Set on 2026-09-02 at the campaign's request.
  *
- * ⚠ THIS IS THE LCP TRADE THE PREVIOUS NOTE WARNED ABOUT, TAKEN DELIBERATELY.
- * An element at opacity 0 does not count as painted, so on any page where this
- * title is the largest element, Largest Contentful Paint is now this animation
- * rather than the network. 3.48s is past Google's 2.5s "good" threshold. On the
- * home page the hero photograph is the likelier LCP element and the headline may
- * never be the one measured; on Platform and About, where there is no
- * photograph above the fold, the title is a real candidate.
+ * The arithmetic is the point, because these three numbers have to be changed
+ * together or the total drifts:
  *
- * The earlier values are one edit away if that shows up in the field, and there
- * is a middle setting: doubling the DURATION alone and leaving the delays at
- * 420/840 lands the last clause at 2.64s, which keeps most of the slowness and
- * stays under the threshold.
+ *   clause 1   starts 0ms      settles 1600ms
+ *   clause 2   starts 700ms    settles 2300ms
+ *   clause 3   starts 1400ms   settles 3000ms   ← the whole headline
  *
- * Anyone who has asked their system for less motion is unaffected either way —
- * the whole block is behind `no-preference` and the base state is visible.
+ * So the total is `nth-child(3)`'s delay plus the duration. Want a different
+ * total T with three clauses? Pick a duration, then set the gap to
+ * (T - duration) / 2 and the third delay to twice the gap.
  *
- * Two clauses or three: a two-clause title simply never matches :nth-child(3).
+ * It has been 1.74s (a compressed quarter of the mockup's 300/1300/2300), then
+ * 3.48s when the campaign asked for double, and now 3.0s.
+ *
+ * ⚠ THE LCP TRADE, TAKEN KNOWINGLY. An element at opacity 0 does not count as
+ * painted, so wherever this title is the largest element on its page, Largest
+ * Contentful Paint is this animation rather than the network. 3.0s is still past
+ * Google's 2.5s "good" threshold — closer than 3.48s was, and not under it. On
+ * the home page the hero photograph is the likelier candidate and the headline
+ * may never be what gets measured; on Platform and About there is no photograph
+ * above the fold, so there the title really is the one.
+ *
+ * If that shows up in the field, the lever with the least cost to the effect is
+ * the DELAYS rather than the duration: 1600ms with 450/900 lands the last clause
+ * at 2.5s and still reads as a stagger.
+ *
+ * Anyone who has asked their system for less motion is unaffected — the whole
+ * block is behind `no-preference` and the base state is visible.
+ *
+ * Two clauses or three: a two-clause title simply never matches :nth-child(3),
+ * so a two-clause title settles at 2300ms rather than 3000.
  */
 @media (prefers-reduced-motion: no-preference) {
   .stagger > span {
     opacity: 0;
-    animation: fade-up 1800ms var(--ease-organic) forwards;
+    animation: fade-up 1600ms var(--ease-organic) forwards;
   }
 
   .stagger > span:nth-child(2) {
-    animation-delay: 840ms;
+    animation-delay: 700ms;
   }
 
   .stagger > span:nth-child(3) {
-    animation-delay: 1680ms;
+    animation-delay: 1400ms;
   }
 }
 
