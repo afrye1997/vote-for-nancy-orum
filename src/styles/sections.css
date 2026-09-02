@@ -206,6 +206,49 @@
  */
 .split--statement {
   grid-template-columns: 0.9fr 1.1fr;
+  /*
+   * `.split` is start-aligned, which leaves each column exactly as tall as its
+   * own content. The sign at the foot of the left column is positioned with
+   * `margin-top: auto`, and auto margins have nothing to push against in a box
+   * that has already shrunk to fit — so the column has to be stretched to the
+   * row's height first. This is the line that makes the sign meet the advocacy
+   * card's lower edge instead of hanging just below the button.
+   */
+  align-items: stretch;
+}
+
+/*
+ * The yard sign at the foot of the statement's left column.
+ *
+ * `margin-top: auto` is what makes it fill rather than merely sit: the column is
+ * a flex child of a stretched grid row, so pushing the sign to the bottom lands
+ * it level with the advocacy card's lower edge instead of leaving the gap under
+ * it. Needs the `display: flex` on the column for that to bite.
+ *
+ * Capped rather than full-width — at the column's full measure the sign competes
+ * with the card beside it, and this is a signature at the end of an argument,
+ * not an illustration of it.
+ */
+.statement__col {
+  display: flex;
+  flex-direction: column;
+}
+
+.statement__sign {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  margin-top: var(--space-8);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* Stacked, there is no gap to fill and no card to line up with — the sign
+   becomes something the reader has to scroll past to reach the form. */
+@media (max-width: 900px) {
+  .statement__sign {
+    display: none;
+  }
 }
 
 .split__emphasis {

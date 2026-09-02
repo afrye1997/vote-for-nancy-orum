@@ -70,30 +70,40 @@
  * the second. `PRIORITIES_APPROVED_BY_CANDIDATE` stays false.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * STILL TO CONFIRM WITH HER — none of these blocks the page
+ * CONFIRMED BY HER, 2026-09-02
  * ─────────────────────────────────────────────────────────────────────────────
  *  1. The hero line. Her statement runs ~400 words and `SITE.heroLede` is one
- *     line over a photograph, so the statement went here and that slot took the
- *     second half of her closing sentence. See the 2026-08-27 note in site.ts.
- *  2. The headline's capitals. She wrote "Protect What We Love. Plan What Comes
- *     Next."; it is set in sentence case because every other heading on the site
- *     is. One word from her restores her capitals.
- *  3. "our little Sugar Creek." The watercourse is properly Little Sugar Creek,
- *     so her lowercase reads either as an affectionate diminutive or as a
- *     mis-cased proper noun. We cannot resolve that for her. Note also that this
- *     is the site's first reference to a named third-party project, and it
- *     asserts a benefit — "will benefit our residents" — that nobody here has
- *     verified. It is published as her opinion, which it is, and it must not be
- *     mistaken later for a checked claim.
- *  4. The two eyebrows. "My power message" was strategy-deck vocabulary being
- *     rendered to voters in capitals; it is now "Where I stand". The card's is
- *     "What I would advocate for", her own phrase minus "Here's".
- *     (`PRIORITIES_INTRO.eyebrow` is also "Where I stand" — harmless while
- *     nothing renders that file, a collision the day anything does.)
- *  5. What retired. Six one-line vision items from the design project are gone,
- *     including "Build partnerships instead of silos." Those themes still reach
- *     the same page through commitment 04's card, but she should hear it from
- *     us rather than notice it.
+ *     line over a photograph, so the statement lives here and that slot took the
+ *     second half of her closing sentence. She confirmed that is the sentence
+ *     she wants up there. See the 2026-08-27 note in site.ts.
+ *  2. The headline's capitals. RESTORED at her request — see the note on
+ *     `heading` below. It had been set in sentence case to match the rest of the
+ *     site; she wants her capitals, so it keeps them.
+ *  3. "little Sugar Creek." CHANGED to "Little Sugar Creek" at her request: she
+ *     was asked whether the lowercase was affection or a mis-cased proper noun
+ *     and chose the proper name.
+ *
+ *     ⚠ The rest of that sentence stands unchanged and still needs care. This is
+ *     the site's only reference to a named third-party project, and it asserts a
+ *     benefit — "will benefit our residents" — that nobody here has verified. It
+ *     is published as her opinion, which it is. Do not let a later editor mistake
+ *     it for a checked claim.
+ *  4. The two eyebrows — "Where I stand" and "What I would advocate for" — both
+ *     confirmed. ("My power message" was strategy-deck vocabulary being rendered
+ *     to voters in capitals. `PRIORITIES_INTRO.eyebrow` is also "Where I stand":
+ *     harmless while nothing renders that file, a collision the day anything
+ *     does.)
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * STILL OPEN — one question, and it does not block the page
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  5. What retired. Six one-line vision items from the design project went when
+ *     her statement replaced them, including "Build partnerships instead of
+ *     silos" and "Learn from successful organizations and communities." She was
+ *     asked whether she wanted any of the six kept and answered "yes" to a
+ *     question phrased so that yes and no both read as agreement — so the answer
+ *     is not usable and has been put back to her. The themes still reach the same
+ *     page through commitment 04's card, so nothing is lost while this is open.
  */
 
 export type AdvocacyItem = {
@@ -156,7 +166,14 @@ export function approvedStatement(): Statement {
 
 const STATEMENT: Statement = {
   eyebrow: 'Where I stand',
-  heading: 'Protect what we love. Plan what comes next.',
+  /*
+   * Her capitals, restored 2026-09-02 at her request. It was set in sentence
+   * case to match every other heading on the site; she was asked and said she
+   * wanted the capitals back, so this heading is now the one place on the site
+   * that is title case. That is a deliberate exception, not an oversight —
+   * leave it alone.
+   */
+  heading: 'Protect What We Love. Plan What Comes Next.',
   emphasis: 'I believe Bella Vista can move forward without losing what makes us Bella Vista.',
   paragraphs: [
     "Growth shouldn't mean commercial development everywhere, clear-cutting our natural landscape, overwhelming our roads, or changing the character of our neighborhoods.",
@@ -170,8 +187,13 @@ const STATEMENT: Statement = {
       id: 'natural-areas',
       label: 'Protect natural areas',
       body: 'Strengthen reasonable tree preservation, buffers, drainage, and environmentally sensitive development standards.',
+      /*
+       * "little Sugar Creek" → "Little Sugar Creek", 2026-09-02. She was asked
+       * whether the lowercase was affection or a mis-cased proper noun, and she
+       * chose the proper name. The watercourse is Little Sugar Creek.
+       */
       aside:
-        'A great example is what is happening with our little Sugar Creek. What an exciting project that will benefit our residents.',
+        'A great example is what is happening with our Little Sugar Creek. What an exciting project that will benefit our residents.',
     },
     {
       id: 'neighborhoods',

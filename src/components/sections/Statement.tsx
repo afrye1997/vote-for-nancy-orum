@@ -1,4 +1,6 @@
 import { LinkButton } from '../ui/Button'
+import { Photo } from '../ui/Photo'
+import { IMAGES, imgSources } from '../../content/images'
 import { approvedStatement } from '../../content/statement'
 import { href } from '../../content/site'
 
@@ -20,7 +22,7 @@ export function Statement({ base }: { readonly base: string }) {
   const statement = approvedStatement()
   return (
     <section className="split split--statement container">
-      <div className="reveal">
+      <div className="statement__col reveal">
         <p className="eyebrow">{statement.eyebrow}</p>
         <h2 className="section__title">{statement.heading}</h2>
         {/*
@@ -39,6 +41,24 @@ export function Statement({ base }: { readonly base: string }) {
             {statement.cta}
           </LinkButton>
         </div>
+        {/*
+          The sign closes the column.
+
+          The advocacy card beside this one is the taller of the two by a wide
+          margin — six items against five paragraphs — so this column ran out
+          with roughly 250px of empty page under the button. The sign fills it
+          with the thing the whole section is arguing for, and it is the same
+          derivative the footer already loads, so it costs a cache hit rather
+          than a download.
+
+          Not decorative, so not alt="". Someone who cannot see it should still
+          learn that her sign carries the slogan the section closes on.
+        */}
+        <Photo
+          className="statement__sign"
+          {...imgSources(base, IMAGES.yardSign)}
+          image={IMAGES.yardSign}
+        />
       </div>
       <div className="card card--tint reveal">
         <p className="eyebrow">{statement.advocacyEyebrow}</p>
