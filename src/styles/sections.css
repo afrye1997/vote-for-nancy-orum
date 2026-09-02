@@ -879,6 +879,20 @@
   margin-top: 14px;
 }
 
+/*
+ * The words picked out of her biography — family, growth, Bella Vista.
+ *
+ * 600 rather than the browser's 700, and navy rather than the body's slate.
+ * Figtree ships a real 700 so either would render honestly, but these land
+ * about once a paragraph across eighteen of them: at full bold the page reads
+ * as spotted. The colour is doing as much of the work as the weight, which is
+ * the same pairing `.advocacy__label` uses to lift a phrase out of a sentence.
+ */
+.bio__text strong {
+  font-weight: var(--weight-semibold);
+  color: var(--navy-900);
+}
+
 .credo {
   margin-top: var(--space-8);
   padding-left: var(--space-6);

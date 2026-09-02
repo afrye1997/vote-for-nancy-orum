@@ -1,5 +1,41 @@
+import { Fragment } from 'react'
 import { BIO_SECTION } from '../../content/about'
 import { BIO_CREDO, BIO_SIGNOFF, FULL_BIO, PULLQUOTE_PROPOSAL } from '../../content/bio'
+
+/**
+ * The three words the campaign asked to have picked out of the biography:
+ * family, growth, and Bella Vista. Across her eighteen paragraphs that is 5, 2
+ * and 12 matches — roughly one a paragraph, which is emphasis rather than
+ * highlighter.
+ *
+ * Longest alternative first. "Bella Vista" has to be offered before the single
+ * words or an engine that took the shorter match could strand "Vista".
+ *
+ * Case-insensitive, and the ORIGINAL casing is what gets rendered — she writes
+ * both "Family" and "family", and both should keep the capital she gave them.
+ */
+const EMPHASISE = /\b(Bella Vista|family|growth)\b/gi
+
+/**
+ * Wraps those words in <strong> at render time.
+ *
+ * Deliberately NOT done by editing the strings in bio.ts. Her paragraphs are
+ * verbatim and that file forbids rewriting them; putting markup inside her
+ * sentences would make every future reader of it wonder which parts are hers.
+ * Emphasis is typography, so it lives in the component that sets the type.
+ *
+ * `split` with a capturing group returns [text, match, text, match, ...], so the
+ * odd indices are exactly the words to wrap.
+ */
+function emphasise(text: string) {
+  return text.split(EMPHASISE).map((part, i) =>
+    i % 2 === 1 ? (
+      <strong key={`${part}-${i}`}>{part}</strong>
+    ) : (
+      <Fragment key={`${part.slice(0, 12)}-${i}`}>{part}</Fragment>
+    ),
+  )
+}
 
 /**
  * Nancy's biography, verbatim.
@@ -32,9 +68,18 @@ export function Biography() {
         ) : null}
         <div className="bio__text">
           {FULL_BIO.map((paragraph) => (
-            <p key={paragraph.id}>{paragraph.text}</p>
+            <p key={paragraph.id}>{emphasise(paragraph.text)}</p>
           ))}
         </div>
+        {/*
+          The credo is NOT emphasised, and that is a constraint rather than a
+          preference. It is set in --font-display, and tokens.css records that
+          the display stack has no real bold on any platform — Libre Caslon
+          Display ships one weight. A <strong> in here would ask for a face that
+          does not exist and get whichever synthetic the device improvises, which
+          is the exact bug that made the growth figures look unbold on a phone.
+          It is already the most emphasised type in the section anyway.
+        */}
         <ul className="credo">
           {BIO_CREDO.map((line) => (
             <li key={line}>{line}</li>
