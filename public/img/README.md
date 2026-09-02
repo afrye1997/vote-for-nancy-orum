@@ -37,7 +37,21 @@ Google Drive files:
 | `walk-card-back-2026.png` | `2.png` | 1650×1275. Reference only, same reason. |
 
 She also shared `large road side banner.png` (19 MB, the same sign artwork at
-banner scale). Nothing uses it, and it is not in `assets/`.
+banner scale). Nothing uses it yet, and it is not in `assets/` — it is over the
+10 MB cap on programmatic Drive downloads and has to be saved by hand. It is the
+best candidate for the wide header lockup this file still asks for below.
+
+⚠ `assets/nancy-creek-2026-EXTRACTED.png` is **staged, not used, and should not
+be used as it stands.** The candidate asked on 2026-09-02 for the creek
+photograph on the back of her walk card to go on the site. That photograph exists
+here only inside the printed card, with "NANCY" and "ORUM" set across it, so this
+is the largest rectangle of it that carries no type: **515×688**. The About page
+portrait it would naturally replace is 1200×800 and renders at up to 600 CSS
+pixels wide, which needs about 1200 real ones. Shipping this would put a visibly
+soft picture of the candidate on the page about her.
+
+Ask her designer for the original camera file — it certainly exists, because the
+card was made from it — and then this extract can be deleted.
 
 The design project is **not** the master for these four — her Drive is. If
 `assets/` is lost, re-exporting the design project restores the twelve older

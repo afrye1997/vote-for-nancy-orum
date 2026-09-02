@@ -152,10 +152,14 @@ export const LEGAL_PLACEHOLDER = 'INSERT HERE'
  * to elect Nancy Orum", which is how a designer set the type, whereas this is
  * the string the campaign wrote into its site file.
  *
- * ⚠ STILL WORTH ONE PHONE CALL. NEEDED-FROM-CAMPAIGN.md §2 asks for the name
- * exactly as filed, and nobody has yet compared this against the filing itself.
- * Capitalisation is the usual discrepancy. Benton County Clerk, (479) 271-1013.
- * If it differs, change it here — this is the only place it appears.
+ * ✅ CONFIRMED BY THE CANDIDATE, 2026-09-02. Asked to check the name against the
+ * filing, she confirmed it reads exactly as below. It also matches the
+ * disclaimer printed on her 2026 walk card, yard sign and logo, which is a
+ * second independent witness to the same string.
+ *
+ * That closes NEEDED-FROM-CAMPAIGN.md §2. If it ever needs re-checking, the
+ * source of truth is the filing itself — Benton County Clerk, (479) 271-1013 —
+ * and this is the only place in the codebase the name appears.
  */
 export const COMMITTEE_NAME: string = 'Committee to Elect Nancy Orum'
 

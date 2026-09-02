@@ -16,9 +16,21 @@
  * What is left here is the design project's, and the header above is true of it.
  */
 
-/** The band that closes every page. */
+/**
+ * The band that closes every page.
+ *
+ * "are still ahead of us", restored 2026-09-02 at her request. The design
+ * project had softened her own sentence — bio.ts has "I am running for City
+ * Council because I believe Bella Vista's best days ARE still ahead of us" — into
+ * "can still be", which turns an assertion into a possibility. She was asked and
+ * wanted the stronger version back, so this is her line again.
+ *
+ * She was asked about the second line in the same breath, since it leans on
+ * "together", the word the headline retired in favour of "Prosper." She chose to
+ * keep it. It stays.
+ */
 export const CTA_BAND = {
-  title: 'Bella Vista’s best days can still be ahead of us.',
+  title: 'Bella Vista’s best days are still ahead of us.',
   sub: 'Let’s build them together.',
 } as const
 

@@ -94,16 +94,13 @@
  *     harmless while nothing renders that file, a collision the day anything
  *     does.)
  *
- * ─────────────────────────────────────────────────────────────────────────────
- * STILL OPEN — one question, and it does not block the page
- * ─────────────────────────────────────────────────────────────────────────────
  *  5. What retired. Six one-line vision items from the design project went when
  *     her statement replaced them, including "Build partnerships instead of
- *     silos" and "Learn from successful organizations and communities." She was
- *     asked whether she wanted any of the six kept and answered "yes" to a
- *     question phrased so that yes and no both read as agreement — so the answer
- *     is not usable and has been put back to her. The themes still reach the same
- *     page through commitment 04's card, so nothing is lost while this is open.
+ *     silos" and "Learn from successful organizations and communities." Asked
+ *     whether she wanted any of the six back, she said all six can stay gone.
+ *     They are preserved in the SUPERSEDED block at the foot of this file.
+ *
+ * Nothing on this list is open. The statement is settled copy.
  */
 
 export type AdvocacyItem = {
