@@ -110,12 +110,18 @@ const TARGETS = {
   'residents-meeting.jpeg': { px: 1040 },
   /* Commitment 06's photograph, supplied 2026-09-02. */
   'trail-riders.jpeg': { px: 1040 },
+  /* Commitments 02 and 04, supplied 2026-09-02. */
+  /* 980, not 1040: this one arrived only 1000px wide and the target must sit
+     below the source or the AVIF will not decode — see the guard below. */
+  'lake-paddleboarding.jpeg': { px: 980 },
   /*
-   * Commitment 04's photograph, supplied 2026-09-02. 1024 rather than the 1040
-   * its neighbours use, because the file ARRIVED at 1024 wide — it is a
-   * web-sized copy, and asking sips for 1040 would upscale it.
+   * 1036, not 1040, and the four pixels matter. At 1040 this source lands on
+   * 1040x617 and sips writes an AVIF that CHROME WILL NOT DECODE — see the
+   * second failure mode in the note above the resample guard. 1036, 1000, 960,
+   * 900 and 1200 all decode; only 1040 fails. Do not "tidy" this to match its
+   * neighbours.
    */
-  'bella-vista-bridge.jpeg': { px: 1000 },
+  'bvpd-badge.jpeg': { px: 1036 },
   'hero-arms-crossed.jpeg': { px: 1800 },
   'community-event.jpeg': { px: 1800 },
   'campaign-booth.jpeg': { px: 1040 },
@@ -232,6 +238,26 @@ for (const [file, target] of Object.entries(TARGETS)) {
    *
    * Found on 2026-09-02 with a 1024px source targeted at 1024. Dropping the
    * target to 1000 forced a resample and the AVIF decoded.
+   *
+   * ─────────────────────────────────────────────────────────────────────────
+   * ⚠ AND A SECOND FAILURE MODE THIS CHECK DOES NOT CATCH
+   * ─────────────────────────────────────────────────────────────────────────
+   * sips also writes undecodable AVIFs from some perfectly ordinary
+   * source/target combinations, with no pattern anyone has pinned down. The
+   * BVPD badge at 1040 (landing on 1040x617) produces one; at 1036, 1000, 960,
+   * 900 and 1200 it is fine, and other images at 1040 are fine. Neighbouring
+   * sizes work, so it is not the odd height.
+   *
+   * There is no build-time test for it. `sips` DECODES ITS OWN BAD OUTPUT
+   * HAPPILY — it round-trips the broken file back to a valid PNG — so the only
+   * oracle is a browser, and making this script depend on Chrome is worse than
+   * the bug.
+   *
+   * THE SYMPTOM, so the next person recognises it in one look: a card renders
+   * with a blank hole where the photograph goes. Both files exist, both are
+   * valid to `file` and to sips, both serve 200, every gate passes. Open the
+   * .avif on its own in a browser — a blank grey page means this. Nudge the
+   * target by a few pixels and it goes away.
    */
   const source = dimensions(from)
   if (Math.max(source.width, source.height) <= target.px) {

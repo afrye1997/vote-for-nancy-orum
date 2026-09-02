@@ -193,33 +193,59 @@ export const IMAGES = {
     focus: '58% 42%',
   },
   /**
-   * Commitment 04, "Verify infrastructure". Supplied 2026-09-02.
+   * Commitment 02, "Protect neighborhoods". Supplied 2026-09-02.
    *
-   * A trail bridge over a creek in Bella Vista — the Central Bridges, by the
-   * filename it arrived under.
+   * Paddle boarders on one of the lakes, with houses along the far shore. Her
+   * card is about keeping higher-impact commercial and tourism development in
+   * appropriate activity areas "not throughout residential Bella Vista", and
+   * this is the one frame we have showing recreation and homes in the same view.
    *
-   * ⚠ THE LOOSEST FIT OF THE FIVE, and worth a second look. Her card is about
-   * whether "roads, sewer, utilities, Police, Fire, and EMS can support
-   * significant growth". This is a recreational bridge: built infrastructure,
-   * certainly, but amenity rather than the services she is asking about. It is
-   * here because the campaign chose it. A road, a lift station or a fire
-   * appliance would say what she is saying; see NEEDED-FROM-CAMPAIGN.md §9.
+   * ⚠ Provenance unconfirmed. `Bella-Vista-Paddle-Boarding-2018-06-KSJ_5943ps`
+   * is a photographer's own naming — initials, frame number, a retouch suffix —
+   * so it is professional work, most likely the POA's or a tourism body's.
    *
-   * It is also the only borrowed photograph on the site that is verifiably OF
-   * Bella Vista, which is worth something on a card about this city's capacity.
-   *
-   * ⚠ Provenance unconfirmed, like 03 and 06. The name is a WordPress slug with a
-   * `-1024x683` size suffix, so this is a resized copy from somebody's website —
-   * a trails or tourism site. It arrived at 1024 wide, which is why its
-   * derivative is 1024 and not the 1040 its neighbours use.
+   * Arrived 1000px wide, which is why its derivative is 980; the target has to
+   * sit below the source. See the guard in scripts/images.mjs.
    */
-  bellaVistaBridge: {
-    file: 'bella-vista-bridge.jpeg',
-    alt: 'A steel trail bridge over a shallow creek in Bella Vista',
-    width: 1000,
-    height: 667,
-    /* The bridge sits across the upper third; a centre crop would show only water. */
-    focus: '50% 33%',
+  lakePaddleboarding: {
+    file: 'lake-paddleboarding.jpeg',
+    alt: 'Paddle boarders on a Bella Vista lake, with lakeside homes on the far shore',
+    width: 980,
+    height: 550,
+    /* Holds the houses on the left shore in frame, not just open water. */
+    focus: '42% 45%',
+  },
+  /**
+   * Commitment 04, "Verify infrastructure". Supplied 2026-09-02, replacing a
+   * trail bridge that was the loosest fit on the page. Her card names Police
+   * among the services that have to carry growth, and this is that.
+   *
+   * ─────────────────────────────────────────────────────────────────────────
+   * ⚠ THIS ONE IS NOT A COPYRIGHT QUESTION. IT IS AN ENDORSEMENT ONE.
+   * ─────────────────────────────────────────────────────────────────────────
+   * A Bella Vista Police Department badge, shoulder flash and radio, close
+   * enough to read. On a candidate's platform page, a public agency's insignia
+   * reads as that agency endorsing her. Police departments generally cannot
+   * endorse candidates and many forbid their insignia in political material
+   * outright — so this is the kind of thing that draws a call from the chief
+   * rather than a letter from a lawyer.
+   *
+   * NEEDED-FROM-CAMPAIGN.md already said Police, Fire or EMS imagery should be
+   * used "only with the crews' own consent, which is theirs to give and not ours
+   * or hers." That still stands, and it is now a thing to obtain rather than a
+   * thing to consider. Get it in writing from BVPD or the city before launch, or
+   * swap this for a road, a lift station, or an appliance with no insignia in
+   * shot.
+   *
+   * The alt text names the department because the badge does; describing it
+   * vaguely would not make the insignia any less legible.
+   */
+  bvpdBadge: {
+    file: 'bvpd-badge.jpeg',
+    alt: 'A Bella Vista Police Department corporal’s badge on a uniform shirt',
+    width: 1036,
+    height: 614,
+    focus: '52% 55%',
   },
   /** Commitment 01, "Protect natural areas" — see ART in platform.ts. */
   tanyardCreek: {

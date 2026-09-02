@@ -118,47 +118,61 @@ pale ones — and the header picks by page. That retired the last of the old log
 from the site. Nothing outstanding here.
 
 ### 9. Photographs
-Five of her six platform cards now carry one, and there is a rights question on
-four — §9a.
+All six platform cards now carry one. What is left is permissions, not pictures
+— see §9a, which is the most important open item on this list.
 
-**Card 02 "Protect neighborhoods" has no picture.** Nothing in the project
-honestly shows a residential street, so rather than put a misleading picture over
-a policy position it ships without one.
-
-**Card 04 "Verify infrastructure" has the loosest fit of the five.** Her card is
-about whether roads, sewer, utilities, Police, Fire and EMS can carry growth; the
-photograph is a trail bridge. It is built infrastructure and it is genuinely of
-Bella Vista, which is more than the others can say — but a road, a lift station
-or a fire appliance would say what she is actually saying.
-
-**Her headshot is on no page of the site**, since the commitment it used to
-illustrate is gone.
-
-What would fix it, roughly in order of value:
+Still worth sending if they exist:
 
 1. **Little Sugar Creek** — she names the project on her first commitment, and
    the waterfall currently on that card is Tanyard Creek, a different one.
-2. **A residential street**, for "Protect neighborhoods" — the one card with no
-   picture at all.
-3. **Police, Fire or EMS** — only with the crews' own consent, which is theirs to
-   give and not ours or hers. This would also replace the trail bridge on card 04
-   with something that matches what that card says.
-4. **A Bella Vista road or intersection**, to replace the borrowed one on card 03
-   (see §9a).
-5. **The creek photograph from the back of her walk card**, at full resolution,
+2. **A road or intersection** in Bella Vista, to replace the borrowed
+   "Welcome to Arkansas" shot on card 03.
+3. **The creek photograph from the back of her walk card**, at full resolution,
    from whoever designed the card. Nancy asked for it on the site; the only copy
    we have is the printed card, with her name set across the picture, which
    leaves 515 usable pixels where the page needs about 1200. The card was laid
    out from the original, so that file exists.
-6. **A new headshot**, or confirmation that the one we have is still the one.
+4. **A new headshot**, or confirmation the one we have is still the one. It is
+   currently on no page of the site.
 
-### ⚠ 9a. Three photographs need their rights cleared before launch
+### ⚠ 9a. Five photographs need permission before launch
 
-This is the one thing on the site that could cost the campaign money, so it is
-worth doing before launch rather than after.
+This is the one thing on the site that could cost the campaign money or
+goodwill, and four of the five are one email each.
 
-| Card | Arrived as | What the filename says |
+| Card | Arrived as | What it looks like |
 |---|---|---|
+| 02 Protect neighborhoods | `Bella-Vista-Paddle-Boarding-2018-06-KSJ_5943ps.jpg` | A photographer's own file naming — professional work, most likely the POA's or a tourism body's. |
+| 03 Address traffic | `Arkansas_Sign_t1684.JPG` | `_t1684` is the suffix a news CMS puts on a resized web copy. EXIF stripped. |
+| 05 Give residents a voice | `783986378_1221117…_n.jpg` | A Facebook CDN name — most likely saved from the campaign's own page, so probably fine. |
+| 06 Make tourism work | `629f6422f64caf17d0821b0f_footer 03.jpg` | A Webflow asset id and a slot name: a marketing photo from somebody's website. |
+
+For each, either **say where it came from and that the campaign may use it**, or
+**send a replacement the campaign owns**.
+
+### ⚠⚠ Card 04 is different, and it is the one to deal with first
+
+The photograph on "Verify infrastructure" is a **Bella Vista Police Department
+badge**, close enough to read, with the shoulder flash and radio in shot.
+
+This is not a copyright question. **A public agency's insignia on a candidate's
+platform page reads as that agency endorsing her.** Police departments generally
+cannot endorse candidates, and many prohibit their insignia in political material
+outright. This is the kind of thing that produces a call from the chief, and the
+campaign would be in the wrong.
+
+Get written permission from BVPD or the city before launch, or swap it for a
+road, a lift station, or an appliance with no insignia in shot. The same goes for
+Fire and EMS imagery if any is sent: **their consent is theirs to give, not the
+campaign's to assume.**
+
+**One more, on card 06.** The leading rider's jersey carries a legible bike-shop
+name. Same implied-endorsement problem in miniature, and one a business is
+entitled to decide for itself. The picture is cropped so the branding falls
+outside the visible band, but the full file still contains it, and anyone
+re-cropping it needs to know why the crop sits where it does.
+
+---|---|---|
 | 03 Address traffic | `Arkansas_Sign_t1684.JPG` | `_t1684` is the suffix a news CMS puts on a resized web copy. EXIF stripped. |
 | 05 Give residents a voice | `783986378_1221117…_n.jpg` | A Facebook CDN name — most likely saved from the campaign's own page, so probably fine. |
 | 06 Make tourism work | `629f6422f64caf17d0821b0f_footer 03.jpg` | A Webflow asset id and a slot name: a marketing photo taken off somebody's website. |
