@@ -108,6 +108,8 @@ const TARGETS = {
    * to the card's 520×220 band — see the focus point in images.ts.
    */
   'residents-meeting.jpeg': { px: 1040 },
+  /* Commitment 06's photograph, supplied 2026-09-02. */
+  'trail-riders.jpeg': { px: 1040 },
   'hero-arms-crossed.jpeg': { px: 1800 },
   'community-event.jpeg': { px: 1800 },
   'campaign-booth.jpeg': { px: 1040 },

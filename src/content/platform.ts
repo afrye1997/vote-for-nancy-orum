@@ -104,6 +104,8 @@ const ART: Record<string, Img> = {
   /* ⚠ Rights unconfirmed — see the note on this image in images.ts. */
   'traffic-first': IMAGES.arkansasHighwaySign,
   'residents-voice': IMAGES.residentsMeeting,
+  /* ⚠ Rights unconfirmed, and a visible business name — see images.ts. */
+  tourism: IMAGES.trailRiders,
 }
 
 export const COMMITMENTS: readonly Commitment[] = approvedStatement().advocacy.map(

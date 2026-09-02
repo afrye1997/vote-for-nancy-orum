@@ -136,13 +136,29 @@ What would fix it, roughly in order of value:
 1. **Little Sugar Creek** — she names the project on her first commitment, and
    the waterfall currently on that card is Tanyard Creek, a different one.
 2. **A road or intersection** in Bella Vista, for "Address traffic before
-   development." ⚠ **There is a placeholder on that card now and it needs
-   clearing before launch.** It arrived as `Arkansas_Sign_t1684.JPG` — 1500×999,
-   EXIF stripped, with the filename pattern a news site gives a resized web copy.
-   It may be perfectly licensed, but nobody has said where it came from, and a
-   campaign publishing a newspaper's photograph is the kind of mistake that
-   arrives as a letter. Either confirm the source and licence, or send a picture
-   of a Bella Vista road that the campaign owns.
+   development."
+
+### ⚠ 9a. Three photographs on the platform page need their rights cleared
+
+This is now the one thing on the site that could cost the campaign money, so it
+is worth doing before launch rather than after.
+
+| Card | Arrived as | What the filename says |
+|---|---|---|
+| 03 Address traffic | `Arkansas_Sign_t1684.JPG` | `_t1684` is the suffix a news CMS puts on a resized web copy. EXIF stripped. |
+| 05 Give residents a voice | `783986378_1221117…_n.jpg` | A Facebook CDN name — most likely saved from the campaign's own page, so probably fine. |
+| 06 Make tourism work | `629f6422f64caf17d0821b0f_footer 03.jpg` | A Webflow asset id and a slot name: a marketing photo taken off somebody's website. |
+
+For each, either **say where it came from and that the campaign may use it**, or
+**send a replacement the campaign owns**. A candidate publishing a newspaper's or
+a business's photograph is the kind of mistake that arrives as a letter.
+
+**One extra thing on card 06, which is not about copyright.** The leading rider's
+jersey carries a legible bike-shop name. A named local business on a candidate's
+platform page reads as that business endorsing her — a claim nobody has made, and
+one the business is entitled to decide for itself. The picture is cropped so the
+branding falls outside the visible band, but the full file still contains it, and
+anyone re-cropping this needs to know why it sits where it does.
 3. **A residential street**, for "Protect neighborhoods."
 4. **Police, Fire or EMS** — only with the crews' own consent, which is theirs to
    give and not ours or hers.

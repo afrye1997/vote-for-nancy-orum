@@ -164,6 +164,34 @@ export const IMAGES = {
     height: 1040,
     focus: '50% 40%',
   },
+  /**
+   * Commitment 06, "Make tourism work for residents". Supplied 2026-09-02.
+   *
+   * Two riders on a wooded singletrack under a limestone bluff. Mountain biking
+   * is what actually brings visitors to this corner of Arkansas, so it
+   * illustrates her point better than a storefront would.
+   *
+   * ⚠ PROVENANCE UNCONFIRMED — clear it before launch, like commitment 03's.
+   * It arrived as `629f6422f64caf17d0821b0f_footer 03.jpg`. That prefix is a
+   * Webflow asset id and "footer 03" is a slot name, so this is a marketing
+   * photograph lifted from somebody's website — a bike shop, a trail group or a
+   * tourism board. Professional photography, and not the campaign's.
+   *
+   * ⚠ AND A SECOND PROBLEM, WHICH IS NOT COPYRIGHT. The leading rider's jersey
+   * carries a legible bike-shop name. A named local business on a candidate's
+   * platform page reads as that business endorsing her, which is a claim nobody
+   * has made and which businesses are entitled to decide for themselves. The
+   * `focus` below is set high and right — the trail and the bluff, not the
+   * riders' backs — so the branding falls outside the card's 520x220 band.
+   * ⚠ Do not "improve" this focus point downward without re-checking that.
+   */
+  trailRiders: {
+    file: 'trail-riders.jpeg',
+    alt: 'Two mountain bikers on a wooded trail beneath a limestone bluff',
+    width: 1040,
+    height: 694,
+    focus: '58% 42%',
+  },
   /** Commitment 01, "Protect natural areas" — see ART in platform.ts. */
   tanyardCreek: {
     file: 'tanyard-creek-falls.jpeg',
