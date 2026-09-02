@@ -229,67 +229,21 @@
 }
 
 /*
- * The statement's two columns, and which one is taller has now flipped twice.
+ * `.split--statement` has no rule of its own any more. It stays as the class the
+ * section is named by; the layout is `.split`'s own 1.1fr / 0.9fr and `start`.
  *
- * The card was briefly the taller side — six headings each trailing a 40-word
- * sentence — and this rule widened it to 1.1fr to give that text a decent
- * measure. On 2026-09-02 those sentences moved to the platform page, so the card
- * is six short headings and the prose column is much the taller of the two. The
- * widened track went with the text that needed it: this section is back on
- * `.split`'s own 1.1fr / 0.9fr, with the wider track under the prose.
+ * It carried two overrides until 2026-09-02, and both existed for one image.
+ * `align-items: stretch` made the LEFT column take the row's full height, because
+ * the yard sign at its foot was placed with `margin-top: auto` and an auto margin
+ * has nothing to push against in a box that has already shrunk to fit. Then
+ * `.split--statement .card { align-self: start }` had to opt the card back OUT of
+ * that stretch, or a card holding six short headings ended in a tall panel of
+ * empty tint.
  *
- * `align-items: stretch` stays, and only the LEFT column wants it. The yard sign
- * at the foot of that column is placed with `margin-top: auto`, and an auto
- * margin has nothing to push against in a box that has already shrunk to fit.
+ * Two rules, one cancelling the other, both serving one picture. The campaign
+ * asked for the sign to come off the home page and the scaffolding went with it.
+ * The same artwork is still in the footer of every page.
  */
-.split--statement {
-  align-items: stretch;
-}
-
-/*
- * ...and the card explicitly opts out of it.
- *
- * Stretched, a card holding six short headings takes the prose column's full
- * height and ends in a tall panel of empty tint. `align-self: start` lets it be
- * its own size while the column beside it still stretches.
- */
-.split--statement .card {
-  align-self: start;
-}
-
-/*
- * The yard sign at the foot of the statement's left column.
- *
- * `margin-top: auto` is what makes it fill rather than merely sit: the column is
- * a flex child of a stretched grid row, so pushing the sign to the bottom lands
- * it level with the advocacy card's lower edge instead of leaving the gap under
- * it. Needs the `display: flex` on the column for that to bite.
- *
- * Capped rather than full-width — at the column's full measure the sign competes
- * with the card beside it, and this is a signature at the end of an argument,
- * not an illustration of it.
- */
-.statement__col {
-  display: flex;
-  flex-direction: column;
-}
-
-.statement__sign {
-  width: 100%;
-  max-width: 340px;
-  height: auto;
-  margin-top: var(--space-8);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-}
-
-/* Stacked, there is no gap to fill and no card to line up with — the sign
-   becomes something the reader has to scroll past to reach the form. */
-@media (max-width: 900px) {
-  .statement__sign {
-    display: none;
-  }
-}
 
 .split__emphasis {
   margin-top: var(--space-3);
