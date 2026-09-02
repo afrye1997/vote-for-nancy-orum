@@ -36,10 +36,11 @@ Google Drive files:
 | `walk-card-front-2026.png` | `1.png` | 1650×1275. Reference only — no target, nothing renders it. Kept because it is where the slogan and the disclaimer wording were read from. |
 | `walk-card-back-2026.png` | `2.png` | 1650×1275. Reference only, same reason. |
 
-She also shared `large road side banner.png` (19 MB, the same sign artwork at
-banner scale). Nothing uses it yet, and it is not in `assets/` — it is over the
-10 MB cap on programmatic Drive downloads and has to be saved by hand. It is the
-best candidate for the wide header lockup this file still asks for below.
+`large road side banner.png` (19 MB) became `assets/nav-banner-2026.png` on
+2026-09-02 — cropped to the middle 76% of its width, which drops the empty sky at
+either end and leaves the sign at roughly 3:2. It is over the 10 MB cap on
+programmatic Drive downloads, so if `assets/` is ever lost this one has to be
+saved out of Drive by hand rather than fetched.
 
 ⚠ `assets/nancy-creek-2026-EXTRACTED.png` is **staged, not used, and should not
 be used as it stands.** The candidate asked on 2026-09-02 for the creek
@@ -59,8 +60,7 @@ files and none of these.
 
 | File | Used by |
 |---|---|
-| `nav-logo.png` | Header, on the dark pages (home, get involved) |
-| `nav-logo-navy.png` | Header, on the light pages, and on every page below 900px |
+| `nav-banner-2026.png` | Header, every page and every width |
 | `hero-arms-crossed.jpeg` | Home hero |
 | `campaign-booth.jpeg` | Platform commitment 4 |
 | `nancy-orum-headshot.jpeg` | Platform commitment 5 |
@@ -69,7 +69,7 @@ files and none of these.
 | `tanyard-creek-falls.png` | Platform commitment 3 |
 | `about-arkansas.png` | About page portrait |
 | `logo-circle-2026.png` | Platform commitment 6; donate page |
-| `yard-sign-2026.png` | Footer, and the yard-sign request block on the form |
+| `yard-sign-2026.png` | Footer, the yard-sign request block on the form, and the foot of the home statement |
 | `ward-map-2022.png` | "See the ward map" disclosure |
 
 ## What the script does
@@ -87,9 +87,10 @@ the full-bleed photographs — those sit under a heavy navy scrim, where finer
 detail is detail nobody can see. The table lives at the top of
 `scripts/images.mjs`.
 
-Alpha decides the fallback format. `about-arkansas`, both nav lockups,
-`logo-circle-2026` and the ward map are transparent and stay PNG; flattening them
-would put a white box around the artwork. The rest become JPEG.
+Alpha decides the fallback format. `about-arkansas`, `logo-circle-2026` and the
+ward map are transparent and stay PNG; flattening them would put a white box
+around the artwork. The rest become JPEG, the header mark included — it is a
+painted sign with no transparency in it.
 
 ## Two checks you can't get around
 
@@ -107,12 +108,13 @@ update `src/content/images.ts`. The script prints the numbers to paste in.
 
 ## Still outstanding
 
-- **A nav lockup with a transparent background** (NEEDED-FROM-CAMPAIGN.md §8).
-  Partly answered on 2026-08-27: `logo-circle-2026.png` has real alpha, and it
-  is what the donate page and the last commitment card now use. The two nav
-  lockups still have their backgrounds baked in, which is why the header ships
-  two files and swaps between them instead of recolouring one mark. A horizontal
-  lockup in the new watercolour brand is what would finish this.
+- ~~A nav lockup with a transparent background~~ (NEEDED-FROM-CAMPAIGN.md §8) —
+  **closed 2026-09-02, and not the way it was asked.** The request assumed the
+  header needed a mark it could recolour per surface. It needed a mark that does
+  not have to be recoloured at all: `nav-banner-2026.png`, cropped from the
+  campaign's roadside banner, is an opaque painted sign that reads over a
+  photograph, on the pale pages and on the narrow bar alike. One file replaced
+  two, and the header's tone-swap went with them.
 - **`og-card.jpg`** — the social preview. `scripts/prerender.mjs` emits
   `og:image` only when `SITE_ORIGIN` is set, and expects the file at
   `/img/og-card.jpg`. It is not generated from `assets/`; add it here directly,

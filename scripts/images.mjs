@@ -67,8 +67,19 @@ const OUT = 'public/img'
  * flattening them would put a white box around the artwork.
  */
 const TARGETS = {
-  'nav-logo.png': { px: 420 },
-  'nav-logo-navy.png': { px: 420 },
+  /**
+   * The header mark, 2026-09-02. Cropped from the campaign's roadside banner —
+   * the supplied file is 7037px of painting with the wordmark in the middle
+   * third, so the empty sky at either end is trimmed and what is left is the
+   * sign at roughly 3:2.
+   *
+   * JPEG, not PNG: this one is a photograph of a painting rather than a knockout,
+   * so there is no alpha to preserve and PNG would be several times the size for
+   * no benefit. It replaced `nav-logo.png` and `nav-logo-navy.png` — one file now
+   * serves both the light and dark pages, because a painted sign does not need
+   * to be recoloured for the surface behind it.
+   */
+  'nav-banner-2026.png': { px: 520, jpeg: true },
   'about-arkansas.png': { px: 1200 },
   /**
    * The 2026 circular logo, supplied by the campaign on 2026-08-27. Stays PNG:

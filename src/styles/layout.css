@@ -76,16 +76,28 @@
 }
 
 /*
- * Back to 140px, the height this knockout was drawn for. It can run taller than
- * the full-bleed signs did in the same 150px bar because it is not a rectangle:
- * the PNG carries its own transparent margin, so a 140px box shows roughly 90px
- * of ink and never touches the edges the way an all-ink crop at 140px did.
+ * 112px, and the drop from 140 is the whole story of this rule.
  *
- * No border-radius — the corners are transparent, so there is nothing to round.
+ * 140px was the height the old knockout was drawn for, and it worked because
+ * that PNG carried its own transparent margin — a 140px box showed roughly 90px
+ * of ink and never reached its own edges. The 2026 mark is a painted sign that
+ * is opaque corner to corner, so at 140px it would put a 210×140 block of colour
+ * at the top of every page. This file already recorded that the full-bleed signs
+ * looked wrong at that size; they did, for exactly this reason.
+ *
+ * 112px shows the same amount of ink the old lockup did while occupying less of
+ * the bar, and it keeps the office strip along the bottom readable — that strip
+ * is why the mark is cropped to include it rather than to the name alone.
+ *
+ * The corners ARE rounded now. There is a rectangle to round.
  */
 .site-header__logo img {
-  height: 140px;
+  height: 112px;
   width: auto;
+  border-radius: var(--radius-sm);
+  /* Lifts the sign off a pale page, where its own light sky would otherwise
+     bleed into the background and leave the mark looking unbounded. */
+  box-shadow: 0 1px 3px rgba(12, 31, 94, 0.18);
 }
 
 .site-nav {
@@ -299,7 +311,7 @@
    * before the hero.
    */
   .site-header__logo img {
-    height: 92px;
+    height: 76px;
   }
 
   .site-nav {

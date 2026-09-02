@@ -27,17 +27,20 @@ export type Img = {
 }
 
 export const IMAGES = {
-  navLogoLight: {
-    file: 'nav-logo.png',
-    alt: 'Nancy Orum — City Council, Ward 2',
-    width: 420,
-    height: 280,
-  },
-  navLogoNavy: {
-    file: 'nav-logo-navy.png',
-    alt: 'Nancy Orum — City Council, Ward 2',
-    width: 420,
-    height: 280,
+  /**
+   * The header mark, from the campaign's 2026 roadside banner.
+   *
+   * ONE record where there were two. `navLogoLight` and `navLogoNavy` existed
+   * because the old lockup was navy ink with nothing behind it: it vanished on
+   * the dark pages, so a white cut was needed alongside it and the header swapped
+   * between them by page tone. This is an opaque painted sign, legible on any
+   * surface, so the swap and the second file are both gone.
+   */
+  navBanner: {
+    file: 'nav-banner-2026.jpeg',
+    alt: 'Nancy Orum — Bella Vista, AR — City Council, Ward 2, Position 2',
+    width: 520,
+    height: 345,
   },
   heroArmsCrossed: {
     file: 'hero-arms-crossed.jpeg',
