@@ -129,27 +129,40 @@
 }
 
 /*
- * Delays compressed to roughly a quarter of the mockup's. The title is the
- * largest element on its page and an element at opacity 0 does not count as
- * painted — stretch the last clause out far enough and Largest Contentful Paint
- * becomes the animation rather than the network. These land a third clause at
- * 1.74s, near the mockup's feel at a little over half its cost. Going further is
- * a real LCP trade, not a taste one.
+ * Doubled on 2026-09-02 at the campaign's request — 900ms became 1800, and the
+ * 420/840 delays became 840/1680. The last clause now settles at 3.48s where it
+ * used to settle at 1.74s.
+ *
+ * ⚠ THIS IS THE LCP TRADE THE PREVIOUS NOTE WARNED ABOUT, TAKEN DELIBERATELY.
+ * An element at opacity 0 does not count as painted, so on any page where this
+ * title is the largest element, Largest Contentful Paint is now this animation
+ * rather than the network. 3.48s is past Google's 2.5s "good" threshold. On the
+ * home page the hero photograph is the likelier LCP element and the headline may
+ * never be the one measured; on Platform and About, where there is no
+ * photograph above the fold, the title is a real candidate.
+ *
+ * The earlier values are one edit away if that shows up in the field, and there
+ * is a middle setting: doubling the DURATION alone and leaving the delays at
+ * 420/840 lands the last clause at 2.64s, which keeps most of the slowness and
+ * stays under the threshold.
+ *
+ * Anyone who has asked their system for less motion is unaffected either way —
+ * the whole block is behind `no-preference` and the base state is visible.
  *
  * Two clauses or three: a two-clause title simply never matches :nth-child(3).
  */
 @media (prefers-reduced-motion: no-preference) {
   .stagger > span {
     opacity: 0;
-    animation: fade-up 900ms var(--ease-organic) forwards;
+    animation: fade-up 1800ms var(--ease-organic) forwards;
   }
 
   .stagger > span:nth-child(2) {
-    animation-delay: 420ms;
+    animation-delay: 840ms;
   }
 
   .stagger > span:nth-child(3) {
-    animation-delay: 840ms;
+    animation-delay: 1680ms;
   }
 }
 
@@ -440,17 +453,24 @@
 }
 
 /*
- * `align-items: center` since 2026-09-02.
+ * `align-items: stretch` — the flex default, restored 2026-09-02 at the
+ * campaign's request that every card be the same size.
  *
- * A flex row defaults to `stretch`, so every card took the tallest card's
- * height. That was invisible while each commitment carried 450–690 characters of
- * body copy. Her six carry 67–252, and at that spread stretching padded the
- * short cards with blank space under their last line. Centring lets each card be
- * its own height on a common axis.
+ * It was briefly `center`. When her six replaced the old commitments the cards
+ * carried 67–252 characters and no photographs, and at that spread stretching
+ * padded the short ones with obvious blank space under the last line, so letting
+ * each be its own height read better.
+ *
+ * All six have a 220px photograph now, which is most of a card's height and the
+ * same on every one of them, so the remaining spread is small enough that equal
+ * cards look deliberate where they used to look padded.
+ *
+ * Widths were never in question: `.plank` is `flex: 0 0 520px`, and one fixed
+ * basis for all six at every breakpoint.
  */
 .rail {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: var(--space-6);
   padding: var(--space-4) calc(50% - 260px) var(--space-6);
   overflow-x: auto;
