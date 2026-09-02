@@ -12,16 +12,19 @@ import { href } from '../../content/site'
  * is strategy-deck vocabulary, and it was reaching the page as an eyebrow in
  * capital letters above a paragraph written for voters.
  *
- * The advocacy list stays inside the tinted card rather than spreading into a
- * full-width band of its own.
+ * The advocacy card lists her six HEADINGS ONLY. The sentences under them, and
+ * the asides she added to three of them, are on the platform page.
  *
- * The reasoning changed shape on 2026-09-02 and the conclusion held. It used to
- * be that six items in a band would sit one scroll above PlatformPreview's six
- * commitment cards with only the statistics between them. Then her six BECAME
- * the commitments, which made the preview a verbatim second printing of this
- * card — so the preview was deleted and this is the only place her six appear on
- * the home page. The card keeps them contained, and the button below carries the
- * onward push the preview used to.
+ * That split was the campaign's call on 2026-09-02 — "leave the extra info for
+ * the platform page" — and it settles a problem this section had been working
+ * around for a week. Her six used to appear here in full AND on the platform
+ * page in full, because they are the same six; the home page was carrying a
+ * complete copy of another page. Now the home page says what she would advocate
+ * for and the platform page says what each one means, which is the division the
+ * two pages should have had from the start.
+ *
+ * It also makes the card scannable. Six headings read in a glance; six headings
+ * each trailing a 40-word sentence do not.
  */
 export function Statement({ base }: { readonly base: string }) {
   const statement = approvedStatement()
@@ -75,18 +78,7 @@ export function Statement({ base }: { readonly base: string }) {
               characters, and a truncated key would collide.
             */
             <li className="advocacy__item" key={item.id}>
-              <p>
-                {/*
-                  The dash is written as an expression, not as bare JSX text.
-                  Hero.tsx documents what this project's markup already did once
-                  with whitespace around an inline element; a literal " — " here
-                  is at the mercy of how the file happens to be wrapped.
-                */}
-                <span className="advocacy__label">{item.label}</span>
-                {' — '}
-                {item.body}
-              </p>
-              {item.aside ? <p className="advocacy__aside">{item.aside}</p> : null}
+              {item.label}
             </li>
           ))}
         </ul>
