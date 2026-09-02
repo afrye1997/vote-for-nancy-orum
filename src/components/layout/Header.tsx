@@ -7,49 +7,69 @@ import { NAV_PAGES, href } from '../../content/site'
  * The overlaid header.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * THREE SURFACES, ONE FILE — 2026-09-02
+ * THREE SURFACES, TWO CUTS OF ONE MARK
  * ─────────────────────────────────────────────────────────────────────────────
- * This used to carry two cuts of the old lockup and choose between them per
- * page, plus a third choice at narrow widths. All of that existed for one
- * reason: the old mark was ink with nothing behind it, so it was legible on
- * exactly one kind of surface and disappeared on the other. Measured over the
- * two hero photographs, 99.7% of the navy cut's ink fell below 4.5:1.
+ * The campaign supplied the 2026 lockup twice on 2026-09-02: "NANCY", the rules
+ * and the banner in white for the photographic pages, the same in navy for the
+ * pale ones, with the watercolour "ORUM" common to both. So the header chooses,
+ * and the mapping is the campaign's:
  *
- * The 2026 mark is a painted sign, opaque edge to edge. It carries its own
- * background, so it reads the same over a photograph, over the pale pages, and
- * on the light bar the header becomes below 900px. One file, no swap, no
- * media-query cut, and `tone` now decides only the colour of the links beside
- * it.
+ *   white cut   home, get involved — the two pages that open on a photograph
+ *   navy cut    about nancy, platform — the two that open on frost
  *
- * The per-page table in HANDOFF.md under "Decisions that must not be quietly
- * reversed" described the old swap and no longer applies to the logo. The rule
- * behind it still does, for the LINKS: which treatment survives over a
- * photograph is a property of the picture, not of this file, so re-measure
- * rather than assume if a hero is ever swapped.
- */
-/**
- * `tone` was a prop here until 2026-09-02 and no longer is. It chose between two
- * cuts of the old lockup; the painted mark needs no choosing. The links still
- * change with the surface, but that has always come from `.site--dark` on the
- * wrapper (layout.css) rather than from anything passed in here.
+ * This is the arrangement the OLD lockup had, and it is back for the same
+ * reason: a knockout is ink with nothing behind it, so it is legible on exactly
+ * one kind of surface. Measured over the two hero photographs, 99.7% of the old
+ * navy cut's ink fell below 4.5:1. If a hero photograph is ever swapped,
+ * re-measure rather than assume — which cut wins is a property of the picture
+ * behind it, not of anything in this file.
+ *
+ * (Between those two arrangements the header briefly wore an opaque painted sign
+ * that needed no choosing at all. It came off because opaque artwork in that
+ * corner needs a rounded edge and a shadow to look bounded, and with both it
+ * reads as a picture stuck to the page rather than as the site's mark.)
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * THE THIRD CASE THE MOCKUP NEVER HAD
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Below 900px the header stops overlaying the artwork and becomes a light bar in
+ * the flow. A dark page's white cut is then white type on a white bar — right
+ * further up the page, wrong here. The `<source media>` pair swaps the navy cut
+ * back in at that width, so `tone` decides the desktop surface and the media
+ * query decides the narrow one.
+ *
+ * Rendering both and hiding one with CSS would download both. `<picture>` picks
+ * the first matching source and fetches only that. Both cuts share one crop box,
+ * so the swap cannot resize the logo — see images.ts.
  */
 export function Header({
   base,
   current,
+  tone,
 }: {
   readonly base: string
   readonly current: string
+  /** Which surface the header sits on, which decides the cut and the links. */
+  readonly tone: 'dark' | 'light'
 }) {
-  const logo = IMAGES.logoCircle
-  const mark = imgSources(base, logo)
+  const logo = tone === 'dark' ? IMAGES.navLogoWhite : IMAGES.navLogoNavy
+  const wide = imgSources(base, logo)
+  /** The mobile header is a light surface whatever the page's tone. */
+  const narrow = imgSources(base, IMAGES.navLogoNavy)
   return (
     <header className="site-header">
       <div className="site-header__inner">
         <a className="site-header__logo" href={href(base, '')}>
           <picture>
-            <source srcSet={mark.avif} type="image/avif" />
+            {tone === 'dark' ? (
+              <>
+                <source media="(max-width: 900px)" srcSet={narrow.avif} type="image/avif" />
+                <source media="(max-width: 900px)" srcSet={narrow.fallback} />
+              </>
+            ) : null}
+            <source srcSet={wide.avif} type="image/avif" />
             <img
-              src={mark.fallback}
+              src={wide.fallback}
               alt={`${logo.alt} — home`}
               width={logo.width}
               height={logo.height}

@@ -67,6 +67,18 @@ const OUT = 'public/img'
  * them would put a white box around the artwork.
  */
 const TARGETS = {
+  /**
+   * The 2026 nav lockups, supplied 2026-09-02. Two cuts of one mark: white type
+   * for the photographic pages, navy for the pale ones. Both stay PNG — they are
+   * knockouts with real alpha, and flattening either would put a box around the
+   * artwork on whichever surface it sits on.
+   *
+   * ⚠ Both were cropped to the SAME box before landing here, chosen as the union
+   * of the two files' ink. That is what lets the header swap one for the other
+   * without the logo's box changing size — see the note in images.ts.
+   */
+  'nav-logo-white-2026.png': { px: 440 },
+  'nav-logo-navy-2026.png': { px: 440 },
   'about-arkansas.png': { px: 1200 },
   /**
    * The 2026 circular logo, supplied by the campaign on 2026-08-27. Stays PNG:

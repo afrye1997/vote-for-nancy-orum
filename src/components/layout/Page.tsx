@@ -38,7 +38,7 @@ export function Page({
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <Header base={base} current={current} />
+      <Header base={base} current={current} tone={tone} />
       <main className={tone === 'light' ? 'site__main site__main--offset' : 'site__main'} id="main">
         {children}
       </main>

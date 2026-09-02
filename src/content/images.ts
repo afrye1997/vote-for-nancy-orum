@@ -27,6 +27,36 @@ export type Img = {
 }
 
 export const IMAGES = {
+  /**
+   * The header lockup, in two cuts — 2026-09-02.
+   *
+   * The campaign supplied one mark twice: "NANCY", the rules and the banner in
+   * white for the photographic pages, and the same in navy for the pale ones.
+   * "ORUM" is the watercolour in both. The header picks by page tone.
+   *
+   * ⚠ IDENTICAL DIMENSIONS, AND THAT IS DELIBERATE. Both files were cropped to
+   * one shared box — the union of the two files' ink — rather than each to its
+   * own. Below 900px a dark page swaps the navy cut in at the same `<img>`, and
+   * two cuts with different aspect ratios would resize the box mid-layout, which
+   * is the layout shift the width and height attributes exist to prevent.
+   *
+   * The cost of the shared box is that the navy cut's ink is a little shorter
+   * than the white cut's, so it sits marginally smaller inside the same frame.
+   * They are never on screen together, and a stable box is worth more than a
+   * matched cap height nobody can compare.
+   */
+  navLogoWhite: {
+    file: 'nav-logo-white-2026.png',
+    alt: 'Nancy Orum — Bella Vista, AR — City Council, Ward 2',
+    width: 440,
+    height: 238,
+  },
+  navLogoNavy: {
+    file: 'nav-logo-navy-2026.png',
+    alt: 'Nancy Orum — Bella Vista, AR — City Council, Ward 2',
+    width: 440,
+    height: 238,
+  },
   heroArmsCrossed: {
     file: 'hero-arms-crossed.jpeg',
     alt: 'Nancy Orum at the Bella Vista arboretum entrance',
