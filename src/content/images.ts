@@ -192,6 +192,35 @@ export const IMAGES = {
     height: 694,
     focus: '58% 42%',
   },
+  /**
+   * Commitment 04, "Verify infrastructure". Supplied 2026-09-02.
+   *
+   * A trail bridge over a creek in Bella Vista — the Central Bridges, by the
+   * filename it arrived under.
+   *
+   * ⚠ THE LOOSEST FIT OF THE FIVE, and worth a second look. Her card is about
+   * whether "roads, sewer, utilities, Police, Fire, and EMS can support
+   * significant growth". This is a recreational bridge: built infrastructure,
+   * certainly, but amenity rather than the services she is asking about. It is
+   * here because the campaign chose it. A road, a lift station or a fire
+   * appliance would say what she is saying; see NEEDED-FROM-CAMPAIGN.md §9.
+   *
+   * It is also the only borrowed photograph on the site that is verifiably OF
+   * Bella Vista, which is worth something on a card about this city's capacity.
+   *
+   * ⚠ Provenance unconfirmed, like 03 and 06. The name is a WordPress slug with a
+   * `-1024x683` size suffix, so this is a resized copy from somebody's website —
+   * a trails or tourism site. It arrived at 1024 wide, which is why its
+   * derivative is 1024 and not the 1040 its neighbours use.
+   */
+  bellaVistaBridge: {
+    file: 'bella-vista-bridge.jpeg',
+    alt: 'A steel trail bridge over a shallow creek in Bella Vista',
+    width: 1000,
+    height: 667,
+    /* The bridge sits across the upper third; a centre crop would show only water. */
+    focus: '50% 33%',
+  },
   /** Commitment 01, "Protect natural areas" — see ART in platform.ts. */
   tanyardCreek: {
     file: 'tanyard-creek-falls.jpeg',

@@ -110,6 +110,12 @@ const TARGETS = {
   'residents-meeting.jpeg': { px: 1040 },
   /* Commitment 06's photograph, supplied 2026-09-02. */
   'trail-riders.jpeg': { px: 1040 },
+  /*
+   * Commitment 04's photograph, supplied 2026-09-02. 1024 rather than the 1040
+   * its neighbours use, because the file ARRIVED at 1024 wide — it is a
+   * web-sized copy, and asking sips for 1040 would upscale it.
+   */
+  'bella-vista-bridge.jpeg': { px: 1000 },
   'hero-arms-crossed.jpeg': { px: 1800 },
   'community-event.jpeg': { px: 1800 },
   'campaign-booth.jpeg': { px: 1040 },
@@ -202,6 +208,7 @@ let afterFallback = 0
 let afterAvif = 0
 const declared = []
 const rotated = []
+const notResampled = []
 
 for (const [file, target] of Object.entries(TARGETS)) {
   const from = join(SRC, file)
@@ -211,6 +218,25 @@ for (const [file, target] of Object.entries(TARGETS)) {
 
   const orientation = exifOrientation(from)
   const resize = [...normalizeArgs(orientation), '-Z', String(target.px)]
+
+  /*
+   * ⚠ THE TARGET MUST BE SMALLER THAN THE SOURCE. Not a size preference — a
+   * correctness one, and it fails silently.
+   *
+   * `sips -Z` only ever shrinks. Hand it a target at or above the source's
+   * longest edge and it does not resample at all, and the AVIF it then writes
+   * from that untouched file DOES NOT DECODE. Chrome takes the AVIF (its type is
+   * supported, so <picture> never reaches the JPEG), fails to decode it, and
+   * paints nothing. The card renders with a blank hole where the photograph is,
+   * every gate passes, and both files are valid on disk.
+   *
+   * Found on 2026-09-02 with a 1024px source targeted at 1024. Dropping the
+   * target to 1000 forced a resample and the AVIF decoded.
+   */
+  const source = dimensions(from)
+  if (Math.max(source.width, source.height) <= target.px) {
+    notResampled.push({ file, target: target.px, longest: Math.max(source.width, source.height) })
+  }
 
   const fallbackArgs = [...resize]
   if (target.jpeg) fallbackArgs.push('-s', 'format', 'jpeg', '-s', 'formatOptions', JPEG_QUALITY)
@@ -257,6 +283,18 @@ if (rotated.length) {
   console.log('  orientation baked in:')
   for (const r of rotated) console.log('    ' + r)
   console.log('')
+}
+
+if (notResampled.length) {
+  console.error('\n  ⚠ TARGET AT OR ABOVE SOURCE SIZE — the AVIF will not decode:\n')
+  for (const n of notResampled) {
+    console.error(`    ${n.file}: source is ${n.longest}px, target is ${n.target}px`)
+  }
+  console.error("\n  `sips -Z` only shrinks. At or above the source size it does not resample,")
+  console.error('  and the AVIF written from the untouched file does not decode — the browser')
+  console.error('  takes it over the JPEG and paints nothing. Lower the target below the')
+  console.error("  source's longest edge, or supply a larger original.\n")
+  process.exit(1)
 }
 
 console.log('  dimensions for src/content/images.ts:')

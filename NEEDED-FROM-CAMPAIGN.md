@@ -118,13 +118,18 @@ pale ones — and the header picks by page. That retired the last of the old log
 from the site. Nothing outstanding here.
 
 ### 9. Photographs
-Five of her six platform cards now carry one. Two still do not, and there is a
-rights question on three — §9a.
+Five of her six platform cards now carry one, and there is a rights question on
+four — §9a.
 
-**Cards 02 "Protect neighborhoods" and 04 "Verify infrastructure" have no
-picture.** Nothing in the project honestly shows a residential street, a utility,
-or a Police, Fire or EMS crew, and rather than put a misleading picture over a
-policy position those two ship without one.
+**Card 02 "Protect neighborhoods" has no picture.** Nothing in the project
+honestly shows a residential street, so rather than put a misleading picture over
+a policy position it ships without one.
+
+**Card 04 "Verify infrastructure" has the loosest fit of the five.** Her card is
+about whether roads, sewer, utilities, Police, Fire and EMS can carry growth; the
+photograph is a trail bridge. It is built infrastructure and it is genuinely of
+Bella Vista, which is more than the others can say — but a road, a lift station
+or a fire appliance would say what she is actually saying.
 
 **Her headshot is on no page of the site**, since the commitment it used to
 illustrate is gone.
@@ -133,9 +138,11 @@ What would fix it, roughly in order of value:
 
 1. **Little Sugar Creek** — she names the project on her first commitment, and
    the waterfall currently on that card is Tanyard Creek, a different one.
-2. **A residential street**, for "Protect neighborhoods."
+2. **A residential street**, for "Protect neighborhoods" — the one card with no
+   picture at all.
 3. **Police, Fire or EMS** — only with the crews' own consent, which is theirs to
-   give and not ours or hers.
+   give and not ours or hers. This would also replace the trail bridge on card 04
+   with something that matches what that card says.
 4. **A Bella Vista road or intersection**, to replace the borrowed one on card 03
    (see §9a).
 5. **The creek photograph from the back of her walk card**, at full resolution,
@@ -155,6 +162,7 @@ worth doing before launch rather than after.
 | 03 Address traffic | `Arkansas_Sign_t1684.JPG` | `_t1684` is the suffix a news CMS puts on a resized web copy. EXIF stripped. |
 | 05 Give residents a voice | `783986378_1221117…_n.jpg` | A Facebook CDN name — most likely saved from the campaign's own page, so probably fine. |
 | 06 Make tourism work | `629f6422f64caf17d0821b0f_footer 03.jpg` | A Webflow asset id and a slot name: a marketing photo taken off somebody's website. |
+| 04 Verify infrastructure | `bella-vista-central-tunnels-…-hero-1024x683.jpg` | A WordPress slug with a size suffix — a resized copy from a trails or tourism site. |
 
 For each, either **say where it came from and that the campaign may use it**, or
 **send a replacement the campaign owns**. A candidate publishing a newspaper's or

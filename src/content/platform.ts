@@ -106,6 +106,8 @@ const ART: Record<string, Img> = {
   'residents-voice': IMAGES.residentsMeeting,
   /* ⚠ Rights unconfirmed, and a visible business name — see images.ts. */
   tourism: IMAGES.trailRiders,
+  /* ⚠ Rights unconfirmed, and the loosest fit of the five — see images.ts. */
+  infrastructure: IMAGES.bellaVistaBridge,
 }
 
 export const COMMITMENTS: readonly Commitment[] = approvedStatement().advocacy.map(
