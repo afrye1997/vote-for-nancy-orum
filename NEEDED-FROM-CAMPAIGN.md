@@ -24,6 +24,9 @@
 3. **The design project's `assets/` folder** — copy it into `public/img/`. The
    twelve files and their purposes are listed in `public/img/README.md`. Two of
    them are 7200px print masters and want downscaling before launch.
+4. **Search Console, Bing, Always Use HTTPS, the www redirect, the stray Pages
+   project** — added 2026-09-02. The site was in no search engine's index. The
+   steps, in order, are in HANDOFF.md under "Search engines".
 
 ## 📋 Nancy — see the numbered list below
 Nothing here blocks development. All of it blocks launch.
@@ -230,6 +233,59 @@ what happens with any developer.
 ⚠️ **After purchase, watch for an ICANN verification email and click the link.**
 If it's ignored, ICANN suspends the domain and the website goes offline. It's the
 single most common way this setup breaks.
+
+---
+
+## 🔍 Search — added 2026-09-02
+
+### 11. Tell the internet the site exists
+
+Searching "nancy orum" on Google today brings up your LinkedIn, your X account,
+a personal Facebook profile and an Amazon page — and not the campaign site. It
+is not that the site ranks badly. Google has never seen it: the only page on
+the internet that links to it is the Facebook page's website field, and
+Facebook wraps that in a redirect that search engines give little weight. We
+are fixing the technical side this week (a sitemap, a robots file,
+machine-readable "this site is Nancy Orum's" data, and registering the site
+with Google and Bing directly). The rest is links, and only you can create
+them. Each takes about two minutes:
+
+1. **Ballotpedia.** You already have a candidate page —
+   <https://ballotpedia.org/Nancy_Orum_(Bella_Vista_City_Council_Ward_2_Position_2,_Arkansas,_candidate_2026)>
+   — and it says you have not completed their *Candidate Connection* survey.
+   Complete it and put `https://votefornancyorum.com` in the website field.
+   This is the single most valuable link you can get, and it is free. The
+   survey is the only route to it — the page's "Submit contact information"
+   form only gets Ballotpedia to email you the survey, and the "endorsement"
+   form is for endorsers. Start at <https://ballotpedia.org/Survey>; it takes
+   about half an hour, saves partway, and verifies your identity by phone.
+2. **The @votefornancyorum Instagram** — Edit profile → Links. The bio has no
+   link today.
+3. **Your LinkedIn** — Contact info → Website. Your LinkedIn is currently the
+   first result for your name, so this one matters most after Ballotpedia.
+4. **Your X account** (@71fancynancy) — Edit profile → Website. Nothing there
+   mentions the campaign yet.
+5. **Your real-estate site** (nancyorumrealestate.com) — a "Nancy for City
+   Council" link anywhere on your agent page. It is one of the pages Google
+   already shows for your name.
+6. **The Facebook page** already has the site in its website field — good.
+   Pin a post with the plain URL in it as well; the pinned post is what most
+   visitors read, and it is a second link on the page.
+7. **Local press.** The Weekly Vista's 2026-08-12 "candidates set" story names
+   you with no link. When the Democrat-Gazette or the Weekly Vista runs
+   candidate profiles, give them the URL — they print it.
+
+And one question. The site can tell Google "these profiles are all the same
+Nancy Orum", which helps it connect your name to the site. We will not guess
+which accounts are yours. If these are yours, say so and they go in:
+
+- LinkedIn: linkedin.com/in/nancy-orum-67515a7
+- X: x.com/71fancynancy
+- Instagram: instagram.com/votefornancyorum
+- nancyorumrealestate.com
+
+Expect the site to appear in Google within days of our registering it, and to
+move to the top for your name a few weeks after the links above exist.
 
 ---
 

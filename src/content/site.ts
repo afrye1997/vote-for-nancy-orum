@@ -82,6 +82,7 @@
  * site carries her slogan.
  */
 
+import { DONATE_URL } from './election'
 import { PLATFORM_META_DESCRIPTION } from './platform'
 
 export const SITE = {
@@ -254,6 +255,15 @@ export const PAGES_NAV: readonly NavPage[] = [
     title: 'Donate — Nancy Orum for Bella Vista City Council',
     description: 'Online donations are not open yet. Here is how else to help.',
     inNav: false,
+    /**
+     * Noindex the moment the processor is live. With DONATE_URL set, nothing
+     * links here and every Donate button takes money — so a search result for
+     * "nancy orum donate" landing on "Coming soon" would contradict the site.
+     * Noindex also keeps it out of the sitemap and the structured data, which
+     * both key off this flag. The page itself still builds, so a null
+     * DONATE_URL brings it back with no other change.
+     */
+    noindex: DONATE_URL !== null,
   },
   {
     /**

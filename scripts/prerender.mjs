@@ -47,8 +47,13 @@ const HCAPTCHA_SITE_KEY = process.env.HCAPTCHA_SITE_KEY ?? null
  *   PAGES: Array<{ id, out, title, description, path, noindex }>
  *   renderPage(id, { base, web3formsKey, origin }): string
  *   renderNotFound({ base, web3formsKey, origin }): string
+ *   structuredData(origin, base, { id, title, description, path }): object | null
+ *   siteName(): string
  */
-const { PAGES, renderPage, renderNotFound } = await import('../dist-ssr/entry-server.js')
+const { PAGES, renderPage, renderNotFound, structuredData, siteName } = await import(
+  '../dist-ssr/entry-server.js'
+)
+const SITE_NAME = siteName()
 
 const renderOpts = {
   base: BASE,
@@ -135,7 +140,30 @@ function jsonScript(id, value) {
   return `<script id="${id}" type="application/json">${json}</script>`
 }
 
-function document({ title, description, body, props, cssHref, jsHref, ogImage, canonical, noindex }) {
+/**
+ * Structured data for search engines, as JSON-LD in the head.
+ *
+ * Same escaping as above, for the same reason. `\u003c` is a legal JSON
+ * escape, so a parser reads the identical document; it just cannot be mistaken
+ * for the end of the script tag. Google's parser handles it.
+ */
+function jsonLdScript(value) {
+  const json = JSON.stringify(value).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')
+  return `<script type="application/ld+json">${json}</script>`
+}
+
+function document({
+  title,
+  description,
+  body,
+  props,
+  cssHref,
+  jsHref,
+  ogImage,
+  canonical,
+  noindex,
+  jsonLd,
+}) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -145,8 +173,9 @@ function document({ title, description, body, props, cssHref, jsHref, ogImage, c
 <meta name="description" content="${escapeHtml(description)}">
 <meta name="theme-color" content="#0C1F5E">${noindex ? '\n<meta name="robots" content="noindex">' : ''}${
     canonical ? `\n<link rel="canonical" href="${canonical}">` : ''
-  }
+  }${jsonLd ? '\n' + jsonLdScript(jsonLd) : ''}
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="${escapeHtml(SITE_NAME)}">
 <meta property="og:title" content="${escapeHtml(title)}">
 <meta property="og:description" content="${escapeHtml(description)}">
 <meta name="twitter:card" content="summary_large_image">${
@@ -200,6 +229,13 @@ const written = []
 
 for (const page of PAGES) {
   const { html: body, props } = renderPage(page.id, renderOpts)
+  /*
+   * Only on pages meant to be indexed: a noindex page describing itself as a
+   * WebPage about the candidate is sending the crawler two opposite messages.
+   * Null without SITE_ORIGIN, because every @id in the graph is an absolute
+   * URL and a graph of relative ids is a graph of ids nothing else can join.
+   */
+  const jsonLd = page.noindex ? null : structuredData(ORIGIN, BASE, page)
   const html = document({
     title: page.title,
     description: page.description,
@@ -210,6 +246,7 @@ for (const page of PAGES) {
     ogImage,
     canonical: ORIGIN ? `${ORIGIN}${BASE}${page.path}` : null,
     noindex: page.noindex,
+    jsonLd,
   })
   const target = join(DIST, page.out)
   await mkdir(dirname(target), { recursive: true })
@@ -240,6 +277,52 @@ const notFound = document({
 })
 await writeFile(join(DIST, '404.html'), notFound, 'utf8')
 written.push({ path: '404.html', kb: (Buffer.byteLength(notFound) / 1024).toFixed(1) })
+
+/**
+ * sitemap.xml and robots.txt.
+ *
+ * Neither is a ranking signal. They exist so that a crawler which has never
+ * heard of this domain — and as of 2026-09-02 that was every crawler — can
+ * learn the full page list from one fetch, and so the sitemap can be handed to
+ * Search Console and Bing Webmaster Tools by URL.
+ *
+ * Only indexable pages go in: a sitemap is a list of URLs you WANT indexed, and
+ * listing thanks/ beside its own noindex tag is the contradiction Search
+ * Console's Pages report flags as "URL marked 'noindex'" on a submitted URL.
+ *
+ * No <lastmod>. Google uses it only when it is consistently accurate, and a
+ * value stamped at build time would change on every deploy whether or not a
+ * single word did — which is the pattern that gets the field ignored. No
+ * <changefreq> or <priority>: Google does not read them.
+ *
+ * The sitemap needs absolute URLs, so it is skipped without SITE_ORIGIN, and
+ * robots.txt drops its Sitemap: line for the same reason. robots.txt is
+ * written regardless, so a preview build behaves like the real one.
+ *
+ * Cloudflare prepends its own managed block — the AI-crawler "content signals"
+ * policy text — to whatever is served here. It is comments only: no directive,
+ * no signal, nothing that helps or hinders a search crawler. The two are
+ * concatenated into one response, ours underneath.
+ */
+const sitemapPages = PAGES.filter((p) => !p.noindex)
+if (ORIGIN) {
+  const urls = sitemapPages
+    .map((p) => `  <url><loc>${escapeHtml(`${ORIGIN}${BASE}${p.path}`)}</loc></url>`)
+    .join('\n')
+  await writeFile(
+    join(DIST, 'sitemap.xml'),
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+      `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+    'utf8',
+  )
+}
+await writeFile(
+  join(DIST, 'robots.txt'),
+  ['User-agent: *', 'Allow: /', ...(ORIGIN ? [`Sitemap: ${ORIGIN}${BASE}sitemap.xml`] : []), ''].join(
+    '\n',
+  ),
+  'utf8',
+)
 
 /** Jekyll would otherwise ignore files and folders beginning with an underscore. */
 await writeFile(join(DIST, '.nojekyll'), '', 'utf8')
@@ -345,6 +428,14 @@ for (const { path } of written) {
   for (const [, src] of html.matchAll(/(?:src|srcSet|srcset)="([^"]*\/img\/[^"]+)"/g)) {
     referenced.add(src.slice(BASE.length))
   }
+  /*
+   * The structured data names a portrait and a logo by absolute URL, and
+   * neither is necessarily on any page as an <img>. A 404 there is invisible in
+   * a browser and visible to Google, so they join the same scan.
+   */
+  for (const [, url] of html.matchAll(/"(?:image|logo)":"([^"]*\/img\/[^"]+)"/g)) {
+    referenced.add(url.slice((ORIGIN ?? '').length + BASE.length))
+  }
   for (const [, tag] of html.matchAll(/<img\b([^>]*)>/g)) {
     const src = /src="([^"]*\/img\/[^"]+)"/.exec(tag)?.[1]
     const w = Number(/\bwidth="(\d+)"/.exec(tag)?.[1])
@@ -393,6 +484,11 @@ console.log(
     ogImage ?? (ORIGIN ? `omitted — public/${OG_CARD} does not exist` : 'not set — needs SITE_ORIGIN')
   }`,
 )
+console.log(
+  `  sitemap:   ${ORIGIN ? `${BASE}sitemap.xml (${sitemapPages.length} urls), listed in ${BASE}robots.txt` : 'not written — needs SITE_ORIGIN'}` +
+    (BASE === '/' ? '' : ' — NOTE: crawlers read robots.txt only at the origin root, not under a base path'),
+)
+console.log(`  json-ld:   ${ORIGIN ? `on ${sitemapPages.length} indexable pages` : 'not emitted — needs SITE_ORIGIN'}`)
 console.log(`  web3forms: ${WEB3FORMS_KEY ? 'configured' : 'NOT CONFIGURED — form will not submit'}`)
 console.log(`  hcaptcha: ${HCAPTCHA_SITE_KEY ? 'configured' : 'off — honeypot only'}`)
 

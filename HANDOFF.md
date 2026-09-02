@@ -314,6 +314,9 @@ Setting it turns on four things at once:
   submit is intercepted, posted with `fetch`, and navigated relatively. That is
   the majority of visitors, and it is why this is no longer launch-blocking
 - Missing images become a build failure instead of a warning
+- Since 2026-09-02: `sitemap.xml`, the `Sitemap:` line in `robots.txt`, and
+  the JSON-LD graph — all absolute URLs, so none exist without it. See
+  "Search engines" below
 
 **The domain is bought: `votefornancyorum.com`.** Settled 2026-08-11,
 superseding NEEDED-FROM-CAMPAIGN.md §10's recommendation of `nancyorum.com` —
@@ -327,8 +330,10 @@ HANDOFF-FIXES.md for the diagnosis and the bundle-hash check that finds it.
 
 Three things still worth confirming, none of them blocking:
 
-- **`www.votefornancyorum.com` does not resolve.** People type it. Add it
-  alongside the apex under the Worker's Domains tab.
+- **`www.votefornancyorum.com` does not resolve.** People type it. Redirect
+  it — placeholder DNS record plus a Redirect Rule, "Search engines" step 4
+  below. Do **not** add it as a second Custom Domain on the Worker; that
+  serves the site twice instead of redirecting.
 - **WHOIS privacy must be on.** This is a candidate's home address, and it is
   public by default at some registrars. Cloudflare Registrar includes it free;
   if the domain is registered elsewhere, check.
@@ -355,6 +360,141 @@ Two smaller gates remain open alongside these: `PULLQUOTE_PROPOSAL.approved` in
 `content/bio.ts` (she picks the line) and `DONATE_URL` in `content/election.ts`
 (read the note there first — turning on fundraising changes her Arkansas Ethics
 Commission filing burden, so it is her call, not a developer's).
+
+---
+
+## Search engines — why "nancy orum" did not find the site, and what fixes it
+
+**Status 2026-09-02: not in any index.** Three weeks after the domain went live,
+`site:votefornancyorum.com` returned nothing on Google, Bing, Yahoo or Brave;
+the Wayback Machine and Common Crawl had never fetched a page; and the only
+page on the web linking to it was the Facebook page's website field, behind a
+redirect search engines discount. Not "ranking low" — undiscovered. Nothing on the site
+blocks crawling: 200 to Googlebot and Bingbot, no noindex on an indexable page,
+no `X-Robots-Tag`, a robots.txt with no directives at all, self-referencing
+canonicals. It had no sitemap, no structured data, and no inbound link a
+crawler could follow.
+
+### What the build now does
+
+- **`dist/sitemap.xml`** — the indexable pages (four while GoodChange is
+  live — `donate/` is noindex whenever `DONATE_URL` is set), absolute URLs, no
+  `<lastmod>` (a build-time stamp changes on every deploy whether or not a
+  word did, which is the pattern that gets the field ignored). Needs
+  `SITE_ORIGIN`, like everything else with an absolute URL in it.
+- **`dist/robots.txt`** — allow-all plus the `Sitemap:` line. Cloudflare
+  prepends its managed AI "content signals" block to whatever is served here.
+  That block is policy text in comments — no directive, no signal, nothing a
+  search crawler acts on — and on its own it is all the domain served before.
+- **JSON-LD** — `src/content/structured.ts`. The home page and `/nancy/`
+  carry the full graph: a WebSite, a Person (Nancy Orum), an Organization (the
+  committee) and the page itself, joined by absolute `@id`s; `/nancy/` is a
+  ProfilePage with her as its main entity. Every other indexable page carries
+  only itself and a stub of the site. Every value but the job title is read
+  from the content modules; every image it names goes through the same
+  missing-file scan as the `<img>` tags. It asserts nothing that is not
+  visible on the site — see the rules at the top of that file before adding a
+  property.
+
+### What needs a dashboard, in the order that matters
+
+1. **Google Search Console** — search.google.com/search-console, signed in as
+   votenancyorum@gmail.com (check first whether a property already exists
+   there; nobody has). Add a *Domain* property for `votefornancyorum.com` and
+   verify it with the DNS TXT record it hands you, added under Cloudflare →
+   DNS → Records (Name `@`, Type TXT; Cloudflare may also be offered as a
+   one-click provider — take it if so). Then
+   *Sitemaps* → submit `https://votefornancyorum.com/sitemap.xml`, and *URL
+   Inspection* → paste the home page → *Request indexing*; do `/nancy/` too.
+   This is the one action that puts the site in Google in days rather than
+   whenever a crawler happens upon it.
+2. **Bing Webmaster Tools** — bing.com/webmasters → *Import from Google Search
+   Console*. One click once step 1 exists. Bing's index also feeds DuckDuckGo
+   and Yahoo.
+3. **Cloudflare → SSL/TLS → Edge Certificates → Always Use HTTPS: on.** Plain
+   `http://votefornancyorum.com/` serves the whole site with a 200 instead of
+   redirecting, so every page exists at two URLs. The canonical points at https
+   so Google should consolidate, but it is a duplicate that costs nothing to
+   remove. HSTS can wait.
+4. **`www` → apex.** Cloudflare's documented shape for a Worker on the apex:
+   DNS → Records → Add record: Type A, Name `www`, IPv4 `192.0.2.0`, Proxied
+   (a reserved placeholder — proxied, so nothing ever reaches it). Then Rules →
+   Overview → Create rule → Redirect Rule: custom filter expression
+   `(http.host eq "www.votefornancyorum.com")`, Type *Dynamic*, expression
+   `concat("https://votefornancyorum.com", http.request.uri.path)`, status
+   301, *Preserve query string* on. Universal SSL already covers `www`. Do
+   **not** add `www` as a second Custom Domain on the Worker instead: that
+   serves the site twice with 200s rather than redirecting, and it conflicts
+   with the placeholder record.
+5. **Delete the stray Pages project** `vote-for-nancy-orum` — Workers & Pages →
+   the *Pages* project (not the Worker of the same name) → Custom domains: remove
+   any listed, or the delete is refused → Settings → Delete project. It serves a
+   stale build with no canonical at vote-for-nancy-orum.pages.dev, and the day
+   anything links to it, that is the copy a crawler finds first. Cached copies
+   can linger at the edge for up to a week after deletion. The wrangler login
+   on this machine (the campaign account) carries `pages (write)`, so from the
+   repo `npx wrangler pages project delete vote-for-nancy-orum` does the same
+   job; it does not carry zone write, so the DNS and redirect steps above are
+   dashboard-only. The workers.dev host is fine: same build, canonical pointing
+   home.
+6. **Two checks and one optional toggle, while in the dashboard.** Security →
+   Settings → *Configure AI bot policies*: the Search preset must be *Allow*.
+   AI Crawl Control (the *AI* item in the zone menu) → Crawlers: Googlebot and
+   BingBot must show Action *Allow* — that table also shows whether either has
+   ever requested the site, which is evidence in itself. Optional: Caching →
+   Configuration → *Crawler Hints* on, which pings IndexNow (Bing, Yandex,
+   others; not Google) when content changes.
+
+After the deploy that adds them, check `/sitemap.xml` and `/robots.txt` with
+curl. Both 404s were served with `cf-cache-status: HIT`; if either lingers,
+Caching → Configuration → Purge Cache → Custom purge, by URL.
+
+### What only the campaign can do — and it is what decides *first*
+
+Google ranks a name query by which page it believes is the person's own, and
+it learns that from links on pages it already trusts. As of 2026-09-02:
+
+- **Ballotpedia has her candidate page**
+  (<https://ballotpedia.org/Nancy_Orum_(Bella_Vista_City_Council_Ward_2_Position_2,_Arkansas,_candidate_2026)>)
+  and it links to nothing — "has not yet completed Ballotpedia's 2026
+  Candidate Connection survey". Completing it, with the website field filled,
+  is the single most authoritative link she can get, and it is free.
+- The campaign Facebook page's website field already holds the URL — the only
+  inbound link found anywhere, wrapped in Facebook's `l.php` redirect, on a
+  page Google has itself not indexed. As a discovery path it is worth nothing. Her LinkedIn and X profiles, the two
+  pages that outrank the site, have no link; nor does the @votefornancyorum
+  Instagram bio. Each has a website field.
+- Her real-estate site (nancyorumrealestate.com) is hers to edit. Link from it.
+- Local press candidate profiles (NWA Democrat-Gazette, Weekly Vista) carry
+  campaign URLs when given one.
+
+All four are written up for her in NEEDED-FROM-CAMPAIGN.md §11, along with a
+request to confirm which profiles are hers — the structured data's `sameAs`
+lists only the Facebook page until she does, because a developer guessing
+from search results which "Nancy Orum" is the candidate is how the wrong
+LinkedIn ends up asserted as hers.
+
+### One content note, her call
+
+The home page's visible text does not contain "Nancy Orum" above the footer.
+The H1 is the slogan; the name is in the `<title>`, in alt text, and in "Paid
+for by the Committee to Elect Nancy Orum". `/nancy/` carries it throughout,
+which is why that page is requested for indexing alongside the home page. The
+smallest fix is the hero eyebrow — `heroEyebrow` in `content/site.ts`, "Ward
+2 · Position 2" → "Nancy Orum · Ward 2 · Position 2". The stronger fix is the
+one Google's own title-link and site-name docs point at: her name in the
+`<h1>` (Google reads the main heading, the title, and anchor text), with the
+slogan kept as the large styled line beneath it, and "About Nancy" → "About
+Nancy Orum" in the nav. `/nancy/` has the same shape — its H1 is "Educator.
+Realtor. Neighbor." The design shows none of this. Ask before changing.
+
+### Expectations
+
+Verified, sitemap submitted, indexing requested: in the index within days.
+First result for "nancy orum": once two or three of the links above exist and
+have been recrawled — weeks. Watch Search Console → Performance for the query.
+Until then, the honest answer to "why doesn't her site come up" is that nothing
+on the internet had told Google it existed.
 
 ---
 
@@ -551,9 +691,12 @@ Every one of these was found the hard way.
 
 ## Things the campaign still owes
 
-From NEEDED-FROM-CAMPAIGN.md, still open: a logo with a transparent background
-(both nav lockups have the gradient baked in, which is why the header ships two
-files and swaps between them), and the `og-card.jpg` social preview.
+- **Links to the site from her own profiles, and the Ballotpedia survey** —
+  see "Search engines" above and NEEDED-FROM-CAMPAIGN.md §11. Nothing in the
+  code can substitute for these.
+
+From NEEDED-FROM-CAMPAIGN.md, still open: the `og-card.jpg` social preview.
+(The transparent logo that used to be listed here arrived 2026-09-02 — §8.)
 
 Worth raising with them: the Get Involved hero photograph has a legible phone
 number and "Bentonville, AR 72712" on a realty banner behind Nancy — her Keller

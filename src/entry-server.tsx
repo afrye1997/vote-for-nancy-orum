@@ -2,6 +2,31 @@ import { renderToString } from 'react-dom/server'
 import { PAGE_COMPONENTS, type PageProps } from './pages/registry'
 import { PAGES_NAV } from './content/site'
 
+import {
+  SITE_NAME,
+  structuredData as buildStructuredData,
+  type StructuredPage,
+} from './content/structured'
+
+/**
+ * The JSON-LD graph and the site name, handed to prerender.mjs from the one
+ * bundle it already imports rather than by compiling src/ a second way.
+ *
+ * Functions, not `export { … } from`: oxlint's only-export-components rule
+ * reads a re-export list as a possible component and then flags every other
+ * export in the file. This entry is never hot-reloaded, so the rule has nothing
+ * to protect here, but two functions cost less than a disable comment on each
+ * of the exports it would go on to complain about.
+ */
+export function structuredData(origin: string | null, base: string, page: StructuredPage) {
+  return buildStructuredData(origin, base, page)
+}
+
+/** The string WebSite.name carries, for the og:site_name meta. */
+export function siteName(): string {
+  return SITE_NAME
+}
+
 /**
  * Build-time rendering entry point.
  *
