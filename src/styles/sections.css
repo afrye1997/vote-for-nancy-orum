@@ -1440,16 +1440,17 @@
 /*
  * The question gets its own line and the biggest type in the card.
  *
- * Rose rather than navy: it is the one place on the site where the pink is the
- * TYPE and not the surface behind it, which is what keeps the colour from
- * reading as decoration. 5.44:1 on the card it sits on.
+ * Pine, at the campaign's request on 2026-09-02 — it was the deep rose, which
+ * against the pale pink card behind it read as red. Green is the one hue in her
+ * painting that is nowhere else in the type, so it cannot be confused with a
+ * link, a label or an error. 5.83:1 on the card.
  */
 .donate-row__lead {
   display: block;
   margin-bottom: 2px;
   font-size: var(--text-xl);
   font-weight: var(--weight-semibold);
-  color: var(--rose-600);
+  color: var(--pine-700);
 }
 
 .donate-row__actions {

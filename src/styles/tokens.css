@@ -105,6 +105,21 @@
   --rose-300: #f7afba;
   --rose-100: #fdecef;
 
+  /*
+   * Pine. The trees along the bottom of her sign and inside the logo's circle.
+   *
+   * ⚠ THIS IS NOT THE OLD GREEN COMING BACK. That was #3da21c, a bright civic
+   * green from the retired logo's gradient, and nothing like it appears in her
+   * painting. This is sampled from the painting: her foliage clusters at hue
+   * 150, low saturation and light — a sage-teal, not a leaf green.
+   *
+   * As painted it is around 64% lightness and cannot be type at all, so this is
+   * that hue taken down until it can be. Same move as --gold-800 and --rose-600,
+   * and for the same reason: her artwork is a sunset, and everything in it is
+   * light. 5.83:1 on the chip-in card, and above 5.6 on every other surface.
+   */
+  --pine-700: #276847;
+
   /* Blue-greys, pulled toward the shadows in the sign's painting. */
   --slate-700: #3b4b75;
   --slate-600: #55678b;

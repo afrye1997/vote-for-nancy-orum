@@ -35,6 +35,7 @@ const T = {
   gold300: '#F7CE85',
   gold800: '#B8790E',
   gold100: '#FCEED4',
+  pine700: '#276847',
   rose600: '#AE3448',
   rose500: '#F87888',
   rose300: '#F7AFBA',
@@ -133,7 +134,7 @@ const PAIRS = [
   ['stat figure (large)', T.blue600, T.frost50, 3.0],
   ['ballot answer title', T.eyebrow, T.gold100, 4.5],
   /* The chip-in card, which is rose where the ballot card is gold. */
-  ['chip-in lead on rose', T.rose600, T.rose100, 4.5],
+  ['chip-in lead on rose', T.pine700, T.rose100, 4.5],
   ['chip-in body on rose', T.slate700, T.rose100, 4.5],
   ['chip-in note on rose', T.slate600, T.rose100, 4.5],
   ['selected text', T.navy900, T.rose100, 4.5],
