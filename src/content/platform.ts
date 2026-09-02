@@ -34,6 +34,7 @@
  * scope, so importing this file at all runs the check.
  */
 
+import { IMAGES, type Img } from './images'
 import { approvedStatement } from './statement'
 
 export type Commitment = {
@@ -53,6 +54,11 @@ export type Commitment = {
   readonly pull?: string
   /** Nav label for the index row. OURS, not hers — see PILLS. */
   readonly pill: string
+  /**
+   * A photograph, where one can honestly illustrate the point. Optional, and
+   * most of them do not have one — see ART.
+   */
+  readonly image?: Img
 }
 
 /**
@@ -75,6 +81,28 @@ const PILLS: Record<string, string> = {
   tourism: 'Tourism',
 }
 
+/**
+ * Photographs, by advocacy id. Absent is the normal case.
+ *
+ * ⚠ ADD ONE ONLY IF IT IS HONESTLY A PICTURE OF THE POINT. A photograph sitting
+ * over a policy position is read as evidence for it, and the library here has
+ * nothing of a road, an intersection, a residential street, a utility, a
+ * storefront, or a Police, Fire or EMS crew. Five of her six therefore have no
+ * image and render without a media band, which is the honest outcome rather than
+ * a gap waiting to be filled with something approximate.
+ *
+ * `natural-areas` was added on 2026-09-02 at the campaign's request, having been
+ * declined once on this reasoning: her aside on that card names Little Sugar
+ * Creek, and the photograph is Tanyard Creek — a different watercourse. The
+ * campaign knows the ward and made the call, and the risk is contained by the
+ * alt text, which describes the picture ("Waterfall on a wooded Bella Vista
+ * creek") without naming a creek or claiming to show her project. Do not
+ * "improve" that alt text into naming one.
+ */
+const ART: Record<string, Img> = {
+  'natural-areas': IMAGES.tanyardCreek,
+}
+
 export const COMMITMENTS: readonly Commitment[] = approvedStatement().advocacy.map(
   (item, index) => {
     const pill = PILLS[item.id]
@@ -94,6 +122,7 @@ export const COMMITMENTS: readonly Commitment[] = approvedStatement().advocacy.m
       title: item.label,
       lede: item.body,
       ...(item.aside === undefined ? {} : { pull: item.aside }),
+      ...(ART[item.id] === undefined ? {} : { image: ART[item.id] }),
       pill,
     }
   },

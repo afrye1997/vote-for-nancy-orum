@@ -4,7 +4,7 @@ import { PlatformRail } from '../components/sections/PlatformRail'
 export function Platform({ base }: { readonly base: string }) {
   return (
     <Page base={base} current="platform" tone="light">
-      <PlatformRail />
+      <PlatformRail base={base} />
     </Page>
   )
 }

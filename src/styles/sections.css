@@ -492,6 +492,21 @@
 
 
 
+/*
+ * The media band, back for the cards that have a photograph — currently one of
+ * six. Restored 2026-09-02 after the platform's six became hers and the old
+ * imagery went with the copy it illustrated.
+ *
+ * A fixed 220px rather than an aspect ratio: the cards are a horizontal rail and
+ * a photograph that set its own height would make every card in the row a
+ * different height. Cropping is `object-fit`'s job.
+ */
+.plank__media {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
 .plank__body {
   display: flex;
   flex-direction: column;
@@ -1384,10 +1399,11 @@
  * Shown only where the arrows are not, and only for a few seconds — see the
  * effect in PlatformRail.tsx for when it comes and goes.
  *
- * It used to sit over the card's photograph — the one part of a card nobody is
- * mid-sentence in. The cards lost their photographs on 2026-09-02, so this now
- * sits over the top of the body copy instead, and the offset below is a measured
- * position rather than a derived one. It is opaque and it is brief.
+ * It sits at the height a card's photograph occupies — the offset below is that
+ * band's middle, the rail's top padding plus half of .plank__media. Most cards
+ * have no photograph since 2026-09-02, so on those it lands over the top of the
+ * body copy instead. It is opaque and it is brief, so neither placement costs a
+ * reader a sentence.
  */
 .rail-hint {
   position: absolute;

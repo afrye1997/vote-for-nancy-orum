@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { Photo } from '../ui/Photo'
 import { StaggerTitle } from '../ui/StaggerTitle'
+import { imgSources } from '../../content/images'
 import { COMMITMENTS, PLATFORM_INTRO, type Commitment } from '../../content/platform'
 
 /**
@@ -101,12 +103,7 @@ const LOOPED_SLIDES: Slide[] = [
   })),
 ]
 
-/**
- * `base` was a prop here too, and for the same one reason: resolving the card
- * photographs' URLs. The cards have no photographs since 2026-09-02, so neither
- * this component nor `Plank` has anything left to resolve.
- */
-export function PlatformRail() {
+export function PlatformRail({ base }: { readonly base: string }) {
   const railRef = useRef<HTMLDivElement>(null)
   const [ready, setReady] = useState(false)
   /** Index into the rendered slides, not into COMMITMENTS. */
@@ -338,6 +335,7 @@ export function PlatformRail() {
         <div className="rail" ref={railRef} tabIndex={0} role="group" aria-label="The six commitments">
           {slides.map((slide, index) => (
             <Plank
+              base={base}
               slide={slide}
               key={slide.key}
               /* The mockup dims and shrinks everything but the centred card. */
@@ -455,14 +453,12 @@ function RailArrow({
   )
 }
 
-/**
- * `base` was a prop here until 2026-09-02. It resolved the card's photograph;
- * the cards have no photograph now, so it has nothing left to resolve.
- */
 function Plank({
+  base,
   slide,
   focused,
 }: {
+  readonly base: string
   readonly slide: Slide
   readonly focused: boolean
 }) {
@@ -475,9 +471,19 @@ function Plank({
       data-focused={focused ? '' : undefined}
     >
       {/*
-        No photograph, deliberately — see the note above the component. The media
-        band and the `image === null` logo fallback both went with the old six.
+        Most cards have no photograph, and render straight into the body.
+        `image` is optional rather than nullable on purpose: the old shape used
+        `null` to mean "put the logo on the brand gradient here", which would now
+        put five identical gradient panels in one carousel and have a screen
+        reader announce the vote date five times. Absent means absent.
       */}
+      {commitment.image === undefined ? null : (
+        <Photo
+          className="plank__media"
+          {...imgSources(base, commitment.image)}
+          image={commitment.image}
+        />
+      )}
       <div className="plank__body">
         <p className="eyebrow plank__eyebrow">Commitment {commitment.num}</p>
         <h2 className="plank__title">{commitment.title}</h2>

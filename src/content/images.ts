@@ -65,16 +65,15 @@ export const IMAGES = {
     focus: '22% 21%',
   },
   /**
-   * ⚠ UNUSED since 2026-09-02, along with `campaignBooth` and `tanyardCreek`.
+   * ⚠ UNUSED since 2026-09-02, along with `campaignBooth`.
    *
-   * They illustrated three of the six commitments the platform page carried. Her
-   * six replaced those, and none of the three could honestly illustrate one of
-   * hers — there is no photograph in this repo of a road, an intersection, a
+   * Both illustrated commitments the platform page no longer carries, and
+   * neither honestly illustrates one of hers. Five of her six have no photograph
+   * for the same reason: nothing here shows a road, an intersection, a
    * residential street, a utility, a storefront, or a Police, Fire or EMS crew,
-   * and putting the wrong picture over a policy position misrepresents it. So
-   * the platform cards ship with no imagery at all.
+   * and a picture over a policy position is read as evidence for it.
    *
-   * Her HEADSHOT is now on no page of the site, which is worth fixing.
+   * Her HEADSHOT is on no page of the site, which is worth fixing.
    *
    * Kept, with their derivatives, because the honest fix is more photographs
    * rather than fewer — see NEEDED-FROM-CAMPAIGN.md §9. `prerender.mjs` only
@@ -113,6 +112,7 @@ export const IMAGES = {
     height: 1350,
     focus: '50% 38%',
   },
+  /** Commitment 01, "Protect natural areas" — see ART in platform.ts. */
   tanyardCreek: {
     file: 'tanyard-creek-falls.jpeg',
     alt: 'Waterfall on a wooded Bella Vista creek',

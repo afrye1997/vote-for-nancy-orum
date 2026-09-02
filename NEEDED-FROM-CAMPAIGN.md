@@ -121,18 +121,20 @@ from the site. Nothing outstanding here.
 Two things happened on 2026-09-02 that make this the most useful thing you can
 send us.
 
-**The platform page has no pictures at all.** Its six cards used to carry
-photographs that illustrated the old commitments. Nancy's six replaced them, and
-none of the pictures we have can honestly illustrate one of hers — there is no
-photograph in the project of a road, an intersection, a residential street, a
-utility, a storefront, or a Police, Fire or EMS crew. Rather than put a
-misleading picture over a policy position, the cards ship without any.
+**Five of the platform's six cards have no picture.** They used to carry
+photographs illustrating the old commitments. Nancy's six replaced them, and only
+one of the pictures we have honestly illustrates one of hers — the waterfall, on
+"Protect natural areas". There is no photograph in the project of a road, an
+intersection, a residential street, a utility, a storefront, or a Police, Fire or
+EMS crew, and rather than put a misleading picture over a policy position those
+five cards ship without one.
 
 **Her headshot is now on no page of the site.** Same cause.
 
 What would fix it, roughly in order of value:
 
-1. **Little Sugar Creek** — she names the project on her first commitment.
+1. **Little Sugar Creek** — she names the project on her first commitment, and
+   the waterfall currently on that card is Tanyard Creek, a different one.
 2. **A road or intersection** in Bella Vista, for "Address traffic before
    development."
 3. **A residential street**, for "Protect neighborhoods."
