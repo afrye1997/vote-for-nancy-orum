@@ -27,21 +27,6 @@ export type Img = {
 }
 
 export const IMAGES = {
-  /**
-   * The header mark, from the campaign's 2026 roadside banner.
-   *
-   * ONE record where there were two. `navLogoLight` and `navLogoNavy` existed
-   * because the old lockup was navy ink with nothing behind it: it vanished on
-   * the dark pages, so a white cut was needed alongside it and the header swapped
-   * between them by page tone. This is an opaque painted sign, legible on any
-   * surface, so the swap and the second file are both gone.
-   */
-  navBanner: {
-    file: 'nav-banner-2026.jpeg',
-    alt: 'Nancy Orum — Bella Vista, AR — City Council, Ward 2, Position 2',
-    width: 520,
-    height: 345,
-  },
   heroArmsCrossed: {
     file: 'hero-arms-crossed.jpeg',
     alt: 'Nancy Orum at the Bella Vista arboretum entrance',
@@ -97,12 +82,22 @@ export const IMAGES = {
   },
   /**
    * The 2026 circular logo. Replaced the square green→blue lockup when the
-   * campaign sent its new artwork on 2026-08-27.
+   * campaign sent its new artwork on 2026-08-27, and became the HEADER MARK on
+   * 2026-09-02 as well — it is now the site's identity everywhere: the header on
+   * every page and width, the donate page, and the last commitment card.
    *
    * Cropped here from the supplied file, which set the circle on a white page
    * with a decorative dotted rule beneath it. The rule is not part of the mark,
    * and a white square would show as a box on every tinted surface this sits
    * on, so the crop is tight to the circle and the surround is transparent.
+   *
+   * That transparency is why it won the header. A wide painted sign cropped from
+   * the campaign's roadside banner held that slot for part of 2026-09-02 and came
+   * off again: opaque artwork in that corner needs a rounded edge and a shadow to
+   * stop it looking unbounded on a pale page, and once it has both it reads as a
+   * picture stuck to the page rather than as the site's mark. A circle has no
+   * edges to bound. `assets/nav-banner-2026.png` is kept as a source in case a
+   * wide lockup is ever wanted; nothing builds a derivative from it.
    */
   logoCircle: {
     file: 'logo-circle-2026.png',

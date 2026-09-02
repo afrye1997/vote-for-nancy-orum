@@ -76,28 +76,26 @@
 }
 
 /*
- * 112px, and the drop from 140 is the whole story of this rule.
+ * The circular mark, 2026-09-02.
  *
- * 140px was the height the old knockout was drawn for, and it worked because
- * that PNG carried its own transparent margin — a 140px box showed roughly 90px
- * of ink and never reached its own edges. The 2026 mark is a painted sign that
- * is opaque corner to corner, so at 140px it would put a 210×140 block of colour
- * at the top of every page. This file already recorded that the full-bleed signs
- * looked wrong at that size; they did, for exactly this reason.
+ * A rectangular sign was here for part of a day and came off again: opaque
+ * artwork in this corner needs a rounded edge and a shadow to stop it looking
+ * unbounded on a pale page, and once it has both it reads as a picture stuck to
+ * the page rather than as the site's mark.
  *
- * 112px shows the same amount of ink the old lockup did while occupying less of
- * the bar, and it keeps the office strip along the bottom readable — that strip
- * is why the mark is cropped to include it rather than to the name alone.
+ * The circle solves that by not having edges. It is cropped to the circle with a
+ * transparent surround (see images.ts), so it needs no rounding, no shadow and
+ * no second cut for the dark pages — the artwork inside it is legible over a
+ * photograph and on white alike.
  *
- * The corners ARE rounded now. There is a rectangle to round.
+ * 124px rather than the old lockup's 140: this one is ink to its own boundary in
+ * every direction, where the lockup carried transparent margin and showed about
+ * 90px of ink inside a 140px box. A circle also reads lighter than a rectangle of
+ * the same height, which is why it can run taller than the sign it replaced.
  */
 .site-header__logo img {
-  height: 112px;
+  height: 124px;
   width: auto;
-  border-radius: var(--radius-sm);
-  /* Lifts the sign off a pale page, where its own light sky would otherwise
-     bleed into the background and leave the mark looking unbounded. */
-  box-shadow: 0 1px 3px rgba(12, 31, 94, 0.18);
 }
 
 .site-nav {
@@ -311,7 +309,7 @@
    * before the hero.
    */
   .site-header__logo img {
-    height: 76px;
+    height: 88px;
   }
 
   .site-nav {

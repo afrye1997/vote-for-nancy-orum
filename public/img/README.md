@@ -36,11 +36,12 @@ Google Drive files:
 | `walk-card-front-2026.png` | `1.png` | 1650×1275. Reference only — no target, nothing renders it. Kept because it is where the slogan and the disclaimer wording were read from. |
 | `walk-card-back-2026.png` | `2.png` | 1650×1275. Reference only, same reason. |
 
-`large road side banner.png` (19 MB) became `assets/nav-banner-2026.png` on
-2026-09-02 — cropped to the middle 76% of its width, which drops the empty sky at
-either end and leaves the sign at roughly 3:2. It is over the 10 MB cap on
-programmatic Drive downloads, so if `assets/` is ever lost this one has to be
-saved out of Drive by hand rather than fetched.
+`large road side banner.png` (19 MB) is in `assets/` as `nav-banner-2026.png`,
+cropped to the middle 76% of its width. **Nothing builds a derivative from it** —
+it was the header mark briefly on 2026-09-02 and the circular logo replaced it.
+Kept because it is the only wide lockup in the new brand. Note it is over the
+10 MB cap on programmatic Drive downloads, so if `assets/` is lost this one has
+to be saved out of Drive by hand rather than fetched.
 
 ⚠ `assets/nancy-creek-2026-EXTRACTED.png` is **staged, not used, and should not
 be used as it stands.** The candidate asked on 2026-09-02 for the creek
@@ -60,7 +61,6 @@ files and none of these.
 
 | File | Used by |
 |---|---|
-| `nav-banner-2026.png` | Header, every page and every width |
 | `hero-arms-crossed.jpeg` | Home hero |
 | `campaign-booth.jpeg` | Platform commitment 4 |
 | `nancy-orum-headshot.jpeg` | Platform commitment 5 |
@@ -68,7 +68,7 @@ files and none of these.
 | `family-square.jpeg` | About "rooted here" band; platform commitment 2 |
 | `tanyard-creek-falls.png` | Platform commitment 3 |
 | `about-arkansas.png` | About page portrait |
-| `logo-circle-2026.png` | Platform commitment 6; donate page |
+| `logo-circle-2026.png` | Header on every page and width; platform commitment 6; donate page |
 | `yard-sign-2026.png` | Footer, the yard-sign request block on the form, and the foot of the home statement |
 | `ward-map-2022.png` | "See the ward map" disclosure |
 
@@ -111,10 +111,12 @@ update `src/content/images.ts`. The script prints the numbers to paste in.
 - ~~A nav lockup with a transparent background~~ (NEEDED-FROM-CAMPAIGN.md §8) —
   **closed 2026-09-02, and not the way it was asked.** The request assumed the
   header needed a mark it could recolour per surface. It needed a mark that does
-  not have to be recoloured at all: `nav-banner-2026.png`, cropped from the
-  campaign's roadside banner, is an opaque painted sign that reads over a
-  photograph, on the pale pages and on the narrow bar alike. One file replaced
-  two, and the header's tone-swap went with them.
+  not have to be recoloured at all. `logo-circle-2026.png` is cropped to the
+  circle with a transparent surround, so it reads over a photograph, on the pale
+  pages and on the narrow bar alike. One file replaced two, and the header's
+  tone-swap went with them. A wide painted crop of the roadside banner was tried
+  first and rejected as less clean — it is still in `assets/` if a wide lockup is
+  ever wanted, but nothing builds it.
 - **`og-card.jpg`** — the social preview. `scripts/prerender.mjs` emits
   `og:image` only when `SITE_ORIGIN` is set, and expects the file at
   `/img/og-card.jpg`. It is not generated from `assets/`; add it here directly,

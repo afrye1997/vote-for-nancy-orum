@@ -40,7 +40,7 @@ export function Header({
   readonly base: string
   readonly current: string
 }) {
-  const logo = IMAGES.navBanner
+  const logo = IMAGES.logoCircle
   const mark = imgSources(base, logo)
   return (
     <header className="site-header">
