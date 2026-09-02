@@ -70,6 +70,16 @@
    * because a gold dark enough for that is a brown, and there is no brown in
    * her artwork.
    */
+  /*
+   * --gold-800 is the only value here that is NOT in her painting. It is her
+   * gold taken down until it can be TYPE ON A LIGHT PAGE, which none of the
+   * painted golds can be: the block gold measures 1.74:1 on the page, and even
+   * large text needs 3. This reaches 3.45 on the page and 3.63 on a card.
+   *
+   * It exists because the accented word in a title has to work on both kinds of
+   * surface — see --title-accent below.
+   */
+  --gold-800: #b8790e;
   --gold-700: #c98a16;
   --gold-600: #f0b63c;
   --gold-500: #f5c862;
@@ -140,6 +150,20 @@
   --border-strong: var(--slate-400);
   --border-warm: var(--gold-300);
   --border-rose: var(--rose-300);
+  /*
+   * The one word set apart in a page title. Two values, because a title accent
+   * has to survive both surfaces this site uses and no single gold does:
+   *
+   *   on a photograph  the light gold, 6.0:1 over the scrims. The deep amber
+   *                    would sink into the navy behind it.
+   *   on a pale page   the deep amber, 3.45:1. The light gold is 1.74:1 there,
+   *                    which is not a heading, it is a suggestion of one.
+   *
+   * `.title-accent` takes the first and `.on-dark .title-accent` the second, so
+   * the section's existing tone class picks the right one with no prop passed.
+   */
+  --title-accent: var(--gold-800);
+  --title-accent-on-dark: var(--gold-300);
   --link: var(--blue-600);
   --link-hover: var(--blue-700);
   --success: var(--gold-700);

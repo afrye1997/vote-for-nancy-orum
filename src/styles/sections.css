@@ -105,64 +105,72 @@
 }
 
 /*
- * The three clauses of her refrain arrive one at a time, as in the mockup —
- * but the reveal is an enhancement, not the thing that makes the words exist.
+ * ── Staggered page titles ────────────────────────────────────────────────────
  *
- * The mockup starts each clause at opacity 0 and delays them 300, 1300 and
- * 2300ms. Anything that has not finished is invisible: a screenshot taken on
- * load shows the word "Listening." alone, a crawler that does not run
- * animations may see nothing, and the headline — the largest element on the
- * page — cannot register as painted for two and a half seconds.
+ * The clauses of a title arrive one at a time, as in the mockup. Applied by
+ * StaggerTitle, which every page title on the site now uses — the home hero,
+ * About, Platform and Get involved.
  *
- * So the base state is visible, and the animation lives behind a
- * `no-preference` query. Delays are compressed to a quarter of the original;
- * the effect still reads as a stagger and the last clause lands under a second.
+ * The reveal is an enhancement, not the thing that makes the words exist. The
+ * mockup starts each clause at opacity 0 and delays them 300, 1300 and 2300ms.
+ * Anything unfinished is invisible: a screenshot on load shows the first word
+ * alone, a crawler that does not run animations may see nothing, and the
+ * headline — the largest element on its page — cannot register as painted for
+ * two and a half seconds. So the base state is VISIBLE and the animation lives
+ * behind `no-preference`.
+ *
+ * Direct children only. The accented clause contains a nested span, and a
+ * descendant selector caught that too — giving the accent its own opacity:0 and
+ * its own clock, and making it an inline-block inside a line of type that wants
+ * to stay one flow.
  */
-/*
- * Direct children only. The last clause contains a nested span for the word set
- * in the accent colour, and a descendant selector caught that too — giving it
- * its own opacity:0 and its own 600ms animation running on a different clock to
- * the clause around it, and making it an inline-block inside a line of type
- * that wants to stay one flow.
- */
-.hero__title > span {
+.stagger > span {
   display: inline-block;
 }
 
 /*
- * The one gold word in a white headline — "Prosper." as of 2026-08-27.
+ * Delays compressed to roughly a quarter of the mockup's. The title is the
+ * largest element on its page and an element at opacity 0 does not count as
+ * painted — stretch the last clause out far enough and Largest Contentful Paint
+ * becomes the animation rather than the network. These land a third clause at
+ * 1.74s, near the mockup's feel at a little over half its cost. Going further is
+ * a real LCP trade, not a taste one.
  *
- * --gold-300 rather than --brand-accent: this sits over the hero scrim, and the
- * block gold is too dark against it. Gold runs the opposite way to the green it
- * replaced — green got darker to gain contrast on light, gold has to get
- * LIGHTER to gain contrast on dark. scripts/contrast.mjs measures it against
- * the scrim's worst case, at both scrim weights.
- */
-.hero__title-accent {
-  color: var(--gold-300);
-}
-
-/*
- * Slowed at the campaign's request, but not back to the mockup's 300/1300/2300.
- * The headline is the largest element on the page, and an element at opacity 0
- * does not count as painted — stretch the last clause far enough out and the
- * page's Largest Contentful Paint is the animation rather than the network.
- * These land the third clause at 1.74s, roughly the mockup's feel at a little
- * over half its cost. Going further is a real LCP trade, not just a taste one.
+ * Two clauses or three: a two-clause title simply never matches :nth-child(3).
  */
 @media (prefers-reduced-motion: no-preference) {
-  .hero__title > span {
+  .stagger > span {
     opacity: 0;
     animation: fade-up 900ms var(--ease-organic) forwards;
   }
 
-  .hero__title > span:nth-child(2) {
+  .stagger > span:nth-child(2) {
     animation-delay: 420ms;
   }
 
-  .hero__title > span:nth-child(3) {
+  .stagger > span:nth-child(3) {
     animation-delay: 840ms;
   }
+}
+
+/*
+ * The one word of a title set apart.
+ *
+ * Two values, chosen by the surface rather than by a prop. The light gold is
+ * 6.0:1 over the hero scrims and 1.74:1 on a pale page; the deep amber is the
+ * reverse. `.on-dark` is already on both photographic sections, so the title
+ * picks the right one with nothing passed down to it.
+ *
+ * Note the direction gold runs: the green this replaced got DARKER to gain
+ * contrast on light, and gold has to get LIGHTER to gain it on dark. Both
+ * values are measured in scripts/contrast.mjs, at both scrim weights.
+ */
+.title-accent {
+  color: var(--title-accent);
+}
+
+.on-dark .title-accent {
+  color: var(--title-accent-on-dark);
 }
 
 .hero__lede {
@@ -1575,10 +1583,6 @@
 .rail-head {
   padding-bottom: 20px;
   text-align: center;
-}
-
-.rail-head__emphasis {
-  font-weight: 700;
 }
 
 .rail-head__lede {

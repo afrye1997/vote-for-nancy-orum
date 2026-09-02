@@ -39,6 +39,13 @@
 export const INVOLVED_HERO = {
   eyebrow: 'Get involved',
   heading: 'Volunteer for an hour. It matters more than you think.',
+  headingSegments: ['Volunteer for an hour.', 'It matters more than you think.'],
+  /**
+   * The only accent on the site that sits INSIDE a clause rather than at the end
+   * of one. StaggerTitle searches the whole clause for this reason; an
+   * ends-with test would have left this title unaccented and silent about it.
+   */
+  headingAccent: 'matters',
 } as const
 
 export const INVOLVED_INTRO =

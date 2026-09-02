@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Photo } from '../ui/Photo'
+import { StaggerTitle } from '../ui/StaggerTitle'
 import { COMMITMENTS, PLATFORM_INTRO, type Commitment } from '../../content/platform'
 import { IMAGES, imgSources } from '../../content/images'
 
@@ -298,10 +299,11 @@ export function PlatformRail({ base }: { readonly base: string }) {
       <section className="section container rail-head">
         <div className="reveal">
           <p className="eyebrow">{PLATFORM_INTRO.eyebrow}</p>
-          <h1 className="section__title">
-            {PLATFORM_INTRO.headingLead}{' '}
-            <span className="rail-head__emphasis">{PLATFORM_INTRO.headingEmphasis}</span>
-          </h1>
+          <StaggerTitle
+            className="section__title"
+            segments={PLATFORM_INTRO.headingSegments}
+            accent={PLATFORM_INTRO.headingAccent}
+          />
           <p className="section__lede rail-head__lede">{PLATFORM_INTRO.lede}</p>
         </div>
         <nav aria-label="Commitments">

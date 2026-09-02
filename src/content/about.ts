@@ -24,6 +24,16 @@
 export const ABOUT_INTRO = {
   eyebrow: 'About Nancy',
   heading: 'Educator. Realtor. Neighbor.',
+  /**
+   * The same line, split at its three sentence boundaries so the title can
+   * animate a clause at a time — see StaggerTitle. `heading` above is kept as
+   * the single string because it reads better in a diff and in search, and
+   * because two lists that disagree is exactly the failure the accent field
+   * below is designed to avoid.
+   */
+  headingSegments: ['Educator.', 'Realtor.', 'Neighbor.'],
+  /** The clause the other two build to, set in the campaign accent. */
+  headingAccent: 'Neighbor.',
   paragraphs: [
     'I’m not running because I believe I have all the answers. I’m running because I know how to listen, learn, connect people, ask questions, and work toward solutions.',
     'I believe Bella Vista’s greatest resource isn’t a building, a road, a lake, or a trail. It’s our people. When we listen to one another, learn from one another, and work together, there is very little we cannot accomplish.',

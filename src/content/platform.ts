@@ -56,8 +56,14 @@ export type Commitment = {
 
 export const PLATFORM_INTRO = {
   eyebrow: 'My platform',
-  headingLead: 'Six commitments, one goal:',
-  headingEmphasis: 'grow well.',
+  /**
+   * Was `headingLead` + `headingEmphasis`, rendered as a bold span. The campaign
+   * asked on 2026-09-02 for the emphasis to be the accent colour instead of a
+   * heavier weight, and for the clauses to arrive the way the home hero's do —
+   * so the pair became a segment list and an accent, like every other title.
+   */
+  headingSegments: ['Six commitments, one goal:', 'grow well.'],
+  headingAccent: 'grow well.',
   lede:
     'We need leaders who will listen before making decisions, ask thoughtful ' +
     'questions, communicate openly, build partnerships, and work toward solutions ' +

@@ -33,6 +33,7 @@ const T = {
   gold700: '#C98A16',
   gold600: '#F0B63C',
   gold300: '#F7CE85',
+  gold800: '#B8790E',
   gold100: '#FCEED4',
   rose600: '#AE3448',
   rose500: '#F87888',
@@ -148,6 +149,11 @@ const PAIRS = [
   ['secondary button hover', T.blue600, T.blue100, 4.5],
   ['inverse button label', T.blue600, T.frost50, 4.5],
   ['commitment card accent word', T.eyebrow, T.white, 4.5],
+  /* The accented word in a page title. Large text, so 3.0 — About is 48px and
+     Platform 36px, both well past the 24px threshold. The deep amber is the only
+     gold that can do this job on a pale page; the block gold is 1.74:1 here. */
+  ['title accent on page', T.gold800, T.frost50, 3.0],
+  ['title accent on card', T.gold800, T.white, 3.0],
   ['commitment card, flipped: body', T.frost100, T.blue600, 4.5],
   ['commitment card, flipped: prompt', T.white, T.blue600, 4.5],
   ['CTA band title', T.white, T.ctaBand, 4.5],
@@ -172,6 +178,8 @@ const PAIRS = [
   ['nav current over hero photo, no scrim', T.white, T.white, 4.5, GAP],
   ['about band line over scrim', T.white, scrimBand, 4.5],
   ['about band eyebrow over scrim', T.gold300, scrimBand, 4.5],
+  /* "matters", in the Get involved title, over that page's hero scrim. */
+  ['title accent over page hero', T.gold300, scrimPageHero, 3.0],
   ['involved hero title over scrim', T.white, scrimPageHero, 4.5],
   ['involved hero eyebrow over scrim', T.gold300, scrimPageHero, 4.5],
   ['focus ring on page', T.navy900, T.frost50, 3.0],

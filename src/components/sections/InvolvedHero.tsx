@@ -1,4 +1,5 @@
 import { Photo } from '../ui/Photo'
+import { StaggerTitle } from '../ui/StaggerTitle'
 import { INVOLVED_HERO } from '../../content/involved'
 import { IMAGES, imgSources } from '../../content/images'
 
@@ -14,7 +15,11 @@ export function InvolvedHero({ base }: { readonly base: string }) {
       <div className="band__scrim" />
       <div className="page-hero__inner container">
         <p className="eyebrow eyebrow--light">{INVOLVED_HERO.eyebrow}</p>
-        <h1 className="page-hero__title">{INVOLVED_HERO.heading}</h1>
+        <StaggerTitle
+          className="page-hero__title"
+          segments={INVOLVED_HERO.headingSegments}
+          accent={INVOLVED_HERO.headingAccent}
+        />
       </div>
     </section>
   )

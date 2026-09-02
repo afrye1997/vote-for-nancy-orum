@@ -1,4 +1,5 @@
 import { LinkButton } from '../ui/Button'
+import { StaggerTitle } from '../ui/StaggerTitle'
 import { Photo } from '../ui/Photo'
 import { ABOUT_INTRO } from '../../content/about'
 import { IMAGES, imgSources } from '../../content/images'
@@ -16,9 +17,12 @@ export function AboutIntro({ base }: { readonly base: string }) {
       </div>
       <div className="reveal">
         <p className="eyebrow">{ABOUT_INTRO.eyebrow}</p>
-        <h1 className="section__title" style={{ fontSize: 'var(--text-4xl)' }}>
-          {ABOUT_INTRO.heading}
-        </h1>
+        <StaggerTitle
+          className="section__title"
+          style={{ fontSize: 'var(--text-4xl)' }}
+          segments={ABOUT_INTRO.headingSegments}
+          accent={ABOUT_INTRO.headingAccent}
+        />
         <div className="prose lede" style={{ marginTop: 16 }}>
           {ABOUT_INTRO.paragraphs.map((text) => (
             <p key={text.slice(0, 32)}>{text}</p>
