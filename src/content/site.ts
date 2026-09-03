@@ -166,6 +166,18 @@ export const SEO = {
     'General election November 3, 2026.',
   /** Absolute URL, set once the domain is purchased. Required for OG tags. */
   canonicalOrigin: null as string | null,
+  /**
+   * Google Search Console ownership token — the `content` of the
+   * `<meta name="google-site-verification">` tag Search Console shows under
+   * "HTML tag". Public by design; it proves nothing except that whoever can
+   * edit this site's head also holds the Search Console account. Null emits
+   * no tag.
+   *
+   * The HTML-file method cannot work on this host: the Worker redirects every
+   * `.html` URL to its extensionless path, and Search Console does not follow
+   * redirects for the verification file. The tag goes in the head instead.
+   */
+  googleSiteVerification: '3UWATDwF8HnJlMwiRTKXaPRygT3mr__fkIoNShdFWdM' as string | null,
 } as const
 
 /**

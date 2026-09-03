@@ -1,6 +1,6 @@
 import { renderToString } from 'react-dom/server'
 import { PAGE_COMPONENTS, type PageProps } from './pages/registry'
-import { PAGES_NAV } from './content/site'
+import { PAGES_NAV, SEO } from './content/site'
 
 import {
   SITE_NAME,
@@ -25,6 +25,11 @@ export function structuredData(origin: string | null, base: string, page: Struct
 /** The string WebSite.name carries, for the og:site_name meta. */
 export function siteName(): string {
   return SITE_NAME
+}
+
+/** Search Console's ownership token, or null for no tag. See SEO in site.ts. */
+export function googleSiteVerification(): string | null {
+  return SEO.googleSiteVerification
 }
 
 /**

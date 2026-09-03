@@ -49,11 +49,20 @@ const HCAPTCHA_SITE_KEY = process.env.HCAPTCHA_SITE_KEY ?? null
  *   renderNotFound({ base, web3formsKey, origin }): string
  *   structuredData(origin, base, { id, title, description, path }): object | null
  *   siteName(): string
+ *   googleSiteVerification(): string | null
  */
-const { PAGES, renderPage, renderNotFound, structuredData, siteName } = await import(
-  '../dist-ssr/entry-server.js'
-)
+const { PAGES, renderPage, renderNotFound, structuredData, siteName, googleSiteVerification } =
+  await import('../dist-ssr/entry-server.js')
 const SITE_NAME = siteName()
+/*
+ * Search Console reads this on the home page only, but the head is identical
+ * across pages on purpose (see HCAPTCHA_SCRIPT), and a tag on every page costs
+ * one line each.
+ */
+const GOOGLE_SITE_VERIFICATION = googleSiteVerification()
+const VERIFICATION_META = GOOGLE_SITE_VERIFICATION
+  ? `\n<meta name="google-site-verification" content="${escapeHtml(GOOGLE_SITE_VERIFICATION)}">`
+  : ''
 
 const renderOpts = {
   base: BASE,
@@ -171,7 +180,7 @@ function document({
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(description)}">
-<meta name="theme-color" content="#0C1F5E">${noindex ? '\n<meta name="robots" content="noindex">' : ''}${
+<meta name="theme-color" content="#0C1F5E">${VERIFICATION_META}${noindex ? '\n<meta name="robots" content="noindex">' : ''}${
     canonical ? `\n<link rel="canonical" href="${canonical}">` : ''
   }${jsonLd ? '\n' + jsonLdScript(jsonLd) : ''}
 <meta property="og:type" content="website">
@@ -489,6 +498,7 @@ console.log(
     (BASE === '/' ? '' : ' — NOTE: crawlers read robots.txt only at the origin root, not under a base path'),
 )
 console.log(`  json-ld:   ${ORIGIN ? `on ${sitemapPages.length} indexable pages` : 'not emitted — needs SITE_ORIGIN'}`)
+console.log(`  search console: ${GOOGLE_SITE_VERIFICATION ? 'verification tag emitted' : 'no verification tag — SEO.googleSiteVerification is null'}`)
 console.log(`  web3forms: ${WEB3FORMS_KEY ? 'configured' : 'NOT CONFIGURED — form will not submit'}`)
 console.log(`  hcaptcha: ${HCAPTCHA_SITE_KEY ? 'configured' : 'off — honeypot only'}`)
 
