@@ -178,6 +178,8 @@ export const SEO = {
    * redirects for the verification file. The tag goes in the head instead.
    */
   googleSiteVerification: '3UWATDwF8HnJlMwiRTKXaPRygT3mr__fkIoNShdFWdM' as string | null,
+  /** Bing Webmaster Tools, same idea: the `content` of its `msvalidate.01` tag. */
+  bingSiteVerification: '3FA7A018B4F777B0D6A72F9AA65AFD23' as string | null,
 } as const
 
 /**

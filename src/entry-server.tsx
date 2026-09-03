@@ -27,9 +27,15 @@ export function siteName(): string {
   return SITE_NAME
 }
 
-/** Search Console's ownership token, or null for no tag. See SEO in site.ts. */
-export function googleSiteVerification(): string | null {
-  return SEO.googleSiteVerification
+/**
+ * Search-engine ownership tags for the head: each engine's meta name and the
+ * token it issued, skipping any that is null. See SEO in site.ts.
+ */
+export function verificationTags(): { name: string; content: string }[] {
+  return [
+    { name: 'google-site-verification', content: SEO.googleSiteVerification },
+    { name: 'msvalidate.01', content: SEO.bingSiteVerification },
+  ].filter((tag): tag is { name: string; content: string } => tag.content !== null)
 }
 
 /**

@@ -49,20 +49,20 @@ const HCAPTCHA_SITE_KEY = process.env.HCAPTCHA_SITE_KEY ?? null
  *   renderNotFound({ base, web3formsKey, origin }): string
  *   structuredData(origin, base, { id, title, description, path }): object | null
  *   siteName(): string
- *   googleSiteVerification(): string | null
+ *   verificationTags(): Array<{ name, content }>
  */
-const { PAGES, renderPage, renderNotFound, structuredData, siteName, googleSiteVerification } =
+const { PAGES, renderPage, renderNotFound, structuredData, siteName, verificationTags } =
   await import('../dist-ssr/entry-server.js')
 const SITE_NAME = siteName()
 /*
- * Search Console reads this on the home page only, but the head is identical
- * across pages on purpose (see HCAPTCHA_SCRIPT), and a tag on every page costs
- * one line each.
+ * Search Console and Bing read these on the home page only, but the head is
+ * identical across pages on purpose (see HCAPTCHA_SCRIPT), and a tag on every
+ * page costs one line each.
  */
-const GOOGLE_SITE_VERIFICATION = googleSiteVerification()
-const VERIFICATION_META = GOOGLE_SITE_VERIFICATION
-  ? `\n<meta name="google-site-verification" content="${escapeHtml(GOOGLE_SITE_VERIFICATION)}">`
-  : ''
+const VERIFICATION_TAGS = verificationTags()
+const VERIFICATION_META = VERIFICATION_TAGS.map(
+  (t) => `\n<meta name="${t.name}" content="${escapeHtml(t.content)}">`,
+).join('')
 
 const renderOpts = {
   base: BASE,
@@ -498,7 +498,9 @@ console.log(
     (BASE === '/' ? '' : ' — NOTE: crawlers read robots.txt only at the origin root, not under a base path'),
 )
 console.log(`  json-ld:   ${ORIGIN ? `on ${sitemapPages.length} indexable pages` : 'not emitted — needs SITE_ORIGIN'}`)
-console.log(`  search console: ${GOOGLE_SITE_VERIFICATION ? 'verification tag emitted' : 'no verification tag — SEO.googleSiteVerification is null'}`)
+console.log(
+  `  verification: ${VERIFICATION_TAGS.length ? VERIFICATION_TAGS.map((t) => t.name).join(', ') : 'no tags — see SEO in site.ts'}`,
+)
 console.log(`  web3forms: ${WEB3FORMS_KEY ? 'configured' : 'NOT CONFIGURED — form will not submit'}`)
 console.log(`  hcaptcha: ${HCAPTCHA_SITE_KEY ? 'configured' : 'off — honeypot only'}`)
 
