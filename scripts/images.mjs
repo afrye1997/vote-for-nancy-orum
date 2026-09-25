@@ -126,7 +126,28 @@ const TARGETS = {
   'community-event.jpeg': { px: 1800 },
   'campaign-booth.jpeg': { px: 1040 },
   'family-square.jpeg': { px: 1800 },
-  'nancy-orum-headshot.jpeg': { px: 1040 },
+  /*
+   * 1036, not 1040, for the same reason as the badge: at 1040 sips writes an
+   * AVIF that does not decode. Found 2026-09-24 by the decode check at the foot
+   * of this script — it had shipped broken since 2026-08-10, unnoticed because
+   * nothing renders the headshot. Fixed anyway, so the day something does it
+   * is not a blank hole.
+   */
+  'nancy-orum-headshot.jpeg': { px: 1036 },
+  /*
+   * Supplied by the campaign 2026-09-24, from a set of six (see README).
+   * Both portrait. The easel photograph sits beside the biography at about
+   * 260 CSS pixels wide, so 1200 on the long edge is already generous; the
+   * log photograph is the full-bleed "rooted here" band and would take the
+   * 1800 cap, but its source IS 1800 on the long edge and the target must sit
+   * below the source or the AVIF will not decode — see the guard below.
+   */
+  'nancy-painting-at-easel.jpeg': { px: 1200 },
+  /*
+   * 1500, not 1600: 1600, 1596, 1580, 1560, 1540 and 1400 all produce an AVIF
+   * that does not decode (the second failure mode below); 1500 and 1440 do.
+   */
+  'sitting-on-log-with-dog.jpeg': { px: 1500 },
 }
 
 const JPEG_QUALITY = '72'
@@ -248,10 +269,12 @@ for (const [file, target] of Object.entries(TARGETS)) {
    * 900 and 1200 it is fine, and other images at 1040 are fine. Neighbouring
    * sizes work, so it is not the odd height.
    *
-   * There is no build-time test for it. `sips` DECODES ITS OWN BAD OUTPUT
-   * HAPPILY — it round-trips the broken file back to a valid PNG — so the only
-   * oracle is a browser, and making this script depend on Chrome is worse than
-   * the bug.
+   * `sips` DECODES ITS OWN BAD OUTPUT HAPPILY — it round-trips the broken file
+   * back to a valid PNG — so sips cannot be the oracle. Since 2026-09-24 the
+   * foot of this script tries Pillow's libavif decoder on every AVIF written,
+   * when python3 with Pillow is on the machine, and fails on the same error a
+   * browser would show ("Invalid image grid"). It is best-effort: with no
+   * Pillow it says so and the browser is again the only test.
    *
    * THE SYMPTOM, so the next person recognises it in one look: a card renders
    * with a blank hole where the photograph goes. Both files exist, both are
@@ -326,3 +349,46 @@ if (notResampled.length) {
 console.log('  dimensions for src/content/images.ts:')
 for (const d of declared) console.log(`    ${d.file.padEnd(28)} ${d.width} × ${d.height}`)
 console.log('')
+
+/**
+ * The decode check. Pillow ships libavif, the same decoder family the browsers
+ * use, so an AVIF it rejects is one they reject. See the note above the
+ * resample guard for why this cannot be done with sips.
+ */
+const avifs = declared.map((d) => join(OUT, d.file.replace(/\.(png|jpeg)$/, '.avif')))
+const probe = `
+import sys
+try:
+    from PIL import Image
+except ImportError:
+    print("NO_PILLOW"); sys.exit(0)
+bad = []
+for f in sys.argv[1:]:
+    try:
+        im = Image.open(f); im.load()
+    except Exception as e:
+        bad.append(f + ": " + str(e).splitlines()[0])
+print("\\n".join(bad) if bad else "ALL_OK")
+`
+let verdict
+try {
+  verdict = execFileSync('python3', ['-c', probe, ...avifs], { encoding: 'utf8' }).trim()
+} catch {
+  verdict = 'NO_PYTHON'
+}
+if (verdict === 'ALL_OK') {
+  console.log(`  avif decode: all ${avifs.length} decode (Pillow/libavif)\n`)
+} else if (verdict === 'NO_PILLOW' || verdict === 'NO_PYTHON') {
+  console.warn(
+    '  ⚠ avif decode: not checked — python3 with Pillow is not available here.\n' +
+      '    Open each new .avif in a browser before committing; see the note above\n' +
+      '    the resample guard.\n',
+  )
+} else {
+  console.error(
+    `\n  ✗ AVIF FILES THAT DO NOT DECODE — the browser will paint a blank hole:\n\n` +
+      verdict.split('\n').map((l) => '    ' + l).join('\n') +
+      '\n\n  Nudge that target by a few pixels and run again.\n',
+  )
+  process.exit(1)
+}

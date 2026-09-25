@@ -615,6 +615,37 @@
 }
 
 /*
+ * The easel photograph, run into the opening paragraphs.
+ *
+ * A float, which is the one layout tool that lets prose wrap a picture, and
+ * the reason the site has none anywhere else: nothing else on it is prose. The
+ * width is a fraction of the 68ch column so the measure beside it stays
+ * readable — about 40 characters at 17px — and the picture is portrait, so it
+ * runs three or four paragraphs deep rather than stranding one line under it.
+ *
+ * Below 620px the column is too narrow to share, so it becomes a full-width
+ * block above the text instead.
+ */
+.bio__photo {
+  float: right;
+  width: 42%;
+  max-width: 280px;
+  height: auto;
+  margin: 6px 0 14px var(--space-6);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 620px) {
+  .bio__photo {
+    float: none;
+    width: 100%;
+    max-width: none;
+    margin: 0 0 var(--space-5);
+  }
+}
+
+/*
  * The words picked out of her biography — family, growth, Bella Vista.
  *
  * 600 rather than the browser's 700, and navy rather than the body's slate.

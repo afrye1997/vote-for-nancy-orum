@@ -1,6 +1,8 @@
 import { Fragment } from 'react'
+import { Photo } from '../ui/Photo'
 import { BIO_SECTION } from '../../content/about'
 import { BIO_CREDO, BIO_SIGNOFF, FULL_BIO, PULLQUOTE_PROPOSAL } from '../../content/bio'
+import { IMAGES, imgSources } from '../../content/images'
 
 /**
  * The three words the campaign asked to have picked out of the biography:
@@ -55,7 +57,7 @@ function emphasise(text: string) {
  * for a "Why I am running" section that she had in fact already written, and she
  * eventually replied that she thought the site had one. She was right.
  */
-export function Biography() {
+export function Biography({ base }: { readonly base: string }) {
   return (
     <section className="section container">
       <div className="bio reveal">
@@ -67,6 +69,19 @@ export function Biography() {
           </blockquote>
         ) : null}
         <div className="bio__text">
+          {/*
+            Her at the easel, added 2026-09-24. Floated into the opening
+            paragraphs so the text wraps it, the way a magazine profile sets a
+            portrait; on a phone it drops to full width above them. The
+            painting is hers, which is why this photograph and not one of the
+            others from the same set — the long version is the section in her
+            own words, and this is the one picture that is also her own work.
+          */}
+          <Photo
+            className="bio__photo"
+            {...imgSources(base, IMAGES.paintingAtEasel)}
+            image={IMAGES.paintingAtEasel}
+          />
           {FULL_BIO.map((paragraph) => (
             <p key={paragraph.id}>{emphasise(paragraph.text)}</p>
           ))}

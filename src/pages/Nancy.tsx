@@ -38,7 +38,7 @@ export function Nancy({ base }: { readonly base: string }) {
     <Page base={base} current="nancy" tone="light">
       <AboutIntro base={base} />
       <Strengths />
-      <Biography />
+      <Biography base={base} />
       <RootedBand base={base} />
     </Page>
   )

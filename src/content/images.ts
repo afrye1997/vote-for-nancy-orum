@@ -82,8 +82,8 @@ export const IMAGES = {
   headshot: {
     file: 'nancy-orum-headshot.jpeg',
     alt: 'Nancy Orum at the arboretum',
-    width: 1040,
-    height: 693,
+    width: 1036,
+    height: 690,
     focus: '30% 20%',
   },
   communityEvent: {
@@ -105,12 +105,39 @@ export const IMAGES = {
      */
     focus: '50% 38%',
   },
+  /**
+   * ⚠ UNUSED on the About page since 2026-09-24 — the "rooted here" band took
+   * the log photograph below instead. Still on platform commitment 2.
+   */
   familySquare: {
     file: 'family-square.jpeg',
     alt: 'Nancy Orum with her family on the downtown square',
     width: 1800,
     height: 1350,
     focus: '50% 38%',
+  },
+  /**
+   * Two of the six photographs the campaign sent on 2026-09-24. Both portrait.
+   */
+  paintingAtEasel: {
+    file: 'nancy-painting-at-easel.jpeg',
+    alt: 'Nancy Orum at an easel, painting a sunset over a stand of pines',
+    width: 800,
+    height: 1200,
+  },
+  logWithDog: {
+    file: 'sitting-on-log-with-dog.jpeg',
+    alt: 'Nancy Orum sitting on a fallen log in autumn woods with her family and their dog',
+    width: 1066,
+    height: 1500,
+    /**
+     * A portrait frame under a landscape band: at desktop width the crop shows
+     * about a fifth of the height. The faces sit around 35% down the frame and
+     * the dog just beside them; 37% puts all three inside the strip with a
+     * little air above the heads. Checked by simulating the crop at 1400×440
+     * and 390×440 — 42% clipped the tops of the heads on a wide screen.
+     */
+    focus: '50% 37%',
   },
   /**
    * Commitment 03, "Address traffic before development". Supplied 2026-09-02.
