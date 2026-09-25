@@ -148,6 +148,9 @@ const TARGETS = {
    * that does not decode (the second failure mode below); 1500 and 1440 do.
    */
   'sitting-on-log-with-dog.jpeg': { px: 1500 },
+  /* The "rooted here" band since 2026-09-24, replacing the log photograph
+     above the same day — the candidate wanted the whole family in it. */
+  'family-on-trail-bridge.jpeg': { px: 1800 },
 }
 
 const JPEG_QUALITY = '72'

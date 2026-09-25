@@ -125,6 +125,7 @@ export const IMAGES = {
     width: 800,
     height: 1200,
   },
+  /** ⚠ UNUSED since later on 2026-09-24 — the band took the bridge photograph. */
   logWithDog: {
     file: 'sitting-on-log-with-dog.jpeg',
     alt: 'Nancy Orum sitting on a fallen log in autumn woods with her family and their dog',
@@ -138,6 +139,20 @@ export const IMAGES = {
      * and 390×440 — 42% clipped the tops of the heads on a wide screen.
      */
     focus: '50% 37%',
+  },
+  familyOnBridge: {
+    file: 'family-on-trail-bridge.jpeg',
+    alt: 'Nancy Orum with her family and their dog on a wooden footbridge in the woods',
+    width: 1800,
+    height: 1472,
+    /**
+     * Landscape, so the band's crop keeps about a third of the height at
+     * desktop width. The faces are around 45% down and the dog near 75%, so
+     * a wide screen cannot hold both; the faces win, with air above the
+     * heads. A phone shows the whole group. Checked by simulating the crop
+     * at 1400×440 and 390×440.
+     */
+    focus: '50% 50%',
   },
   /**
    * Commitment 03, "Address traffic before development". Supplied 2026-09-02.

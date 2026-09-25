@@ -8,8 +8,8 @@ export function RootedBand({ base }: { readonly base: string }) {
     <section className="band on-dark">
       <Photo
         className="band__media"
-        {...imgSources(base, IMAGES.logWithDog)}
-        image={IMAGES.logWithDog}
+        {...imgSources(base, IMAGES.familyOnBridge)}
+        image={IMAGES.familyOnBridge}
       />
       <div className="band__scrim" />
       <div className="band__inner container">
