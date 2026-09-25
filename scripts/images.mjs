@@ -151,6 +151,8 @@ const TARGETS = {
   /* The "rooted here" band since 2026-09-24, replacing the log photograph
      above the same day — the candidate wanted the whole family in it. */
   'family-on-trail-bridge.jpeg': { px: 1800 },
+  /* Beside the growth heading on the home page, at up to ~560 CSS px wide. */
+  'nancy-with-her-painting.jpeg': { px: 1200 },
 }
 
 const JPEG_QUALITY = '72'

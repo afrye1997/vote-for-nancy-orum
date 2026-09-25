@@ -59,8 +59,8 @@ Ask her designer for the original camera file — it certainly exists, because t
 card was made from it — and then this extract can be deleted.
 
 Six more photographs arrived from the campaign on 2026-09-24 as camera files
-named `IMG_1560`–`IMG_1565`, renamed here to what they show. Three have targets
-(the easel, the log and the bridge); the other three — `nancy-with-her-painting.jpeg`,
+named `IMG_1560`–`IMG_1565`, renamed here to what they show. Four have targets
+(the easel, the log, the bridge and her with the painting); the other two —
 `painting-sunset-pines.jpeg`, `nancy-signing-painting.jpeg` — are kept in
 `assets/` unused. Like the
 2026 artwork, none of these is in the design project.
@@ -79,6 +79,7 @@ files and none of these.
 | `nancy-painting-at-easel.jpeg` | About page, beside the biography |
 | `sitting-on-log-with-dog.jpeg` | Nothing yet (derivatives kept) |
 | `family-on-trail-bridge.jpeg` | About "rooted here" band |
+| `nancy-with-her-painting.jpeg` | Home, beside the growth heading |
 | `tanyard-creek-falls.png` | Platform commitment 3 |
 | `about-arkansas.png` | About page portrait |
 | `nav-logo-white-2026.png` | Header on the dark pages (home, get involved) |

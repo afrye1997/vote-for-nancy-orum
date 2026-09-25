@@ -8,7 +8,7 @@ export function Home({ base }: { readonly base: string }) {
     <Page base={base} current="home" tone="dark">
       <Hero base={base} />
       <Statement base={base} />
-      <GrowthStats />
+      <GrowthStats base={base} />
     </Page>
   )
 }

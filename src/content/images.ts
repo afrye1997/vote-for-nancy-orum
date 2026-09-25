@@ -140,6 +140,13 @@ export const IMAGES = {
      */
     focus: '50% 37%',
   },
+  /** Home page, beside "Bella Vista is not the town it was ten years ago." */
+  nancyWithPainting: {
+    file: 'nancy-with-her-painting.jpeg',
+    alt: 'Nancy Orum standing in front of a large landscape painting of hers, a sunset over pines',
+    width: 1200,
+    height: 800,
+  },
   familyOnBridge: {
     file: 'family-on-trail-bridge.jpeg',
     alt: 'Nancy Orum with her family and their dog on a wooden footbridge in the woods',

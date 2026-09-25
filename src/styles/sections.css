@@ -14,25 +14,45 @@
 }
 
 /*
- * The mockup sets `white-space: nowrap` on the growth heading so it holds one
- * line, and caps the paragraph under it at 58ch rather than 62. Left to wrap it
- * breaks after "ten years", which reads as a different sentence.
+ * The growth heading and, since 2026-09-24, the photograph beside it.
  *
- * The nowrap is lifted below the width where it would overflow — on a phone it
- * would push the whole page sideways.
+ * The mockup held the heading to one line with `white-space: nowrap`, so it
+ * would not break after "ten years". That rule is gone: the heading now shares
+ * its row with a picture and has roughly half the width, where a forced single
+ * line would overflow the column. `text-wrap: balance` asks the browser for
+ * two even lines instead, which keeps "ten years ago" together in practice.
  */
+.growth-head {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 56px;
+  align-items: center;
+}
+
 .section__head--growth {
   max-width: none;
 }
 
-@media (min-width: 901px) {
-  .section__head--growth .section__title {
-    white-space: nowrap;
-  }
+.section__head--growth .section__title {
+  text-wrap: balance;
 }
 
 .section__head--growth .section__lede {
   max-width: 58ch;
+}
+
+.growth-head__photo {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 900px) {
+  .growth-head {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
 }
 
 .section__title {

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { CountUp } from '../ui/CountUp'
+import { Photo } from '../ui/Photo'
 import { GROWTH_INTRO, STATS } from '../../content/growth'
+import { IMAGES, imgSources } from '../../content/images'
 
 /**
  * The three growth figures.
@@ -18,7 +20,7 @@ import { GROWTH_INTRO, STATS } from '../../content/growth'
  * `STAT_SOURCE_LINKS_REQUIRED`: underlined, not colour alone, and pointing at a
  * page a non-technical visitor can actually read.
  */
-export function GrowthStats() {
+export function GrowthStats({ base }: { readonly base: string }) {
   const statsRef = useRef<HTMLDivElement>(null)
   const [counting, setCounting] = useState(false)
 
@@ -47,10 +49,25 @@ export function GrowthStats() {
 
   return (
     <section className="section container" style={{ paddingTop: 0 }}>
-      <div className="section__head section__head--growth reveal">
-        <p className="eyebrow">{GROWTH_INTRO.eyebrow}</p>
-        <h2 className="section__title">{GROWTH_INTRO.heading}</h2>
-        <p className="section__lede">{GROWTH_INTRO.lede}</p>
+      {/*
+        The heading and its photograph share a row, added 2026-09-24 at the
+        candidate's request: her in front of one of her own paintings, beside
+        the paragraph about how much the town has changed. On a phone the
+        photograph follows the text.
+      */}
+      <div className="growth-head">
+        <div className="section__head section__head--growth reveal">
+          <p className="eyebrow">{GROWTH_INTRO.eyebrow}</p>
+          <h2 className="section__title">{GROWTH_INTRO.heading}</h2>
+          <p className="section__lede">{GROWTH_INTRO.lede}</p>
+        </div>
+        <div className="reveal">
+          <Photo
+            className="growth-head__photo"
+            {...imgSources(base, IMAGES.nancyWithPainting)}
+            image={IMAGES.nancyWithPainting}
+          />
+        </div>
       </div>
       {/*
         Revealed as one block, not three. The counters are deliberately kept in
